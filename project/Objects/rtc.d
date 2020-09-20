@@ -1,0 +1,13 @@
+.\objects\rtc.o: ..\driver\rtc.c
+.\objects\rtc.o: ..\common\common.h
+.\objects\rtc.o: ..\common\arm_cm0.h
+.\objects\rtc.o: ..\common\kea128_config.h
+.\objects\rtc.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\rtc.o: ..\mcu\inc\SKEAZ1284.h
+.\objects\rtc.o: ..\mcu\inc\core_cm0plus.h
+.\objects\rtc.o: ..\mcu\inc\core_cmInstr.h
+.\objects\rtc.o: ..\mcu\inc\core_cmFunc.h
+.\objects\rtc.o: ..\mcu\inc\system_SKEAZ1284.h
+.\objects\rtc.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\rtc.o: ..\common\assert.h
+.\objects\rtc.o: ..\driver\rtc.h

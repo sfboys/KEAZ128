@@ -1,0 +1,17 @@
+.\objects\main.o: ..\usr\source\main.c
+.\objects\main.o: ..\usr\inc\led.h
+.\objects\main.o: ..\mcu\inc\derivative.h
+.\objects\main.o: ..\mcu\inc\SKEAZ1284.h
+.\objects\main.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\main.o: ..\mcu\inc\core_cm0plus.h
+.\objects\main.o: ..\mcu\inc\core_cmInstr.h
+.\objects\main.o: ..\mcu\inc\core_cmFunc.h
+.\objects\main.o: ..\mcu\inc\system_SKEAZ1284.h
+.\objects\main.o: ..\uCOS-II\Source\includes.h
+.\objects\main.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdarg.h
+.\objects\main.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\main.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\main.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\math.h
+.\objects\main.o: ..\uCOS-II\Source\ucos_ii.h
+.\objects\main.o: ..\uCOS-II\Source\os_cfg.h
+.\objects\main.o: ..\uCOS-II\Ports\os_cpu.h

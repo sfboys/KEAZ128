@@ -1,0 +1,13 @@
+.\objects\kbi.o: ..\driver\kbi.c
+.\objects\kbi.o: ..\common\common.h
+.\objects\kbi.o: ..\common\arm_cm0.h
+.\objects\kbi.o: ..\common\kea128_config.h
+.\objects\kbi.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\kbi.o: ..\mcu\inc\SKEAZ1284.h
+.\objects\kbi.o: ..\mcu\inc\core_cm0plus.h
+.\objects\kbi.o: ..\mcu\inc\core_cmInstr.h
+.\objects\kbi.o: ..\mcu\inc\core_cmFunc.h
+.\objects\kbi.o: ..\mcu\inc\system_SKEAZ1284.h
+.\objects\kbi.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\kbi.o: ..\common\assert.h
+.\objects\kbi.o: ..\driver\kbi.h

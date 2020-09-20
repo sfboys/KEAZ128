@@ -1,0 +1,13 @@
+.\objects\pit.o: ..\driver\pit.c
+.\objects\pit.o: ..\common\common.h
+.\objects\pit.o: ..\common\arm_cm0.h
+.\objects\pit.o: ..\common\kea128_config.h
+.\objects\pit.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\pit.o: ..\mcu\inc\SKEAZ1284.h
+.\objects\pit.o: ..\mcu\inc\core_cm0plus.h
+.\objects\pit.o: ..\mcu\inc\core_cmInstr.h
+.\objects\pit.o: ..\mcu\inc\core_cmFunc.h
+.\objects\pit.o: ..\mcu\inc\system_SKEAZ1284.h
+.\objects\pit.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\pit.o: ..\common\assert.h
+.\objects\pit.o: ..\driver\pit.h

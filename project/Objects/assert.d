@@ -1,0 +1,12 @@
+.\objects\assert.o: ..\common\assert.c
+.\objects\assert.o: ..\common\common.h
+.\objects\assert.o: ..\common\arm_cm0.h
+.\objects\assert.o: ..\common\kea128_config.h
+.\objects\assert.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\assert.o: ..\mcu\inc\SKEAZ1284.h
+.\objects\assert.o: ..\mcu\inc\core_cm0plus.h
+.\objects\assert.o: ..\mcu\inc\core_cmInstr.h
+.\objects\assert.o: ..\mcu\inc\core_cmFunc.h
+.\objects\assert.o: ..\mcu\inc\system_SKEAZ1284.h
+.\objects\assert.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\assert.o: ..\common\assert.h

@@ -1,0 +1,16 @@
+.\objects\uart.o: ..\driver\uart.c
+.\objects\uart.o: ..\common\common.h
+.\objects\uart.o: ..\common\arm_cm0.h
+.\objects\uart.o: ..\common\kea128_config.h
+.\objects\uart.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\uart.o: ..\mcu\inc\SKEAZ1284.h
+.\objects\uart.o: ..\mcu\inc\core_cm0plus.h
+.\objects\uart.o: ..\mcu\inc\core_cmInstr.h
+.\objects\uart.o: ..\mcu\inc\core_cmFunc.h
+.\objects\uart.o: ..\mcu\inc\system_SKEAZ1284.h
+.\objects\uart.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\uart.o: ..\common\assert.h
+.\objects\uart.o: ..\driver\uart.h
+.\objects\uart.o: ..\mcu\inc\SKEAZ1284.h
+.\objects\uart.o: ..\driver\wdog.h
+.\objects\uart.o: ..\driver\sim.h

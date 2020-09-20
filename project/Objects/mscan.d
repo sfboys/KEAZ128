@@ -1,0 +1,13 @@
+.\objects\mscan.o: ..\driver\mscan.c
+.\objects\mscan.o: ..\common\common.h
+.\objects\mscan.o: ..\common\arm_cm0.h
+.\objects\mscan.o: ..\common\kea128_config.h
+.\objects\mscan.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\mscan.o: ..\mcu\inc\SKEAZ1284.h
+.\objects\mscan.o: ..\mcu\inc\core_cm0plus.h
+.\objects\mscan.o: ..\mcu\inc\core_cmInstr.h
+.\objects\mscan.o: ..\mcu\inc\core_cmFunc.h
+.\objects\mscan.o: ..\mcu\inc\system_SKEAZ1284.h
+.\objects\mscan.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\mscan.o: ..\common\assert.h
+.\objects\mscan.o: ..\driver\mscan.h

@@ -1,0 +1,9 @@
+.\objects\led.o: ..\usr\source\led.c
+.\objects\led.o: ..\usr\inc\led.h
+.\objects\led.o: ..\mcu\inc\derivative.h
+.\objects\led.o: ..\mcu\inc\SKEAZ1284.h
+.\objects\led.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\led.o: ..\mcu\inc\core_cm0plus.h
+.\objects\led.o: ..\mcu\inc\core_cmInstr.h
+.\objects\led.o: ..\mcu\inc\core_cmFunc.h
+.\objects\led.o: ..\mcu\inc\system_SKEAZ1284.h
