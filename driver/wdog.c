@@ -25,18 +25,13 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
 *
 * @brief Provide common watchdog module routines. 
 *
-* @history:
-* 	Jun. 25, 2013	modified the watch dog unlock sequence and disable sequence
+
 ******************************************************************************/
-#include "common.h"
 #include "wdog.h"
- 
+#include "derivative.h" 
 /******************************************************************************
 * Global variables
 ******************************************************************************/
@@ -44,7 +39,8 @@
 /******************************************************************************
 * Constants and macros
 ******************************************************************************/
-
+#define DisableInterrupts asm(" CPSID i");
+#define EnableInterrupts asm(" CPSIE i");
 /******************************************************************************
 * Local types
 ******************************************************************************/
@@ -56,10 +52,15 @@
 /******************************************************************************
 * Local variables
 ******************************************************************************/
-
+/*!
+ * @brief global variable to store RTC callbacks.
+ *
+ */
+WDOG_CallbackType WDOG_Callback[1] = {(WDOG_CallbackType)(0)};    /*!< WDOG initial callback */
 /******************************************************************************
 * Local functions
 ******************************************************************************/
+void WDOG_IRQHandler(void);
 
 /******************************************************************************
 * Global functions
@@ -191,30 +192,66 @@ void WDOG_Init(WDOG_ConfigPtr pConfig)
     {
         u8Cs1 &= ~WDOG_CS1_EN_MASK;
     }
+    else
+    {
+        u8Cs1 |= WDOG_CS1_EN_MASK;
+
+    }
     if(pConfig->sBits.bIntEnable)
     {
         u8Cs1 |= WDOG_CS1_INT_MASK;
+        Enable_Interrupt(WDOG_IRQn);
+
+    }
+    else
+    {
+    	 u8Cs1 &= ~WDOG_CS1_INT_MASK;
+         Disable_Interrupt(WDOG_IRQn);
+
     }
     if(pConfig->sBits.bStopEnable)
     {
         u8Cs1 |= WDOG_CS1_STOP_MASK;
     }
+    else
+    {
+        u8Cs1 &= ~WDOG_CS1_STOP_MASK;
+
+    }
     if(pConfig->sBits.bDbgEnable)
     {
         u8Cs1 |= WDOG_CS1_DBG_MASK;
+    }
+    else
+    {
+    	 u8Cs1 &= ~WDOG_CS1_DBG_MASK;
     }
     if(pConfig->sBits.bWaitEnable)
     {
         u8Cs1 |= WDOG_CS1_WAIT_MASK;
     }
+    else
+    {
+    	 u8Cs1 &= ~WDOG_CS1_WAIT_MASK;
+    }
     if(pConfig->sBits.bUpdateEnable)
     {
         u8Cs1 |= WDOG_CS1_UPDATE_MASK;
+    }
+    else
+    {
+    	 u8Cs1 &= ~WDOG_CS1_UPDATE_MASK;
     }
     if(pConfig->sBits.bWinEnable)
     {
         u8Cs2 |= WDOG_CS2_WIN_MASK;
     }
+    else
+    {
+        u8Cs2 &= ~WDOG_CS2_WIN_MASK;
+
+    }
+    
     if(pConfig->sBits.bPrescaler)
     {
         u8Cs2 |= WDOG_CS2_PRES_MASK;
@@ -340,6 +377,42 @@ void WDOG_DisableUpdate(void)
     WDOG->WIN    =  u16WIN;
     WDOG->CS1    =  u8Cs1;  
     
+}
+
+/*****************************************************************************//*!
+*
+* @brief set call back function for wdog module 
+*        
+* @param[in] pfnCallback point to call back function
+*
+* @return none 
+*
+* @ Pass/ Fail criteria: none
+*****************************************************************************/
+void WDOG_SetCallback(WDOG_CallbackType pfnCallback)
+{
+  WDOG_Callback[0] = pfnCallback;
+}
+
+/*****************************************************************************//*!
+*
+* @brief WDOG module interrupt service routine
+*        
+* @param none  
+*
+* @return none 
+*
+* @ Pass/ Fail criteria: none
+*****************************************************************************/
+void WDOG_IRQHandler(void) 
+{
+	/* Clear WDOG flag*/
+	WDOG_CS2|=WDOG_CS2_FLG_MASK;
+    	       
+    if (WDOG_Callback[0])
+    {    
+        WDOG_Callback[0]();     
+    }
 }
 
 

@@ -24,9 +24,6 @@
 *
 * @author   Freescale
 *
-* @version  0.0.1
-*
-* @date     Jun 25, 2013
 *
 * @brief    Periodic Interrupt Timer (PIT) driver head file. 
 *
@@ -36,14 +33,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+//#define PIT PIT_BASE_PTR
 /******************************************************************************
 * Includes
 ******************************************************************************/
-
+#include "derivative.h"
 /******************************************************************************
 * Constants
 ******************************************************************************/
-
+#define FALSE 0
+#define TRUE 1
 /******************************************************************************
 * PIT channel number list
 *
@@ -128,7 +128,7 @@ typedef struct
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PIT_Enable(void)
+static inline void PIT_Enable(void)
 {
 
     PIT->MCR &= ~PIT_MCR_MDIS_MASK; 
@@ -146,7 +146,7 @@ __STATIC_INLINE void PIT_Enable(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PIT_Disable(void)
+static inline void PIT_Disable(void)
 {
 
     PIT->MCR |= PIT_MCR_MDIS_MASK; 
@@ -163,7 +163,7 @@ __STATIC_INLINE void PIT_Disable(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PIT_SetDebugFreeze(void)
+static inline void PIT_SetDebugFreeze(void)
 {
 
     PIT->MCR |= PIT_MCR_FRZ_MASK;
@@ -180,7 +180,7 @@ __STATIC_INLINE void PIT_SetDebugFreeze(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PIT_SetDebugOn(void)
+static inline void PIT_SetDebugOn(void)
 {
 
     PIT->MCR &= ~PIT_MCR_FRZ_MASK;
@@ -197,7 +197,7 @@ __STATIC_INLINE void PIT_SetDebugOn(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PIT_ChannelEnable(uint8_t u8Channel)
+static inline void PIT_ChannelEnable(uint8_t u8Channel)
 
 {
 
@@ -215,7 +215,7 @@ __STATIC_INLINE void PIT_ChannelEnable(uint8_t u8Channel)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PIT_ChannelDisable(uint8_t u8Channel)
+static inline void PIT_ChannelDisable(uint8_t u8Channel)
 {
 
     PIT->CHANNEL[u8Channel].TCTRL &= ~PIT_TCTRL_TEN_MASK; 
@@ -232,7 +232,7 @@ __STATIC_INLINE void PIT_ChannelDisable(uint8_t u8Channel)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PIT_ChannelEnableInt(uint8_t u8Channel)
+static inline void PIT_ChannelEnableInt(uint8_t u8Channel)
 
 {
 
@@ -250,7 +250,7 @@ __STATIC_INLINE void PIT_ChannelEnableInt(uint8_t u8Channel)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PIT_ChannelDisableInt(uint8_t u8Channel)
+static inline void PIT_ChannelDisableInt(uint8_t u8Channel)
 
 {
 
@@ -268,7 +268,7 @@ __STATIC_INLINE void PIT_ChannelDisableInt(uint8_t u8Channel)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PIT_ChannelEnableChain(uint8_t u8Channel)
+static inline void PIT_ChannelEnableChain(uint8_t u8Channel)
 {
     PIT->CHANNEL[u8Channel].TCTRL |= PIT_TCTRL_CHN_MASK;
 }
@@ -284,7 +284,7 @@ __STATIC_INLINE void PIT_ChannelEnableChain(uint8_t u8Channel)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PIT_ChannelDisableChain(uint8_t u8Channel)
+static inline void PIT_ChannelDisableChain(uint8_t u8Channel)
 
 {
     PIT->CHANNEL[u8Channel].TCTRL &= ~PIT_TCTRL_CHN_MASK;
@@ -302,7 +302,7 @@ __STATIC_INLINE void PIT_ChannelDisableChain(uint8_t u8Channel)
 * @ Pass/ Fail criteria: none
 
 *****************************************************************************/
-__STATIC_INLINE uint8_t PIT_ChannelGetFlags(uint8_t u8Channel)
+static inline uint8_t PIT_ChannelGetFlags(uint8_t u8Channel)
 
 {
     uint8_t bflag;  
@@ -324,9 +324,10 @@ __STATIC_INLINE uint8_t PIT_ChannelGetFlags(uint8_t u8Channel)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PIT_ChannelClrFlags(uint8_t u8Channel)
+static inline void PIT_ChannelClrFlags(uint8_t u8Channel)
 {
-    PIT->CHANNEL[u8Channel].TFLG |= PIT_TFLG_TIF_MASK;       
+   PIT->CHANNEL[u8Channel].TFLG |= PIT_TFLG_TIF_MASK;      
+
 }
 
 

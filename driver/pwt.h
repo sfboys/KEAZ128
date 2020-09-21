@@ -24,9 +24,6 @@
 *
 * @author   Freescale
 *
-* @version  0.0.1
-*
-* @date     Jun 25, 2013
 *
 * @brief    Periodic Interrupt Timer (PWT) driver head file. 
 *
@@ -39,7 +36,7 @@ extern "C" {
 /******************************************************************************
 * Includes
 ******************************************************************************/
-
+#include "derivative.h"
 /******************************************************************************
 * Constants
 ******************************************************************************/
@@ -58,7 +55,7 @@ extern "C" {
 #define PWT_PCLKS_BUS               0 	/*!< select bus clock as PWT clock source  */
 #define PWT_PCLKS_ALTCLK            1	/*!< select alternative clock as PWT clock source  */
 
-#define PWT_PINSEL_PTC4             0	/*!< PWTIN[0]  */
+#define PWT_PINSEL_PTD5             0	/*!< PWTIN[0]  */
 #define PWT_PINSEL_PTB0             1	/*!< PWTIN[1]  */
 #define PWT_PINSEL_ACMP0_OUTPUT     2	/*!< PWTIN[2]  */
 #define PWT_PINSEL_ACMP1_OUTPUT     3	/*!< PWTIN[3]  */
@@ -75,7 +72,7 @@ extern "C" {
 #define PWT_CLK_PRESCALER_16        4	/*!< presalcer is 16 */
 #define PWT_CLK_PRESCALER_32        5	/*!< presalcer is 32 */
 #define PWT_CLK_PRESCALER_64        6	/*!< presalcer is 64 */
-#define PWT_CLK_PRESCALER_128       7	/*!< presalcer is 64 */
+#define PWT_CLK_PRESCALER_128       7	/*!< presalcer is 128 */
 
 /*! @} End of pwt_controlbit                                                  */
         
@@ -153,7 +150,7 @@ typedef struct
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_Enable(void)
+static inline void PWT_Enable(void)
 {
 
     PWT->R1 |= PWT_R1_PWTEN_MASK; 
@@ -171,7 +168,7 @@ __STATIC_INLINE void PWT_Enable(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_Disable(void)
+static inline void PWT_Disable(void)
 {
 
     PWT->R1 &= ~PWT_R1_PWTEN_MASK;
@@ -186,7 +183,7 @@ __STATIC_INLINE void PWT_Disable(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_EnableInt(void)
+static inline void PWT_EnableInt(void)
 
 {
     PWT->R1 |= PWT_R1_PWTIE_MASK; 
@@ -202,7 +199,7 @@ __STATIC_INLINE void PWT_EnableInt(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_DisableInt(void)
+static inline void PWT_DisableInt(void)
 
 {
     PWT->R1 &= ~PWT_R1_PWTIE_MASK;
@@ -218,7 +215,7 @@ __STATIC_INLINE void PWT_DisableInt(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_EnableOverFlowInt(void)
+static inline void PWT_EnableOverFlowInt(void)
 
 {
     PWT->R1 |= PWT_R1_POVIE_MASK; 
@@ -234,7 +231,7 @@ __STATIC_INLINE void PWT_EnableOverFlowInt(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_DisableOverFlowInt(void)
+static inline void PWT_DisableOverFlowInt(void)
 
 {
     PWT->R1 &= ~PWT_R1_POVIE_MASK; 
@@ -249,7 +246,7 @@ __STATIC_INLINE void PWT_DisableOverFlowInt(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_EnableReadyInt(void)
+static inline void PWT_EnableReadyInt(void)
 
 {
     PWT->R1 |= PWT_R1_PRDYIE_MASK; 
@@ -265,7 +262,7 @@ __STATIC_INLINE void PWT_EnableReadyInt(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_DisableReadyInt(void)
+static inline void PWT_DisableReadyInt(void)
 
 {
     PWT->R1 &= ~PWT_R1_PRDYIE_MASK; 
@@ -280,7 +277,7 @@ __STATIC_INLINE void PWT_DisableReadyInt(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_SetSoftReset(void)
+static inline void PWT_SetSoftReset(void)
 {
     PWT->R1 |= PWT_R1_PWTSR_MASK; 
 }
@@ -294,7 +291,7 @@ __STATIC_INLINE void PWT_SetSoftReset(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_SetPinSelect(uint8_t u8PinSelect)
+static inline void PWT_SetPinSelect(uint8_t u8PinSelect)
 {
     PWT->R1 &= ~PWT_R1_PINSEL_MASK; 
     PWT->R1 |= PWT_R1_PINSEL(u8PinSelect);     
@@ -309,7 +306,7 @@ __STATIC_INLINE void PWT_SetPinSelect(uint8_t u8PinSelect)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_SetEdgeSensitivity(uint8_t u8EdgeSensitivity)
+static inline void PWT_SetEdgeSensitivity(uint8_t u8EdgeSensitivity)
 {
     PWT->R1 &= ~PWT_R1_EDGE_MASK; 
     PWT->R1 |= PWT_R1_EDGE(u8EdgeSensitivity);   
@@ -324,7 +321,7 @@ __STATIC_INLINE void PWT_SetEdgeSensitivity(uint8_t u8EdgeSensitivity)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void PWT_SetClockPresacler(uint8_t u8ClockPresacler)
+static inline void PWT_SetClockPresacler(uint8_t u8ClockPresacler)
 {
     PWT->R1 &= ~PWT_R1_PRE_MASK; 
     PWT->R1 |= PWT_R1_PRE(u8ClockPresacler);     
@@ -340,7 +337,7 @@ __STATIC_INLINE void PWT_SetClockPresacler(uint8_t u8ClockPresacler)
 * @ Pass/ Fail criteria: none
 
 *****************************************************************************/
-__STATIC_INLINE uint8_t PWT_GetOverflowFlag(void)
+static inline uint8_t PWT_GetOverflowFlag(void)
 
 {
     uint8_t bOverflowflag;  
@@ -361,7 +358,7 @@ __STATIC_INLINE uint8_t PWT_GetOverflowFlag(void)
 * @ Pass/ Fail criteria: none
 
 *****************************************************************************/
-__STATIC_INLINE void PWT_ClrOverflowFlag(void)
+static inline void PWT_ClrOverflowFlag(void)
 
 {
     PWT->R1 &= ~PWT_R1_PWTOV_MASK; 
@@ -378,7 +375,7 @@ __STATIC_INLINE void PWT_ClrOverflowFlag(void)
 * @ Pass/ Fail criteria: none
 
 *****************************************************************************/
-__STATIC_INLINE uint8_t PWT_GetReadyFlag(void)
+static inline uint8_t PWT_GetReadyFlag(void)
 
 {
     uint8_t bReadyflag;  
@@ -398,7 +395,7 @@ __STATIC_INLINE uint8_t PWT_GetReadyFlag(void)
 * @ Pass/ Fail criteria: none
 
 *****************************************************************************/
-__STATIC_INLINE void PWT_ClrReadyFlag(void)
+static inline void PWT_ClrReadyFlag(void)
 
 {  
     PWT->R1 &= ~PWT_R1_PWTRDY_MASK;

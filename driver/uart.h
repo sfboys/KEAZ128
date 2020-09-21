@@ -24,9 +24,6 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun 6, 2013
 *
 * @brief provide commond UART utilities. 
 *
@@ -41,8 +38,13 @@ extern "C" {
 /******************************************************************************
 * Includes
 ******************************************************************************/
-#include <SKEAZ1284.h>
-#include "wdog.h"
+#include "derivative.h"
+#include "nvic.h"
+
+/* callback types */
+typedef void (*UART_TxDoneCallbackType)(void);
+typedef void (*UART_RxDoneCallbackType)(void);
+
 /******************************************************************************
 * Constants
 ******************************************************************************/
@@ -52,14 +54,17 @@ extern "C" {
 ******************************************************************************/
 #define MAX_UART_NO             3
 
+#define UART_0	UART0_BASE_PTR
+#define UART_1	UART1_BASE_PTR
+#define UART_2	UART2_BASE_PTR
 /******************************************************************************
 * Types
 ******************************************************************************/
 
 /******************************************************************************
-*define uart setting type
+*define uart ctrl1 type
 *
-*//*! @addtogroup uart_setting_type
+*//*! @addtogroup uart_ctrl1_type
 * @{
 *******************************************************************************/  
 
@@ -68,12 +73,78 @@ extern "C" {
 *
 */ 
 
-typedef struct
-{
-    uint32_t bEnable      : 1;                /*!< 1: enable, 0: disable */
-    uint32_t resvd        : 31;               /*!< 1: reserved bit field */
-} UART_SettingType;
-/*! @} End of uart_setting_type */
+typedef union
+{ 
+	uint8_t byte;  /*!< byte field of union type */
+	struct{
+		uint8_t bPt			:1; 	/*!< Parity type */
+		uint8_t bPe 		:1;		/*!< Parity enable */
+		uint8_t bIlt 		:1;		/*!< Idle Line Type Select*/
+		uint8_t bWake 		:1;		/*!< Receiver Wakeup Method Select*/
+		uint8_t bM			:1;		/*!< 9-Bit or 8-Bit Mode Select*/
+		uint8_t bRsrc   	:1;    	/*!< Receiver Source Select*/
+		uint8_t bUartswai	:1;		/*!< UART Stops in Wait Mode*/
+		uint8_t bLoops		:1;		/*!< Loop Mode Select*/
+	}bits;   
+} UART_Ctrl1Type, *UART_Ctrl1Ptr;
+/*! @} End of uart_ctrl1_type */
+
+
+/******************************************************************************
+*define uart ctrl2 type
+*
+*//*! @addtogroup uart_ctrl2_type
+* @{
+*******************************************************************************/  
+
+/*!
+* @brief UART setting type.
+*
+*/ 
+
+typedef union
+{ 
+	uint8_t byte;  /*!< byte field of union type */
+	struct{
+		uint8_t bSbk		:1; 	/*!< Send Break */
+		uint8_t bRwu 		:1;		/*!< Receiver Wakeup Control*/
+		uint8_t bRe 		:1;		/*!< Receiver Enable*/
+		uint8_t bTe 		:1;		/*!< Transmitter Enable*/
+		uint8_t bIlie		:1;		/*!< Idle Line Interrupt Enable for IDLE*/
+		uint8_t bRie   		:1;    	/*!< Receiver Interrupt Enable for RDRF*/
+		uint8_t bTcie		:1;		/*!< Transmission Complete Interrupt Enable for TC*/
+		uint8_t bTie		:1;		/*!< Transmit Interrupt Enable for TDRE*/
+	}bits;   
+} UART_Ctrl2Type, *UART_Ctrl2Ptr;
+/*! @} End of uart_ctrl2_type */
+
+
+/******************************************************************************
+*define uart ctrl3 type
+*
+*//*! @addtogroup uart_ctrl3_type
+* @{
+*******************************************************************************/  
+
+/*!
+* @brief UART setting type.
+*
+*/ 
+
+typedef union
+{ 
+	uint8_t byte;  /*!< byte field of union type */
+	struct{
+		uint8_t bPeie		:1; 	/*!< Parity Error Interrupt Enable */
+		uint8_t bFeie 		:1;		/*!< Framing Error Interrupt Enable*/
+		uint8_t bNeie 		:1;		/*!< Noise Error Interrupt Enable*/
+		uint8_t bOrie		:1;		/*!< Overrun Interrupt Enable*/
+		uint8_t bTxinv		:1;		/*!< Transmit Data Inversion*/
+		uint8_t bTxdir   	:1; 	/*!< TxD Pin Direction in Single-Wire Mode*/
+	}bits;   
+} UART_Ctrl3Type, *UART_Ctrl3Ptr;
+/*! @} End of uart_ctrl3_type */
+
 
 /******************************************************************************
 *define uart config type
@@ -87,10 +158,13 @@ typedef struct
  */   
 typedef struct 
 {
-    UART_SettingType    sSettings;              /*!< UART settings */
-    uint32_t    u32SysClkHz;        /*!< system clock */
-    uint32_t    u32Baudrate;        /*!< UART baudrate */
-} UART_ConfigType;
+    UART_Ctrl1Type sctrl1settings;          /*!< UART Control 1 settings */
+    UART_Ctrl2Type sctrl2settings;          /*!< UART Control 2 settings */
+    UART_Ctrl3Type sctrl3settings;          /*!< UART Control 3 settings */
+    uint8_t		   bSbns;					/*!< Stop Bit Number Select */
+    uint32_t   	   u32SysClkHz;        		/*!< system clock */
+    uint32_t       u32Baudrate;        		/*!< UART baudrate */
+} UART_ConfigType,*UART_ConfigPtr;
 /*! @} End of uart_config_type  */
 
 /******************************************************************************
@@ -178,7 +252,9 @@ typedef enum
 /*! @} End of uart_flag_type_list   */
 
 /* callback types */
-typedef void (*UART_CallbackType)(UART_Type *pUART);
+
+
+typedef void (*UART_CallbackType) (UART_MemMapPtr pUART);
 
 /******************************************************************************
 * Global variables
@@ -204,7 +280,7 @@ typedef void (*UART_CallbackType)(UART_Type *pUART);
 * @return unsign char received char
 *
 *****************************************************************************/
-__STATIC_INLINE uint8_t UART_ReadDataReg(UART_Type *pUART)
+static inline uint8_t UART_ReadDataReg(UART_MemMapPtr pUART)
 {
     /* Return the 8-bit data from the receiver */
     return pUART->D;
@@ -219,7 +295,7 @@ __STATIC_INLINE uint8_t UART_ReadDataReg(UART_Type *pUART)
 * @return none
 *
 *****************************************************************************/
-__STATIC_INLINE void UART_WriteDataReg(UART_Type *pUART, uint8_t u8Char)
+static inline void UART_WriteDataReg(UART_MemMapPtr pUART, uint8_t u8Char)
 {
     /* Send the character */
     pUART->D = (uint8_t)u8Char;
@@ -235,7 +311,7 @@ __STATIC_INLINE void UART_WriteDataReg(UART_Type *pUART, uint8_t u8Char)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-__STATIC_INLINE uint8_t UART_CharPresent(UART_Type *pUART)
+static inline uint8_t UART_CharPresent(UART_MemMapPtr pUART)
 {  
     return (pUART->S1 & UART_S1_RDRF_MASK);
 }
@@ -248,7 +324,7 @@ __STATIC_INLINE uint8_t UART_CharPresent(UART_Type *pUART)
 * @return none
 *
 *****************************************************************************/
-__STATIC_INLINE void UART_EnableTx(UART_Type *pUART)
+static inline void UART_EnableTx(UART_MemMapPtr pUART)
 {
     
     pUART->C2 |= UART_C2_TE_MASK;
@@ -262,7 +338,7 @@ __STATIC_INLINE void UART_EnableTx(UART_Type *pUART)
 * @return none
 *
 *****************************************************************************/
-__STATIC_INLINE void UART_DisableTx(UART_Type *pUART)
+static inline void UART_DisableTx(UART_MemMapPtr pUART)
 {    
     pUART->C2 &= (~UART_C2_TE_MASK);
 }
@@ -275,7 +351,7 @@ __STATIC_INLINE void UART_DisableTx(UART_Type *pUART)
 * @return none
 *
 *****************************************************************************/
-__STATIC_INLINE void UART_EnableRx(UART_Type *pUART)
+static inline void UART_EnableRx(UART_MemMapPtr pUART)
 {    
     pUART->C2 |= UART_C2_RE_MASK;
 }
@@ -288,7 +364,7 @@ __STATIC_INLINE void UART_EnableRx(UART_Type *pUART)
 * @return none
 *
 *****************************************************************************/
-__STATIC_INLINE void UART_DisableRx(UART_Type *pUART)
+static inline void UART_DisableRx(UART_MemMapPtr pUART)
 {    
     pUART->C2 &= (~UART_C2_RE_MASK);
 }
@@ -301,7 +377,7 @@ __STATIC_INLINE void UART_DisableRx(UART_Type *pUART)
 * @return none
 *
 *****************************************************************************/
-__STATIC_INLINE void UART_EnableLoopback(UART_Type *pUART)
+static inline void UART_EnableLoopback(UART_MemMapPtr pUART)
 {
     pUART->C1 |= UART_C1_LOOPS_MASK;
     pUART->C1 &= (~UART_C1_RSRC_MASK);
@@ -315,7 +391,7 @@ __STATIC_INLINE void UART_EnableLoopback(UART_Type *pUART)
 * @return none
 *
 *****************************************************************************/
-__STATIC_INLINE void UART_EnableSingleWire(UART_Type *pUART)
+static inline void UART_EnableSingleWire(UART_MemMapPtr pUART)
 {
     pUART->C1 |= UART_C1_LOOPS_MASK;
     pUART->C1 |= UART_C1_RSRC_MASK;
@@ -329,7 +405,7 @@ __STATIC_INLINE void UART_EnableSingleWire(UART_Type *pUART)
 * @return none
 *
 *****************************************************************************/
-__STATIC_INLINE void UART_Set8BitMode(UART_Type *pUART)
+static inline void UART_Set8BitMode(UART_MemMapPtr pUART)
 {
     pUART->C1 &= (~UART_C1_M_MASK);
 }
@@ -342,10 +418,39 @@ __STATIC_INLINE void UART_Set8BitMode(UART_Type *pUART)
 * @return none
 *
 *****************************************************************************/
-__STATIC_INLINE void UART_Set9BitMode(UART_Type *pUART)
+static inline void UART_Set9BitMode(UART_MemMapPtr pUART)
 {
     pUART->C1 |= UART_C1_M_MASK;
 }
+
+/*****************************************************************************//*!
+*
+* @brief set 1 stop bit 
+*        
+* @param[in] pUART       base of UART port
+*
+* @return none
+*
+*****************************************************************************/
+static inline void UART_Set1StopBit(UART_MemMapPtr pUART)
+{
+    pUART->BDH &= ~UART_BDH_SBNS_MASK;
+}
+
+/*****************************************************************************//*!
+*
+* @brief set 2 stop bit 
+*        
+* @param[in] pUART       base of UART port
+*
+* @return none
+*
+*****************************************************************************/
+static inline void UART_Set2StopBit(UART_MemMapPtr pUART)
+{
+    pUART->BDH|= UART_BDH_SBNS_MASK;
+}
+
 /*****************************************************************************//*!
 *
 * @brief enable transmit buffer empty interrupt
@@ -356,7 +461,7 @@ __STATIC_INLINE void UART_Set9BitMode(UART_Type *pUART)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-__STATIC_INLINE void UART_EnableTxBuffEmptyInt(UART_Type *pUART)
+static inline void UART_EnableTxBuffEmptyInt(UART_MemMapPtr pUART)
 {
     pUART->C2 |= UART_C2_TIE_MASK;
 }
@@ -370,7 +475,7 @@ __STATIC_INLINE void UART_EnableTxBuffEmptyInt(UART_Type *pUART)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-__STATIC_INLINE void UART_EnableTxCompleteInt(UART_Type *pUART)
+static inline void UART_EnableTxCompleteInt(UART_MemMapPtr pUART)
 {
     pUART->C2 |= UART_C2_TCIE_MASK;
 }
@@ -384,7 +489,7 @@ __STATIC_INLINE void UART_EnableTxCompleteInt(UART_Type *pUART)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-__STATIC_INLINE void UART_EnableRxBuffFullInt(UART_Type *pUART)
+static inline void UART_EnableRxBuffFullInt(UART_MemMapPtr pUART)
 {
     pUART->C2 |= UART_C2_RIE_MASK;
 }
@@ -398,7 +503,7 @@ __STATIC_INLINE void UART_EnableRxBuffFullInt(UART_Type *pUART)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-__STATIC_INLINE void UART_DisableTxBuffEmptyInt(UART_Type *pUART)
+static inline void UART_DisableTxBuffEmptyInt(UART_MemMapPtr pUART)
 {
         pUART->C2 &= (~UART_C2_TIE_MASK);    
 }
@@ -412,7 +517,7 @@ __STATIC_INLINE void UART_DisableTxBuffEmptyInt(UART_Type *pUART)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-__STATIC_INLINE void UART_DisableTxCompleteInt(UART_Type *pUART)
+static inline void UART_DisableTxCompleteInt(UART_MemMapPtr pUART)
 {
     pUART->C2 &= (~UART_C2_TCIE_MASK);   
 }
@@ -426,7 +531,7 @@ __STATIC_INLINE void UART_DisableTxCompleteInt(UART_Type *pUART)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-__STATIC_INLINE void UART_DisableRxBuffFullInt(UART_Type *pUART)
+static inline void UART_DisableRxBuffFullInt(UART_MemMapPtr pUART)
 {
     pUART->C2 &= (~UART_C2_RIE_MASK);  
 }
@@ -440,7 +545,7 @@ __STATIC_INLINE void UART_DisableRxBuffFullInt(UART_Type *pUART)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-__STATIC_INLINE void UART_PutBreak(UART_Type *pUART)
+static inline void UART_PutBreak(UART_MemMapPtr pUART)
 {
     /* Write 1 then write 0 to UART_C2[SBK] bit, will put break character */
     pUART->C2 |= UART_C2_SBK_MASK; 
@@ -459,7 +564,7 @@ __STATIC_INLINE void UART_PutBreak(UART_Type *pUART)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE uint8_t UART_IsTxComplete(UART_Type *pUART)
+static inline uint8_t UART_IsTxComplete(UART_MemMapPtr pUART)
 {
     return (pUART->S1 & UART_S1_TC_MASK);
 }
@@ -475,7 +580,7 @@ __STATIC_INLINE uint8_t UART_IsTxComplete(UART_Type *pUART)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE uint8_t UART_IsTxBuffEmpty(UART_Type *pUART)
+static inline uint8_t UART_IsTxBuffEmpty(UART_MemMapPtr pUART)
 {
     return (pUART->S1 & UART_S1_TDRE_MASK);
 }
@@ -491,31 +596,39 @@ __STATIC_INLINE uint8_t UART_IsTxBuffEmpty(UART_Type *pUART)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE uint8_t UART_IsRxBuffFull(UART_Type *pUART)
+static inline uint8_t UART_IsRxBuffFull(UART_MemMapPtr pUART)
 {
     return (pUART->S1 & UART_S1_RDRF_MASK);
 }
+
+
+
 /*! @} End of uart_api_list */
 
 
 /******************************************************************************
 * Global functions declaration
 ******************************************************************************/
-void UART_Init(UART_Type *pUART, UART_ConfigType *pConfig);
-uint8_t UART_GetChar(UART_Type *pUART);
-void UART_PutChar(UART_Type *pUART, uint8_t u8Char);
-void UART_SetBaudrate(UART_Type *pUART, UART_ConfigBaudrateType *pConfig);
-void UART_EnableInterrupt(UART_Type *pUART, UART_InterruptType InterruptType);
-void UART_DisableInterrupt(UART_Type *pUART, UART_InterruptType InterruptType);
-uint16_t UART_GetFlags(UART_Type *pUART);
-uint8_t UART_CheckFlag(UART_Type *pUART, UART_FlagType FlagType);
-void UART_SendWait(UART_Type *pUART, uint8_t *pSendBuff, uint32_t u32Length);
-void UART_ReceiveWait(UART_Type *pUART, uint8_t *pReceiveBuff, uint32_t u32Length);
-void UART_WaitTxComplete(UART_Type *pUART);
+void UART_Init(UART_MemMapPtr pUART, UART_ConfigType *pConfig);
+uint8_t UART_GetChar(UART_MemMapPtr pUART);
+void UART_PutChar(UART_MemMapPtr pUART, uint8_t u8Char);
+void UART_SetBaudrate(UART_MemMapPtr pUART, UART_ConfigBaudrateType *pConfig);
+void UART_DisableInterrupt(UART_MemMapPtr pUART, UART_InterruptType InterruptType);
+uint16_t UART_GetFlags(UART_MemMapPtr pUART);
+uint8_t UART_CheckFlag(UART_MemMapPtr *pUART, UART_FlagType FlagType);
+void UART_SendWait(UART_MemMapPtr pUART, uint8_t *pSendBuff, uint32_t u32Length);
+void UART_ReceiveWait(UART_MemMapPtr pUART, uint8_t *pReceiveBuff, uint32_t u32Length);
+void UART_WaitTxComplete(UART_MemMapPtr pUART);
 void UART_SetCallback(UART_CallbackType pfnCallback);
 void UART0_Isr(void);
 void UART1_Isr(void);
 void UART2_Isr(void);
+void UART_SetTxDoneCallback(UART_MemMapPtr *pUART, UART_TxDoneCallbackType pfnCallback);
+void UART_SetRxDoneCallback(UART_MemMapPtr *pUART, UART_RxDoneCallbackType pfnCallback);
+void UART_HandleInt(UART_MemMapPtr *pUART);
+void UART_SendInt(UART_MemMapPtr *pUART, uint8_t *pSendBuff, uint32_t u32Length);
+
+
 
 
 #ifdef __cplusplus

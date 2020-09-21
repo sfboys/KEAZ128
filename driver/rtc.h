@@ -24,10 +24,6 @@
 *
 * @author   Freescale
 *
-* @version  0.0.1
-*
-* @date     Jun 25, 2013
-*
 * @brief    Real-time counter (RTC) driver head file.  
 *
 ******************************************************************************/
@@ -39,7 +35,8 @@ extern "C" {
 /******************************************************************************
 * Includes
 ******************************************************************************/
-
+#include "derivative.h"
+#include "nvic.h"
 /******************************************************************************
 * Constants
 ******************************************************************************/
@@ -61,13 +58,13 @@ extern "C" {
 #define RTC_CLKSRC_1KHZ             1	/*!< select LPO as RTC clock source  */
 #define RTC_CLKSRC_IREF             2	/*!< select internal reference clock as RTC clock source  */
 #define RTC_CLKSRC_BUS              3	/*!< select bus clock as RTC clock source  */
-#define RTC_CLK_PRESCALER_128       1	/*!< presalcer is 1 or 128 according to RTCLKS bits */
-#define RTC_CLK_PRESCALER_256       2	/*!< presalcer is 2 or 256 according to RTCLKS bits */
-#define RTC_CLK_PRESCALER_512       3	/*!< presalcer is 4 or 512 according to RTCLKS bits */
-#define RTC_CLK_PRESCALER_1024      4	/*!< presalcer is 8 or 1024 according to RTCLKS bits */
-#define RTC_CLK_PRESCALER_2048      5	/*!< presalcer is 16 or 2048 according to RTCLKS bits */
-#define RTC_CLK_PRESCALER_100       6	/*!< presalcer is 32 or 100 according to RTCLKS bits */
-#define RTC_CLK_PRESCALER_1000      7	/*!< presalcer is 64 or 1000 according to RTCLKS bits */
+#define RTC_CLK_PRESCALER_128       1	/*!< prescaler is 1 or 128 according to RTCLKS bits */
+#define RTC_CLK_PRESCALER_256       2	/*!< prescaler is 2 or 256 according to RTCLKS bits */
+#define RTC_CLK_PRESCALER_512       3	/*!< prescaler is 4 or 512 according to RTCLKS bits */
+#define RTC_CLK_PRESCALER_1024      4	/*!< prescaler is 8 or 1024 according to RTCLKS bits */
+#define RTC_CLK_PRESCALER_2048      5	/*!< prescaler is 16 or 2048 according to RTCLKS bits */
+#define RTC_CLK_PRESCALER_100       6	/*!< prescaler is 32 or 100 according to RTCLKS bits */
+#define RTC_CLK_PRESCALER_1000      7	/*!< prescaler is 64 or 1000 according to RTCLKS bits */
 
 
 /*! @} End of rtc_controlbit                                                  */
@@ -110,7 +107,7 @@ typedef struct
     uint16_t bReserved1                 : 1;    /*!< reserved */ 
     uint16_t bInterruptEn               : 1;    /*!< 1: RTC interrupt is enable, 0: RTC interrupt is disable */
     uint16_t bFlag                      : 1;    /*!< 1: RTC flag is set, 0: RTC flag is not set */   
-    uint16_t bClockPresaler             : 3;    /*!< 1: RTC presclaer, from 0x0 to 0x7 */    
+    uint16_t bClockPrescaler             : 3;    /*!< 1: RTC presclaer, from 0x0 to 0x7 */    
     uint16_t bReserved2                 : 3;    /*!< reserved */ 
     uint16_t bClockSource               : 2;    /*!< RTC clock source selection from 0x0 to 0x3 */
     uint16_t u16ModuloValue                ;    /*!< 16-bit rtc modulo value */
@@ -142,9 +139,10 @@ typedef struct
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void RTC_EnableInt(void)
+static inline void RTC_EnableInt(void)
 {
     RTC->SC |= RTC_SC_RTIE_MASK;
+    
 }
 
 
@@ -158,9 +156,10 @@ __STATIC_INLINE void RTC_EnableInt(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void RTC_DisableInt(void)
+static inline void RTC_DisableInt(void)
 {
-    RTC->SC &= ~RTC_SC_RTIE_MASK;
+	RTC->SC &= ~RTC_SC_RTIE_MASK;
+   
 }
 
 
@@ -174,7 +173,7 @@ __STATIC_INLINE void RTC_DisableInt(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void RTC_SetModulo(uint16_t u16Mod_Value)
+static inline void RTC_SetModulo(uint16_t u16Mod_Value)
 {
  
     RTC->MOD = u16Mod_Value;
@@ -191,7 +190,7 @@ __STATIC_INLINE void RTC_SetModulo(uint16_t u16Mod_Value)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void RTC_SetClock(uint16_t u16Clock_Number, uint16_t u16Presalcer)
+static inline void RTC_SetClock(uint16_t u16Clock_Number, uint16_t u16Presalcer)
 {
     uint32_t u32rtc_sc;
         
@@ -211,7 +210,7 @@ __STATIC_INLINE void RTC_SetClock(uint16_t u16Clock_Number, uint16_t u16Presalce
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE uint8_t RTC_GetFlags(void)
+static inline uint8_t RTC_GetFlags(void)
 {
   uint8_t bflag;
   
@@ -231,7 +230,7 @@ __STATIC_INLINE uint8_t RTC_GetFlags(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void RTC_ClrFlags(void)
+static inline void RTC_ClrFlags(void)
 {
     RTC->SC |= RTC_SC_RTIF_MASK; 
 }
@@ -246,7 +245,5 @@ void RTC_DeInit(void);
 
 /*! @} End of rtc_api_list                                                   */
 
-#ifdef __cplusplus
-}
-#endif
+
 #endif /* RTC_H_ */

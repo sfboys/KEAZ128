@@ -1,328 +1,242 @@
-;/*****************************************************************************
-; * @file:    startup_SKEAZ1284.s
-; * @purpose: CMSIS Cortex-M0plus Core Device Startup File for the
-; *           SKEAZ1284
-; * @version: 1.2
-; * @date:    2014-1-10
-; *
-; * Copyright: 1997 - 2014 Freescale Semiconductor, Inc. All Rights Reserved.
-;*
-; *------- <<< Use Configuration Wizard in Context Menu >>> ------------------
-; *
-; *****************************************************************************/
+/* ---------------------------------------------------------------------------------------*/
+/*  @file:    startup_SKEAZ1284.s                                                         */
+/*  @purpose: CMSIS Cortex-M0P Core Device Startup File                                   */
+/*            SKEAZ1284                                                                   */
+/*  @version: 1.3                                                                         */
+/*  @date:    2014-5-28                                                                   */
+/*  @build:   b140606                                                                     */
+/* ---------------------------------------------------------------------------------------*/
+/*                                                                                        */
+/* Copyright (c) 1997 - 2014 , Freescale Semiconductor, Inc.                              */
+/* All rights reserved.                                                                   */
+/*                                                                                        */
+/* Redistribution and use in source and binary forms, with or without modification,       */
+/* are permitted provided that the following conditions are met:                          */
+/*                                                                                        */
+/* o Redistributions of source code must retain the above copyright notice, this list     */
+/*   of conditions and the following disclaimer.                                          */
+/*                                                                                        */
+/* o Redistributions in binary form must reproduce the above copyright notice, this       */
+/*   list of conditions and the following disclaimer in the documentation and/or          */
+/*   other materials provided with the distribution.                                      */
+/*                                                                                        */
+/* o Neither the name of Freescale Semiconductor, Inc. nor the names of its               */
+/*   contributors may be used to endorse or promote products derived from this            */
+/*   software without specific prior written permission.                                  */
+/*                                                                                        */
+/* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND        */
+/* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED          */
+/* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE                 */
+/* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR       */
+/* ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES         */
+/* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;           */
+/* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON         */
+/* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT                */
+/* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS          */
+/* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                           */
+/*****************************************************************************/
+/* Version: GCC for ARM Embedded Processors                                  */
+/*****************************************************************************/
+    .syntax unified
+    .arch armv6-m
 
+    .section .isr_vector, "a"
+    .align 2
+    .globl __isr_vector
+__isr_vector:
+    .long   __StackTop                                      /* Top of Stack */
+    .long   Reset_Handler                                   /* Reset Handler */
+    .long   NMI_Handler                                     /* NMI Handler*/
+    .long   HardFault_Handler                               /* Hard Fault Handler*/
+    .long   0                                               /* Reserved*/
+    .long   0                                               /* Reserved*/
+    .long   0                                               /* Reserved*/
+    .long   0                                               /* Reserved*/
+    .long   0                                               /* Reserved*/
+    .long   0                                               /* Reserved*/
+    .long   0                                               /* Reserved*/
+    .long   SVC_Handler                                     /* SVCall Handler*/
+    .long   0                                               /* Reserved*/
+    .long   0                                               /* Reserved*/
+    .long   PendSV_Handler                                  /* PendSV Handler*/
+    .long   SysTick_Handler                                 /* SysTick Handler*/
 
-; <h> Stack Configuration
-;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
-; </h>
+                                                            /* External Interrupts*/
+    .long   Reserved16_IRQHandler                           /* Reserved interrupt*/
+    .long   Reserved17_IRQHandler                           /* Reserved interrupt*/
+    .long   Reserved18_IRQHandler                           /* Reserved interrupt*/
+    .long   Reserved19_IRQHandler                           /* Reserved interrupt*/
+    .long   Reserved20_IRQHandler                           /* Reserved interrupt*/
+    .long   FTMRE_IRQHandler                                /* Command complete and read collision*/
+    .long   PMC_IRQHandler                                  /* Low-voltage detect, low-voltage warning*/
+    .long   IRQ_IRQHandler                                  /* External Interrupt*/
+    .long   I2C0_IRQHandler                                 /* I2C0 interrupt*/
+    .long   I2C1_IRQHandler                                 /* I2C1 interrupt*/
+    .long   SPI0_IRQHandler                                 /* SPI0 single interrupt vector for all sources*/
+    .long   SPI1_IRQHandler                                 /* SPI1 single interrupt vector for all sources*/
+    .long   UART0_IRQHandler                                /* UART0 status and error*/
+    .long   UART1_IRQHandler                                /* UART1 status and error*/
+    .long   UART2_IRQHandler                                /* UART2 status and error*/
+    .long   ADC_IRQHandler                                  /* ADC interrupt*/
+    .long   ACMP0_IRQHandler                                /* ACMP0 interrupt*/
+    .long   FTM0_IRQHandler                                 /* FTM0 single interrupt vector for all sources*/
+    .long   FTM1_IRQHandler                                 /* FTM1 single interrupt vector for all sources*/
+    .long   FTM2_IRQHandler                                 /* FTM2 single interrupt vector for all sources*/
+    .long   RTC_IRQHandler                                  /* RTC overflow*/
+    .long   ACMP1_IRQHandler                                /* ACMP1 interrupt*/
+    .long   PIT_CH0_IRQHandler                              /* PIT CH0 overflow*/
+    .long   PIT_CH1_IRQHandler                              /* PIT CH1 overflow*/
+    .long   KBI0_IRQHandler                                 /* Keyboard interrupt0(32bit)*/
+    .long   KBI1_IRQHandler                                 /* Keyboard interrupt1(32bit)*/
+    .long   Reserved42_IRQHandler                           /* Reserved interrupt*/
+    .long   ICS_IRQHandler                                  /* ICS interrupt*/
+    .long   WDOG_IRQHandler                                 /* Watchdog timeout*/
+    .long   PWT_IRQHandler                                  /* PWT interrupt*/
+    .long   MSCAN_RX_IRQHandler                             /* MSCAN Rx Interrupt*/
+    .long   MSCAN_TX_IRQHandler                             /* MSCAN Tx, Err and Wake-up interrupt*/
 
-Stack_Size      EQU     0x00000100
+    .size    __isr_vector, . - __isr_vector
 
-                AREA    STACK, NOINIT, READWRITE, ALIGN=3
-Stack_Mem       SPACE   Stack_Size
-__initial_sp
+/* Flash Configuration */
+    .section .FlashConfig, "a"
+    .long 0xFFFFFFFF
+    .long 0xFFFFFFFF
+    .long 0xFFFFFFFF
+    .long 0xFFFEFFFF
 
+    .equ _NVIC_ICER,  0xE000E180
+    .equ _NVIC_ICPR,  0xE000E280
+    .text
+    .thumb
 
-; <h> Heap Configuration
-;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
-; </h>
+/* Reset Handler */
 
-Heap_Size       EQU     0x00000000
+    .thumb_func
+    .align 2
+    .globl   Reset_Handler
+    .type    Reset_Handler, %function
+Reset_Handler:
+    cpsid   i               /* Mask interrupts */
+    ldr r0, =_NVIC_ICER    /* Disable interrupts and clear pending flags */
+    ldr r1, =_NVIC_ICPR
+    ldr r2, =0xFFFFFFFF
+    str r2, [r0]            /* NVIC_ICER - clear enable IRQ register */
+    str r2, [r1]            /* NVIC_ICPR - clear pending IRQ register */
 
-                AREA    HEAP, NOINIT, READWRITE, ALIGN=3
-__heap_base
-Heap_Mem        SPACE   Heap_Size
-__heap_limit
+#ifdef __RAM_CONFIGURATION    
+    // Initialize the stack pointer
+	ldr r0, =__StackTop
+	mov sp, r0
+#endif
+ 
+#ifndef __NO_SYSTEM_INIT
+    bl SystemInit
+#endif
+    cpsie   i               /* Unmask interrupts */
+/*     Loop to copy data from read only memory to RAM. The ranges
+ *      of copy from/to are specified by following symbols evaluated in
+ *      linker script.
+ *      __etext: End of code section, i.e., begin of data sections to copy from.
+ *      __data_start__/__data_end__: RAM address range that data should be
+ *      copied to. Both must be aligned to 4 bytes boundary.  */
 
+    ldr    r1, =__etext
+    ldr    r2, =__data_start__
+    ldr    r3, =__data_end__
 
-                PRESERVE8
-                THUMB
+    subs    r3, r2
+    ble     .LC0
 
+.LC1:
+    subs    r3, 4
+    ldr    r0, [r1,r3]
+    str    r0, [r2,r3]
+    bgt    .LC1
+.LC0:
 
-; Vector Table Mapped to Address 0 at Reset
+#ifdef __STARTUP_CLEAR_BSS
+/*     This part of work usually is done in C library startup code. Otherwise,
+ *     define this macro to enable it in this startup.
+ *
+ *     Loop to zero out BSS section, which uses following symbols
+ *     in linker script:
+ *      __bss_start__: start of BSS section. Must align to 4
+ *      __bss_end__: end of BSS section. Must align to 4
+ */
+    ldr r1, =__bss_start__
+    ldr r2, =__bss_end__
 
-                AREA    RESET, DATA, READONLY
-                EXPORT  __Vectors
-                EXPORT  __Vectors_End
-                EXPORT  __Vectors_Size
+    subs    r2, r1
+    ble .LC3
 
-__Vectors       DCD     __initial_sp  ; Top of Stack
-                DCD     Reset_Handler  ; Reset Handler
-                DCD     NMI_Handler  ; NMI Handler
-                DCD     HardFault_Handler  ; Hard Fault Handler
-                DCD     0  ; Reserved
-                DCD     0  ; Reserved
-                DCD     0  ; Reserved
-                DCD     0  ; Reserved
-                DCD     0  ; Reserved
-                DCD     0  ; Reserved
-                DCD     0  ; Reserved
-                DCD     SVC_Handler  ; SVCall Handler
-                DCD     0  ; Reserved
-                DCD     0  ; Reserved
-				IMPORT	OS_CPU_PendSVHandler
-                DCD     OS_CPU_PendSVHandler  ; PendSV Handler
-				IMPORT	OS_CPU_SysTickHandler
-                DCD     OS_CPU_SysTickHandler  ; SysTick Handler
+    movs    r0, 0
+.LC2:
+    str r0, [r1, r2]
+    subs    r2, 4
+    bge .LC2
+.LC3:
+#endif
+#ifndef __START
+#define __START _start
+#endif
+    bl    __START
+    .pool
+    .size Reset_Handler, . - Reset_Handler
 
-                ; External Interrupts
-                DCD     Reserved16_IRQHandler  ; Reserved interrupt
-                DCD     Reserved17_IRQHandler  ; Reserved interrupt
-                DCD     Reserved18_IRQHandler  ; Reserved interrupt
-                DCD     Reserved19_IRQHandler  ; Reserved interrupt
-                DCD     Reserved20_IRQHandler  ; Reserved interrupt
-                DCD     FTMRE_IRQHandler  ; Command complete and read collision
-                DCD     PMC_IRQHandler  ; Low-voltage detect, low-voltage warning
-                DCD     IRQ_IRQHandler  ; External Interrupt
-                DCD     I2C0_IRQHandler  ; I2C0 interrupt
-                DCD     I2C1_IRQHandler  ; I2C1 interrupt
-                DCD     SPI0_IRQHandler  ; SPI0 single interrupt vector for all sources
-                DCD     SPI1_IRQHandler  ; SPI1 single interrupt vector for all sources
-                DCD     UART0_IRQHandler  ; UART0 status and error
-                DCD     UART1_IRQHandler  ; UART1 status and error
-                DCD     UART2_IRQHandler  ; UART2 status and error
-                DCD     ADC_IRQHandler  ; ADC interrupt
-                DCD     ACMP0_IRQHandler  ; ACMP0 interrupt
-                DCD     FTM0_IRQHandler  ; FTM0 single interrupt vector for all sources
-                DCD     FTM1_IRQHandler  ; FTM1 single interrupt vector for all sources
-                DCD     FTM2_IRQHandler  ; FTM2 single interrupt vector for all sources
-                DCD     RTC_IRQHandler  ; RTC overflow
-                DCD     ACMP1_IRQHandler  ; ACMP1 interrupt
-                DCD     PIT_CH0_IRQHandler  ; PIT CH0 overflow
-                DCD     PIT_CH1_IRQHandler  ; PIT CH1 overflow
-                DCD     KBI0_IRQHandler  ; Keyboard interrupt0(32bit)
-                DCD     KBI1_IRQHandler  ; Keyboard interrupt1(32bit)
-                DCD     Reserved42_IRQHandler  ; Reserved interrupt
-                DCD     ICS_IRQHandler  ; ICS interrupt
-                DCD     WDOG_IRQHandler  ; Watchdog timeout
-                DCD     PWT_IRQHandler  ; PWT interrupt
-                DCD     MSCAN_RX_IRQHandler  ; MSCAN Rx Interrupt
-                DCD     MSCAN_TX_IRQHandler  ; MSCAN Tx, Err and Wake-up interrupt
-__Vectors_End
+  .align	1
+  .thumb_func
+  .weak	Default_Handler
+  .type	Default_Handler, %function
+Default_Handler:
+  b	.
+  .size	Default_Handler, . - Default_Handler
 
-__Vectors_Size 	EQU     __Vectors_End - __Vectors
+/*    Macro to define default handlers. Default handler
+ *    will be weak symbol and just dead loops. They can be
+ *    overwritten by other handlers */
+  .macro	def_irq_handler	handler_name
+  .weak	\handler_name
+  .set	\handler_name, Default_Handler
+  .endm
 
-; <h> Flash Configuration
-;   <i> 16-byte flash configuration field that stores default protection settings (loaded on reset)
-;   <i> and security information that allows the MCU to restrict acces to the FTFL module.
-;   <h> Backdoor Comparison Key
-;     <o0>  Backdoor Key 0  <0x0-0xFF:2>
-;     <o1>  Backdoor Key 1  <0x0-0xFF:2>
-;     <o2>  Backdoor Key 2  <0x0-0xFF:2>
-;     <o3>  Backdoor Key 3  <0x0-0xFF:2>
-;     <o4>  Backdoor Key 4  <0x0-0xFF:2>
-;     <o5>  Backdoor Key 5  <0x0-0xFF:2>
-;     <o6>  Backdoor Key 6  <0x0-0xFF:2>
-;     <o7>  Backdoor Key 7  <0x0-0xFF:2>
-BackDoorK0      EQU     0xFF
-BackDoorK1      EQU     0xFF
-BackDoorK2      EQU     0xFF
-BackDoorK3      EQU     0xFF
-BackDoorK4      EQU     0xFF
-BackDoorK5      EQU     0xFF
-BackDoorK6      EQU     0xFF
-BackDoorK7      EQU     0xFF
-;   </h>
-;     <h> FPROT
-;       <i> P-Flash Protection Register
-;       <o.7> FPOPEN
-;         <0=> FPHDIS and FPLDIS bits define unprotected address ranges as specified by the corresponding FPHS and FPLS bits FPROT1.1
-;         <1=> FPHDIS and FPLDIS bits enable protection for the address range specified by the corresponding FPHS and FPLS bits
-;       <o.5> FPHDIS
-;         <0=> Protection/Unprotection enabled
-;         <1=> Protection/Unprotection disabled
-;       <o.3..4> FPHS
-;         <0=> Address range: 0x00_7C00-0x00_7FFF; protected size: 1 KB
-;         <1=> Address range: 0x00_7800-0x00_7FFF; protected size: 2 KB
-;         <2=> Address range: 0x00_7000-0x00_7FFF; protected size: 4 KB
-;         <3=> Address range: 0x00_6000-0x00_7FFF; protected size: 8 KB
-;       <o.5> FPLDIS
-;         <0=> Protection/Unprotection enabled
-;         <1=> Protection/Unprotection disabled
-;       <o.3..4> FPLS
-;         <0=> Address range: 0x00_0000-0x00_07FF; protected size: 2 KB
-;         <1=> Address range: 0x00_0000-0x00_0FFF; protected size: 4 KB
-;         <2=> Address range: 0x00_0000-0x00_1FFF; protected size: 8 KB
-;         <3=> Address range: 0x00_0000-0x00_3FFF; protected size: 16 KB
-FPROT         EQU     0xFF
-;     </h>
-;   </h>
-;   <h> Flash security byte (FSEC)
-;     <i> WARNING: If SEC field is configured as "MCU security status is secure" and MEEN field is configured as "Mass erase is disabled",
-;     <i> MCU's security status cannot be set back to unsecure state since Mass erase via the debugger is blocked !!!
-;     <o.0..1> SEC
-;       <2=> MCU security status is unsecure
-;       <3=> MCU security status is secure
-;         <i> Flash Security
-;         <i> This bits define the security state of the MCU.
-;     <o.6..7> KEYEN
-;       <2=> Backdoor key access enabled
-;       <3=> Backdoor key access disabled
-;         <i> Backdoor key Security Enable
-;         <i> These bits enable and disable backdoor key access to the FTFL module.
-FSEC            EQU     0xFE
-;   </h>
-;   <h> Flash Option Register (FOPT)
-FOPT            EQU     0xFE
-;   </h>
-                IF      :LNOT::DEF:RAM_TARGET
-                AREA    |.ARM.__at_0x400|, CODE, READONLY
-                DCB     BackDoorK0, BackDoorK1, BackDoorK2, BackDoorK3
-                DCB     BackDoorK4, BackDoorK5, BackDoorK6, BackDoorK7
-                DCB     0xFF,       0xFF,       0xFF,       0xFF
-                DCB     0xFF,       FPROT,      FSEC,       FOPT
-                ENDIF
+/* Exception Handlers */
+    def_irq_handler    NMI_Handler
+    def_irq_handler    HardFault_Handler
+    def_irq_handler    SVC_Handler
+    def_irq_handler    PendSV_Handler
+    def_irq_handler    SysTick_Handler
+    def_irq_handler    Reserved16_IRQHandler
+    def_irq_handler    Reserved17_IRQHandler
+    def_irq_handler    Reserved18_IRQHandler
+    def_irq_handler    Reserved19_IRQHandler
+    def_irq_handler    Reserved20_IRQHandler
+    def_irq_handler    FTMRE_IRQHandler
+    def_irq_handler    PMC_IRQHandler
+    def_irq_handler    IRQ_IRQHandler
+    def_irq_handler    I2C0_IRQHandler
+    def_irq_handler    I2C1_IRQHandler
+    def_irq_handler    SPI0_IRQHandler
+    def_irq_handler    SPI1_IRQHandler
+    def_irq_handler    UART0_IRQHandler
+    def_irq_handler    UART1_IRQHandler
+    def_irq_handler    UART2_IRQHandler
+    def_irq_handler    ADC_IRQHandler
+    def_irq_handler    ACMP0_IRQHandler
+    def_irq_handler    FTM0_IRQHandler
+    def_irq_handler    FTM1_IRQHandler
+    def_irq_handler    FTM2_IRQHandler
+    def_irq_handler    RTC_IRQHandler
+    def_irq_handler    ACMP1_IRQHandler
+    def_irq_handler    PIT_CH0_IRQHandler
+    def_irq_handler    PIT_CH1_IRQHandler
+    def_irq_handler    KBI0_IRQHandler
+    def_irq_handler    KBI1_IRQHandler
+    def_irq_handler    Reserved42_IRQHandler
+    def_irq_handler    ICS_IRQHandler
+    def_irq_handler    WDOG_IRQHandler
+    def_irq_handler    PWT_IRQHandler
+    def_irq_handler    MSCAN_RX_IRQHandler
+    def_irq_handler    MSCAN_TX_IRQHandler
+    def_irq_handler    DefaultISR
 
-                AREA    |.text|, CODE, READONLY
-
-;init_data_bss
-;     User defined function for data and bs memory segment initialization.
-;      Weak definition to be replaced by user code.
-
-init_data_bss   PROC
-                EXPORT  init_data_bss             [WEAK]
-                BX      R14
-                ENDP
-
-; Reset Handler
-
-Reset_Handler   PROC
-                EXPORT  Reset_Handler             [WEAK]
-                IMPORT  SystemInit
-                IMPORT  __main
-                LDR     R0, =SystemInit
-                BLX     R0
-                LDR     R0, =init_data_bss
-                BLX     R0
-                LDR     R0, =__main
-                BX      R0
-                ENDP
-
-
-; Dummy Exception Handlers (infinite loops which can be modified)
-
-NMI_Handler     PROC
-                EXPORT  NMI_Handler               [WEAK]
-                B       .
-                ENDP
-HardFault_Handler\
-                PROC
-                EXPORT  HardFault_Handler         [WEAK]
-                B       .
-                ENDP
-SVC_Handler     PROC
-                EXPORT  SVC_Handler               [WEAK]
-                B       .
-                ENDP
-PendSV_Handler  PROC
-                EXPORT  PendSV_Handler            [WEAK]
-                B       .
-                ENDP
-SysTick_Handler PROC
-                EXPORT  SysTick_Handler           [WEAK]
-                B       .
-                ENDP
-
-Default_Handler PROC
-                EXPORT  Reserved16_IRQHandler     [WEAK]
-                EXPORT  Reserved17_IRQHandler     [WEAK]
-                EXPORT  Reserved18_IRQHandler     [WEAK]
-                EXPORT  Reserved19_IRQHandler     [WEAK]
-                EXPORT  Reserved20_IRQHandler     [WEAK]
-                EXPORT  FTMRE_IRQHandler     [WEAK]
-                EXPORT  PMC_IRQHandler     [WEAK]
-                EXPORT  IRQ_IRQHandler     [WEAK]
-                EXPORT  I2C0_IRQHandler     [WEAK]
-                EXPORT  I2C1_IRQHandler     [WEAK]
-                EXPORT  SPI0_IRQHandler     [WEAK]
-                EXPORT  SPI1_IRQHandler     [WEAK]
-                EXPORT  UART0_IRQHandler     [WEAK]
-                EXPORT  UART1_IRQHandler     [WEAK]
-                EXPORT  UART2_IRQHandler     [WEAK]
-                EXPORT  ADC_IRQHandler     [WEAK]
-                EXPORT  ACMP0_IRQHandler     [WEAK]
-                EXPORT  FTM0_IRQHandler     [WEAK]
-                EXPORT  FTM1_IRQHandler     [WEAK]
-                EXPORT  FTM2_IRQHandler     [WEAK]
-                EXPORT  RTC_IRQHandler     [WEAK]
-                EXPORT  ACMP1_IRQHandler     [WEAK]
-                EXPORT  PIT_CH0_IRQHandler     [WEAK]
-                EXPORT  PIT_CH1_IRQHandler     [WEAK]
-                EXPORT  KBI0_IRQHandler     [WEAK]
-                EXPORT  KBI1_IRQHandler     [WEAK]
-                EXPORT  Reserved42_IRQHandler     [WEAK]
-                EXPORT  ICS_IRQHandler     [WEAK]
-                EXPORT  WDOG_IRQHandler     [WEAK]
-                EXPORT  PWT_IRQHandler     [WEAK]
-                EXPORT  MSCAN_RX_IRQHandler     [WEAK]
-                EXPORT  MSCAN_TX_IRQHandler     [WEAK]
-                EXPORT  DefaultISR                      [WEAK]
-
-Reserved16_IRQHandler
-Reserved17_IRQHandler
-Reserved18_IRQHandler
-Reserved19_IRQHandler
-Reserved20_IRQHandler
-FTMRE_IRQHandler
-PMC_IRQHandler
-IRQ_IRQHandler
-I2C0_IRQHandler
-I2C1_IRQHandler
-SPI0_IRQHandler
-SPI1_IRQHandler
-UART0_IRQHandler
-UART1_IRQHandler
-UART2_IRQHandler
-ADC_IRQHandler
-ACMP0_IRQHandler
-FTM0_IRQHandler
-FTM1_IRQHandler
-FTM2_IRQHandler
-RTC_IRQHandler
-ACMP1_IRQHandler
-PIT_CH0_IRQHandler
-PIT_CH1_IRQHandler
-KBI0_IRQHandler
-KBI1_IRQHandler
-Reserved42_IRQHandler
-ICS_IRQHandler
-WDOG_IRQHandler
-PWT_IRQHandler
-MSCAN_RX_IRQHandler
-MSCAN_TX_IRQHandler
-DefaultISR
-
-                B       .
-
-                ENDP
-
-
-                ALIGN
-
-
-; User Initial Stack & Heap
-
-                IF      :DEF:__MICROLIB
-
-                EXPORT  __initial_sp
-                EXPORT  __heap_base
-                EXPORT  __heap_limit
-
-                ELSE
-
-                IMPORT  __use_two_region_memory
-                EXPORT  __user_initial_stackheap
-__user_initial_stackheap
-
-                LDR     R0, =  Heap_Mem
-                LDR     R1, =(Stack_Mem + Stack_Size)
-                LDR     R2, = (Heap_Mem +  Heap_Size)
-                LDR     R3, = Stack_Mem
-                BX      LR
-
-                ALIGN
-
-                ENDIF
-
-
-                END
+    .end

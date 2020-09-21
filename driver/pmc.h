@@ -22,12 +22,6 @@
 *
 * @file pmc.h
 *
-* @author Freescale
-*
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
-*
 * @brief header file for PMC. 
 *
 *******************************************************************************
@@ -43,6 +37,7 @@ extern "C" {
 /******************************************************************************
 * Includes
 ******************************************************************************/
+#include "derivative.h"
 
 /******************************************************************************
 * Macros
@@ -53,10 +48,10 @@ extern "C" {
 *//*! @addtogroup pmc_sysmode
 * @{
 *******************************************************************************/
-#define PmcModeRun     0                     /*!< run mode */
-#define PmcModeWait    1                     /*!< wait mode */
-#define PmcModeStop4   2                     /*!< stop4 mode */
-#define PmcModeStop3   3                     /*!< stop3 mode */
+#define PmcModeRun     0                     /* run mode */
+#define PmcModeWait    1                     /* wait mode */
+#define PmcModeStop4   2                     /* stop4 mode */
+#define PmcModeStop3   3                     /* stop3 mode */
 /*! @} End of pmc_sysmode                                                     */
 
 /******************************************************************************
@@ -65,13 +60,13 @@ extern "C" {
 *//*! @addtogroup pmc_voltageselect
 * @{
 *******************************************************************************/
-#define PmcLVDTrip_Low   0                    /*!< LVD low trip point */
-#define PmcLVDTrip_High  1                     /*!< LVD high trip point  */
+#define PmcLVDTrip_Low   0                    /* LVD low trip point */
+#define PmcLVDTrip_High  1                     /* LVD high trip point  */
 
-#define PmcLVWTrip_Low   0                     /*!< LVW low trip point */
-#define PmcLVWTrip_Mid1  1                     /*!< LVW mid1 trip point */
-#define PmcLVWTrip_Mid2  2                     /*!< LVW mid2 trip point */
-#define PmcLVWTrip_High  3                     /*!< LVW high trip point */
+#define PmcLVWTrip_Low   0                     /* LVW low trip point */
+#define PmcLVWTrip_Mid1  1                     /* LVW mid1 trip point */
+#define PmcLVWTrip_Mid2  2                     /* LVW mid2 trip point */
+#define PmcLVWTrip_High  3                     /* LVW high trip point */
 /*! @} End of pmc_voltageselect                                               */
 
 
@@ -92,19 +87,19 @@ extern "C" {
 
 typedef union 
 {
-   uint8_t byte;						  /*!< byte field of union type */
+   uint8_t byte;						  /* byte field of union type */
    struct 
    {     
-       uint8_t bBandgapEn        :1;      /*!< bandgap enable */
-       uint8_t bBandgapDrv       :1;      /*!< bandgap drive select */
-       uint8_t bLvdEn            :1;      /*!< LVD enable */
-       uint8_t bLvdStopEn        :1;      /*!< LVD enable in stop mode */
-       uint8_t bLvdRstEn         :1;      /*!< reset enable when VLD evvent */
-       uint8_t bLvwIrqEn         :1;      /*!< LVW int enable */
-       uint8_t bLvwAck           :1;      /*!< LVW acknowledge */
-       uint8_t bLvwFlag          :1;      /*!< LVW flag */
-   }bits; 								  /*!< bitfield of union type */
-}PMC_Ctrl1Type, *PMC_Ctrl1Ptr;		  /*!< PMC control1 reg structure */
+       uint8_t bBandgapEn        :1;      /* bandgap enable */
+       uint8_t bBandgapDrv       :1;      /* bandgap drive select */
+       uint8_t bLvdEn            :1;      /* LVD enable */
+       uint8_t bLvdStopEn        :1;      /* LVD enable in stop mode */
+       uint8_t bLvdRstEn         :1;      /* reset enable when VLD evvent */
+       uint8_t bLvwIrqEn         :1;      /* LVW int enable */
+       uint8_t bLvwAck           :1;      /* LVW acknowledge */
+       uint8_t bLvwFlag          :1;      /* LVW flag */
+   }bits; 								  /* bitfield of union type */
+}PMC_Ctrl1Type, *PMC_Ctrl1Ptr;		  /* PMC control1 reg structure */
 /*! @} End of pmc_ctrlstruct                                                  */
 
 /******************************************************************************
@@ -119,15 +114,15 @@ typedef union
  */
 typedef union 
 {
-   uint8_t byte;						   /*!< byte field of union type */
+   uint8_t byte;						   /* byte field of union type */
    struct 
    {     
-       uint8_t           :4;               /*!< none */  
-       uint8_t bLVWV     :2;               /*!< LVW voltage select */  
-       uint8_t bLVDV     :1;               /*!< LVD voltage select */  
-       uint8_t           :1;               /*!< none */                 
-   }bits;  								   /*!< bitfield of union type */
-}PMC_Ctrl2Type, *PMC_Ctrl2Ptr;		   /*!< PMC control2 reg structure */
+       uint8_t           :4;               /* none */
+       uint8_t bLVWV     :2;               /* LVW voltage select */
+       uint8_t bLVDV     :1;               /* LVD voltage select */
+       uint8_t           :1;               /* none */
+   }bits;  								   /* bitfield of union type */
+}PMC_Ctrl2Type, *PMC_Ctrl2Ptr;		   /* PMC control2 reg structure */
 /*! @} End of pmc_voltselectstruct                                            */
 
 /******************************************************************************
@@ -143,9 +138,9 @@ typedef union
 
 typedef struct 
 {
-    PMC_Ctrl1Type    sCtrlstatus;          /*!< PMC control and status */  
-    PMC_Ctrl2Type    sDetectVoltSelect;    /*!< LVW and LVW voltage select */  
-}PMC_ConfigType, *PMC_ConfigPtr;		   /*!< PMC configuration structure */
+    PMC_Ctrl1Type    sCtrlstatus;          /* PMC control and status */
+    PMC_Ctrl2Type    sDetectVoltSelect;    /* LVW and LVW voltage select */
+}PMC_ConfigType, *PMC_ConfigPtr;		   /* PMC configuration structure */
 /*! @} End of pmc_configstruct                                            */  
 
 

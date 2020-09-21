@@ -24,14 +24,9 @@
 *
 * @author   Freescale
 *
-* @version  0.0.1
-*
-* @date     Jun 25, 2013
-*
 * @brief    Real-time counter (RTC) driver source code.  
 *
 ******************************************************************************/
-#include "common.h"
 #include "rtc.h"
 
 /******************************************************************************
@@ -57,12 +52,12 @@
  * @brief global variable to store RTC callbacks.
  *
  */
-RTC_CallbackType RTC_Callback[1] = {(RTC_CallbackType)NULL};    /*!< RTC initial callback */
+RTC_CallbackType RTC_Callback[1] = {(RTC_CallbackType)(0)};    /*!< RTC initial callback */
 
 /******************************************************************************
 * Local functions
 ******************************************************************************/
-void RTC_Isr(void);
+void RTC_IRQHandler(void);
 
 /******************************************************************************
 * Global functions
@@ -107,12 +102,13 @@ void RTC_Init(RTC_ConfigType *pConfig)
     
     if (pConfig->bInterruptEn)
     {
-         NVIC_EnableIRQ(RTC_IRQn);
+         Enable_Interrupt(RTC_IRQn);
          RTC_EnableInt(); 
     }
     else      
     {   
-        NVIC_DisableIRQ(RTC_IRQn);
+    
+        Disable_Interrupt(RTC_IRQn);
     }
     
     if (pConfig->bFlag)
@@ -121,7 +117,7 @@ void RTC_Init(RTC_ConfigType *pConfig)
     }
 
     u16Clocksource = pConfig->bClockSource; 
-    u16Prescler    = pConfig->bClockPresaler;
+    u16Prescler    = pConfig->bClockPrescaler;
      
     RTC_SetClock(u16Clocksource,u16Prescler );
 }
@@ -156,7 +152,7 @@ void RTC_SetCallback(RTC_CallbackType pfnCallback)
 *****************************************************************************/
 void RTC_DeInit(void)
 {
-    NVIC_DisableIRQ(RTC_IRQn);    
+    Disable_Interrupt(RTC_IRQn);
     RTC->MOD = 0;
     while(RTC->MOD);
     
@@ -182,7 +178,7 @@ void RTC_DeInit(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void RTC_Isr(void) 
+void RTC_IRQHandler(void) 
 {
     RTC_ClrFlags();	       
     if (RTC_Callback[0])

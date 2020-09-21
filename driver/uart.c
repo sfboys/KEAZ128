@@ -24,16 +24,27 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date June-6-2013
-*
 * @brief providing common UART API. 
 *
 ******************************************************************************/
-#include "common.h"
 #include "uart.h"
+#include "ics.h"
+#include "derivative.h"
 
+
+uint16_t global_pass_count = 0;
+uint16_t global_fail_count = 0;
+UART_TxDoneCallbackType UART_TxDoneCallback[MAX_UART_NO] = {(0)};
+UART_RxDoneCallbackType UART_RxDoneCallback[MAX_UART_NO] = {(0)};
+
+
+static uint8_t *pUART_TxBuff[MAX_UART_NO] = {(0)};           /* pointer to RxBuf */
+static uint8_t *pUART_RxBuff[MAX_UART_NO] = {(0)};           /* pointer to TxBuf */
+static uint16_t gu16UART_TxBuffPos[MAX_UART_NO] = {0};        /* write position to RxBuf */
+static uint16_t gu16UART_RxBuffPos[MAX_UART_NO] = {0};        /* read position to TxBuf */
+static uint32_t gu32UART_BuffSize[MAX_UART_NO] = {0};         /* buffer size*/
+
+#define NULL	(0)
 /******************************************************************************
 * Local variables
 ******************************************************************************/
@@ -45,7 +56,7 @@ UART_CallbackType UART_Callback = NULL;
 /******************************************************************************
 * Local functions
 *****************************************************************************/
-
+void UART_InitPrint(void);
 /******************************************************************************
 * Global functions
 ******************************************************************************/
@@ -66,40 +77,37 @@ UART_CallbackType UART_Callback = NULL;
 *
 * @return none
 *
+*
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void UART_Init(UART_Type *pUART, UART_ConfigType *pConfig)
+void UART_Init(UART_MemMapPtr pUART, UART_ConfigType *pConfig)
 {
     uint16_t u16Sbr;
     uint8_t u8Temp;
     uint32_t u32SysClk = pConfig->u32SysClkHz;
     uint32_t u32Baud = pConfig->u32Baudrate;
-
-    /* Sanity check */
-    ASSERT((pUART == UART0) || (pUART == UART1) || (pUART == UART2));
-  
+    
 	/* Enable the clock to the selected UART */    
-    if (pUART == UART0)
+    if (pUART == UART0_BASE_PTR)
 	{
-		SIM->SCGC |= SIM_SCGC_UART0_MASK;
+    	SIM_BASE_PTR->SCGC |= SIM_SCGC_UART0_MASK;
 	}
-#if defined(CPU_KEA8)  | defined(CPU_KEA128)
-	else if (pUART == UART1)
-	{
-        SIM->SCGC |= SIM_SCGC_UART1_MASK;
-	}
-    else
-	{
-        SIM->SCGC |= SIM_SCGC_UART2_MASK;
-	}
-#endif    
+    if (pUART == UART1_BASE_PTR)
+   	{
+       	SIM_BASE_PTR->SCGC |= SIM_SCGC_UART1_MASK;
+   	}
+    if (pUART == UART2_BASE_PTR)
+    {
+          	SIM_BASE_PTR->SCGC |= SIM_SCGC_UART2_MASK;
+     }
+
     /* Make sure that the transmitter and receiver are disabled while we 
      * change settings.
      */
     pUART->C2 &= ~(UART_C2_TE_MASK | UART_C2_RE_MASK );
     
     /* Configure the UART for 8-bit mode, no parity */
-    pUART->C1 = 0;
+    pUART->C1 = pConfig->sctrl1settings.byte;
     
     /* Calculate baud settings */
     u16Sbr = (((u32SysClk)>>4) + (u32Baud>>1))/u32Baud;
@@ -109,9 +117,40 @@ void UART_Init(UART_Type *pUART, UART_ConfigType *pConfig)
     
     pUART->BDH = u8Temp |  UART_BDH_SBR(u16Sbr >> 8);
     pUART->BDL = (uint8_t)(u16Sbr & UART_BDL_SBR_MASK);
+    
+    if(1==pConfig->bSbns)
+    {
+    	UART_Set2StopBit(pUART);
+    }
+    else
+    {
+    	UART_Set1StopBit(pUART);
 
-    /* Enable receiver and transmitter */
-    pUART->C2 |= (UART_C2_TE_MASK | UART_C2_RE_MASK );
+    }
+    pUART->C3=pConfig->sctrl3settings.byte;
+  	pUART->C2 =pConfig->sctrl2settings.byte;
+  	
+    if(1==pConfig->sctrl2settings.bits.bIlie||1==pConfig->sctrl2settings.bits.bRie||1==pConfig->sctrl2settings.bits.bTcie||1==pConfig->sctrl2settings.bits.bTie
+    		||1==pConfig->sctrl3settings.bits.bFeie||1==pConfig->sctrl3settings.bits.bNeie||1==pConfig->sctrl3settings.bits.bOrie||1==pConfig->sctrl3settings.bits.bPeie)
+    {
+    	if(pUART==UART0)
+    	{
+      	  Enable_Interrupt(UART0_IRQn);
+
+    	}
+    	if(pUART==UART1)
+    	{
+      	  Enable_Interrupt(UART1_IRQn);
+
+    	}
+    	if(pUART==UART2)
+    	{
+      	  Enable_Interrupt(UART2_IRQn);
+
+    	}
+    }
+    
+
 }
 
 /*****************************************************************************//*!
@@ -123,12 +162,8 @@ void UART_Init(UART_Type *pUART, UART_ConfigType *pConfig)
 * @return unsigned char
 *
 *****************************************************************************/
-uint8_t UART_GetChar(UART_Type *pUART)
+uint8_t UART_GetChar(UART_MemMapPtr pUART)
 {
-
-    /* Sanity check */
-    ASSERT((pUART == UART0) || (pUART == UART1) || (pUART == UART2));
- 
     /* Wait until character has been received */
     while (!(pUART->S1 & UART_S1_RDRF_MASK));
     
@@ -145,7 +180,7 @@ uint8_t UART_GetChar(UART_Type *pUART)
 * @return none
 *
 *****************************************************************************/
-void UART_PutChar(UART_Type *pUART, uint8_t u8Char)
+void UART_PutChar(UART_MemMapPtr pUART, uint8_t u8Char)
 {    
     /* Wait until space is available in the FIFO */
     while (!(pUART->S1 & UART_S1_TDRE_MASK));
@@ -165,16 +200,13 @@ void UART_PutChar(UART_Type *pUART, uint8_t u8Char)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-void UART_SetBaudrate(UART_Type *pUART, UART_ConfigBaudrateType *pConfig)
+void UART_SetBaudrate(UART_MemMapPtr pUART, UART_ConfigBaudrateType *pConfig)
 {
     uint8_t u8Temp;
     uint16_t u16Sbr;
     uint32_t u32SysClk    = pConfig->u32SysClkHz;
     uint32_t u32baud       = pConfig->u32Baudrate;
  
-    /* Sanity check */
-    ASSERT((pUART == UART0) || (pUART == UART1) || (pUART == UART2));
-
     /* Calculate baud settings */
     u16Sbr = (((u32SysClk)>>4) + (u32baud>>1))/u32baud;
 
@@ -189,60 +221,6 @@ void UART_SetBaudrate(UART_Type *pUART, UART_ConfigBaudrateType *pConfig)
 
 }
 
-/*****************************************************************************//*!
-*
-* @brief enable interrupt.
-*        
-* @param[in] pUART          base of UART port
-* @param[in] InterruptType  interrupt type
-*
-* @return none
-*
-* @ Pass/ Fail criteria:
-*****************************************************************************/
-void UART_EnableInterrupt(UART_Type *pUART, UART_InterruptType InterruptType)
-{
-
-    /* Sanity check */
-    ASSERT((pUART == UART0) || (pUART == UART1) || (pUART == UART2));
-
-    if (InterruptType == UART_TxBuffEmptyInt)
-    {
-        pUART->C2 |= UART_C2_TIE_MASK;
-    }
-    else if (InterruptType == UART_TxCompleteInt)
-    {
-        pUART->C2 |= UART_C2_TCIE_MASK;
-    }
-    else if (InterruptType == UART_RxBuffFullInt)
-    {
-        pUART->C2 |= UART_C2_RIE_MASK;
-    }
-    else if (InterruptType == UART_IdleLineInt)
-    {
-        pUART->C2 |= UART_C2_ILIE_MASK;
-    }
-    else if (InterruptType == UART_RxOverrunInt)
-    {
-        pUART->C3 |= UART_C3_ORIE_MASK;
-    }
-    else if (InterruptType == UART_NoiseErrorInt)
-    {
-        pUART->C3 |= UART_C3_NEIE_MASK;
-    }
-    else if (InterruptType == UART_FramingErrorInt)
-    {
-        pUART->C3 |= UART_C3_FEIE_MASK;
-    } 
-    else if (InterruptType == UART_ParityErrorInt)
-    {
-        pUART->C3 |= UART_C3_FEIE_MASK;
-    } 
-    else
-    {
-        /* un-supported Interrupt type */
-    }  
-}
 
 /*****************************************************************************//*!
 *
@@ -255,11 +233,8 @@ void UART_EnableInterrupt(UART_Type *pUART, UART_InterruptType InterruptType)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-void UART_DisableInterrupt(UART_Type *pUART, UART_InterruptType InterruptType)
+void UART_DisableInterrupt(UART_MemMapPtr pUART, UART_InterruptType InterruptType)
 {
-    /* Sanity check */
-    ASSERT((pUART == UART0) || (pUART == UART1) || (pUART == UART2));
-
 
     if (InterruptType == UART_TxBuffEmptyInt)
     {
@@ -310,7 +285,7 @@ void UART_DisableInterrupt(UART_Type *pUART, UART_InterruptType InterruptType)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-uint16_t UART_GetFlags(UART_Type *pUART)
+uint16_t UART_GetFlags(UART_MemMapPtr pUART)
 {
     uint16_t u16StatusFlags = 0;
 
@@ -332,7 +307,7 @@ uint16_t UART_GetFlags(UART_Type *pUART)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-uint8_t UART_CheckFlag(UART_Type *pUART, UART_FlagType FlagType)
+uint8_t UART_CheckFlag(UART_MemMapPtr *pUART, UART_FlagType FlagType)
 {
     uint16_t u16StatusFlags = 0;
 
@@ -353,7 +328,7 @@ uint8_t UART_CheckFlag(UART_Type *pUART, UART_FlagType FlagType)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-void UART_SendWait(UART_Type *pUART, uint8_t *pSendBuff, uint32_t u32Length)
+void UART_SendWait(UART_MemMapPtr pUART, uint8_t *pSendBuff, uint32_t u32Length)
 {
     uint8_t u8TxChar;
     uint32_t  i;
@@ -363,9 +338,6 @@ void UART_SendWait(UART_Type *pUART, uint8_t *pSendBuff, uint32_t u32Length)
         u8TxChar = pSendBuff[i];
         while (!UART_IsTxBuffEmpty(pUART))
         {
-            #if defined(ENABLE_WDOG)
-                WDOG_Feed();
-            #endif        
         }
         UART_WriteDataReg(pUART, u8TxChar);        
     }
@@ -383,7 +355,7 @@ void UART_SendWait(UART_Type *pUART, uint8_t *pSendBuff, uint32_t u32Length)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-void UART_ReceiveWait(UART_Type *pUART, uint8_t *pReceiveBuff, uint32_t u32Length)
+void UART_ReceiveWait(UART_MemMapPtr pUART, uint8_t *pReceiveBuff, uint32_t u32Length)
 {
     uint8_t u8RxChar;
     uint32_t i;
@@ -391,10 +363,7 @@ void UART_ReceiveWait(UART_Type *pUART, uint8_t *pReceiveBuff, uint32_t u32Lengt
     for (i = 0; i < u32Length; i++)
     {
         while (!UART_IsRxBuffFull(pUART))
-        {
-            #if defined(ENABLE_WDOG)
-                WDOG_Feed();
-            #endif       
+        {  
         }    
         u8RxChar = UART_ReadDataReg(pUART);
         pReceiveBuff[i] = u8RxChar;
@@ -410,7 +379,7 @@ void UART_ReceiveWait(UART_Type *pUART, uint8_t *pReceiveBuff, uint32_t u32Lengt
 * @return       none
 *
 * @ Pass/ Fail criteria: none*****************************************************************************/
-void UART_WaitTxComplete(UART_Type *pUART)
+void UART_WaitTxComplete(UART_MemMapPtr pUART)
 {
     while (!UART_IsTxComplete(pUART));
 }
@@ -428,7 +397,7 @@ void UART_WaitTxComplete(UART_Type *pUART)
 *****************************************************************************/
 void UART_SetCallback(UART_CallbackType pfnCallback)
 {
-    //uint8_t    u8Port = ((uint32_t)pUART-(uint32_t)UART0)>>12;
+   
     UART_Callback = pfnCallback;
 }
 
@@ -438,7 +407,7 @@ void UART_SetCallback(UART_CallbackType pfnCallback)
 
 /*****************************************************************************//*!
 *
-* @brief uart0 interrupt service routine.
+* @brief UART0_BASE_PTR interrupt service routine.
 *        
 * @param        none
 *
@@ -446,16 +415,15 @@ void UART_SetCallback(UART_CallbackType pfnCallback)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-void UART0_Isr(void)
+void UART0_IRQHandler(void)
 {
-    UART_Callback(UART0);
+    UART_Callback(UART0_BASE_PTR);
 }
 
 
-#if defined(CPU_KEA8) | defined(CPU_KEA128)
 /*****************************************************************************//*!
 *
-* @brief uart1 interrupt service routine.
+* @brief UART1_BASE_PTR interrupt service routine.
 *        
 * @param        none
 *
@@ -463,13 +431,16 @@ void UART0_Isr(void)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-void UART1_Isr(void)
+void UART1_IRQHandler(void)
 {
-    UART_Callback(UART1);
+    UART_Callback(UART1_BASE_PTR);
+    
 }
+
+
 /*****************************************************************************//*!
 *
-* @brief uart2 interrupt service routine.
+* @brief UART2_BASE_PTR interrupt service routine.
 *        
 * @param        none
 *
@@ -477,13 +448,10 @@ void UART1_Isr(void)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
-void UART2_Isr(void)
+void UART2_IRQHandler(void)
 {
-    UART_Callback(UART2);
+    UART_Callback(UART2_BASE_PTR);
 }
-
-
-#endif
 
 
 

@@ -24,16 +24,12 @@
 *
 * @author   Freescale
 *
-* @version  0.0.1
-*
-* @date     Jun 25, 2013
 *
 * @brief    Periodic Interrupt Timer (PIT) source code. 
 *
 ******************************************************************************/
-#include "common.h"
 #include "pit.h"
-
+#include "nvic.h"
 /******************************************************************************
 * Global variables
 ******************************************************************************/
@@ -57,14 +53,11 @@
  * @brief global variable to store PIT callbacks.
  *
  */
-PIT_CallbackType PIT_Callback[2] = {(PIT_CallbackType)NULL}; /*!< PIT initial callback */
+PIT_CallbackType PIT_Callback[2] = {(0)}; /*!< PIT initial callback */
 
 /******************************************************************************
 * Local functions
 ******************************************************************************/
-void PIT_Ch0Isr(void);
-void PIT_Ch1Isr(void);
-
 
 /******************************************************************************
 * Global functions
@@ -107,18 +100,18 @@ void PIT_Init(uint8_t u8Channel_No, PIT_ConfigType *pConfig)
     if (pConfig->bInterruptEn)            
     {                                   
         if (u8Channel_No)
-        {        
-             NVIC_EnableIRQ(PIT_CH1_IRQn);             
+        {    
+        	Enable_Interrupt(PIT_CH1_IRQn);
         }
         else
         {                  
-            NVIC_EnableIRQ(PIT_CH0_IRQn);
+        	Enable_Interrupt(PIT_CH0_IRQn);
         }
         PIT_ChannelEnableInt(u8Channel_No);
     }                   
     else                                     
     {                     
-        NVIC_DisableIRQ(PIT_CH0_IRQn);       
+    	Disable_Interrupt(PIT_CH0_IRQn);
     }
 
     if (pConfig->bChainMode)            
@@ -180,9 +173,9 @@ void PIT_SetCallback(uint8_t u8Channel_No, PIT_CallbackType pfnCallback)
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
 void PIT_DeInit(void)
-{
-    NVIC_DisableIRQ(PIT_CH0_IRQn);
-    NVIC_DisableIRQ(PIT_CH1_IRQn);    
+{   
+    Disable_Interrupt(PIT_CH0_IRQn);
+    Disable_Interrupt(PIT_CH1_IRQn);
     PIT_SetLoadVal(0,0);
     PIT_SetLoadVal(1,0);
     PIT_ChannelDisable(0);
@@ -210,7 +203,7 @@ void PIT_DeInit(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void PIT_Ch0Isr(void) 
+void PIT_CH0_IRQHandler(void) 
 {   
    PIT_ChannelClrFlags(0);  
     
@@ -230,7 +223,7 @@ void PIT_Ch0Isr(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void PIT_Ch1Isr(void) 
+void PIT_CH1_IRQHandler(void) 
 {   
     PIT_ChannelClrFlags(1);
     if (PIT_Callback[1])

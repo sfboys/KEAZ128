@@ -1,7 +1,7 @@
 /******************************************************************************
 *
 * Freescale Semiconductor Inc.
-* (c) Copyright 2013 Freescale Semiconductor, Inc.
+* (c) Copyright 2014 Freescale Semiconductor, Inc.
 * ALL RIGHTS RESERVED.
 *
 ***************************************************************************
@@ -24,9 +24,6 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
 *
 * @brief providing APIs for configuring I2C module (I2C). 
 *
@@ -34,7 +31,7 @@
 *
 * provide APIs for configuring I2C module (I2C).
 ******************************************************************************/
-#include "common.h"
+
 #include "i2c.h"
 
 /******************************************************************************
@@ -56,11 +53,10 @@
 /******************************************************************************
 * Local variables
 ******************************************************************************/
-static I2C_CallbackType I2C_Callback[2] = {(I2C_CallbackType)NULL};
+static I2C_CallbackType I2C_Callback[2] = {(I2C_CallbackType)(0)};
 /******************************************************************************
 * Local functions
 ******************************************************************************/
-void I2C0_Isr( void );
 
 /******************************************************************************
 * Global functions
@@ -78,22 +74,19 @@ void I2C0_Isr( void );
    * @brief Initialize I2C module.
    *        
    * @param[in] pI2Cx      point to I2C module type.
- 	 * @param[in] pI2CConfig point to I2C configure structure.
+   * @param[in] pI2CConfig point to I2C configure structure.
    *
    * @return none
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
 
-void I2C_Init(I2C_Type *pI2Cx,I2C_ConfigPtr pI2CConfig)
+void I2C_Init(I2C_Type pI2Cx,I2C_ConfigPtr pI2CConfig)
 {
     uint8_t u8Temp;
 
-#if defined(CPU_KEA8)
-    SIM->SCGC |= SIM_SCGC_IIC_MASK;
-#elif defined(CPU_KEA64)
-    SIM->SCGC |= SIM_SCGC_IIC_MASK;
-#elif defined(CPU_KEA128)
+
+    
     if(pI2Cx == I2C0)
     {
         SIM->SCGC |= SIM_SCGC_I2C0_MASK;
@@ -102,7 +95,7 @@ void I2C_Init(I2C_Type *pI2Cx,I2C_ConfigPtr pI2CConfig)
     {
         SIM->SCGC |= SIM_SCGC_I2C1_MASK;
     }
-#endif
+
 
 	I2C_SetBaudRate(pI2Cx,pI2CConfig->u16F);
     I2C_SetSlaveAddress(pI2Cx,pI2CConfig->u16OwnA1);
@@ -126,7 +119,7 @@ void I2C_Init(I2C_Type *pI2Cx,I2C_ConfigPtr pI2CConfig)
     }
     pI2Cx->C2 |= u8Temp;
 
-    /* configure SMB rehister */
+    /* configure SMB register */
     u8Temp = 0;
     if( pI2CConfig->sSetting.bFackEn )
     {
@@ -146,35 +139,44 @@ void I2C_Init(I2C_Type *pI2Cx,I2C_ConfigPtr pI2CConfig)
     }
     pI2Cx->SMB = u8Temp;
     
-    /* configure C1 rehister */
+    /* configure C1 register */
     u8Temp = 0;
     if( pI2CConfig->sSetting.bIntEn )
     {
         u8Temp |= I2C_C1_IICIE_MASK;
         if(pI2Cx == I2C0)
         {
-            NVIC_EnableIRQ(I2C0_IRQn);
+            Enable_Interrupt(I2C0_IRQn);
         }
-    #if defined(CPU_KEA128)     
+    
         else if(pI2Cx == I2C1)
         {
-            NVIC_EnableIRQ(I2C1_IRQn);
+        
+            Enable_Interrupt(I2C1_IRQn);
         }
-    #endif    
-        else
-        {
-            //
-        }
+        
     }
+    
     if( pI2CConfig->sSetting.bWakeUpEn )
-    {
-        u8Temp |= I2C_C1_WUEN_MASK;
-    }
-    if( pI2CConfig->sSetting.bI2CEn )
-    {
-        u8Temp |= I2C_C1_IICEN_MASK;
-    }
+	{
+	  u8Temp |= I2C_C1_WUEN_MASK;
+	}
+	
+	
+	if( pI2CConfig->sSetting.bMSTEn )
+	{
+	  u8Temp |= I2C_C1_MST_MASK;
+	}
+	
+	if( pI2CConfig->sSetting.bI2CEn )
+	{
+	 u8Temp |= I2C_C1_IICEN_MASK;
+	}
+    
     pI2Cx->C1 = u8Temp;
+ 
+
+
 
 
 }
@@ -188,7 +190,7 @@ void I2C_Init(I2C_Type *pI2Cx,I2C_ConfigPtr pI2CConfig)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-uint8_t I2C_Start(I2C_Type *pI2Cx)
+uint8_t I2C_Start(I2C_Type pI2Cx)
 {
     uint32_t u32Timeout;
     uint8_t u8ErrorStatus;
@@ -222,7 +224,7 @@ uint8_t I2C_Start(I2C_Type *pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-uint8_t I2C_Stop(I2C_Type *pI2Cx)
+uint8_t I2C_Stop(I2C_Type pI2Cx)
 {
     uint32_t u32Timeout;
     uint8_t u8ErrorStatus;
@@ -256,7 +258,7 @@ uint8_t I2C_Stop(I2C_Type *pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-uint8_t I2C_RepeatStart(I2C_Type *pI2Cx)
+uint8_t I2C_RepeatStart(I2C_Type pI2Cx)
 {
     uint32_t u32Timeout;
     uint8_t u8ErrorStatus;
@@ -289,7 +291,7 @@ uint8_t I2C_RepeatStart(I2C_Type *pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void I2C_SetSlaveAddress(I2C_Type *pI2Cx,uint16_t u16SlaveAddress)
+void I2C_SetSlaveAddress(I2C_Type pI2Cx,uint16_t u16SlaveAddress)
 {
     /* write low 8bit address */
     pI2Cx->A1 = (uint8_t)u16SlaveAddress;
@@ -309,23 +311,18 @@ void I2C_SetSlaveAddress(I2C_Type *pI2Cx,uint16_t u16SlaveAddress)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void I2C_IntDisable(I2C_Type *pI2Cx)
+void I2C_IntDisable(I2C_Type pI2Cx)
 {
     pI2Cx->C1 &= ~I2C_C1_IICIE_MASK;
     if(pI2Cx == I2C0)
     {
-        NVIC_DisableIRQ(I2C0_IRQn);
+        Disable_Interrupt(I2C0_IRQn);
     }
-    #if defined(CPU_KEA128)
     else if(pI2Cx == I2C1)
     {
-        NVIC_DisableIRQ(I2C1_IRQn);
+        Disable_Interrupt(I2C1_IRQn);
     }
-    #endif
-    else
-    {
-        
-    }
+   
 }
 /*****************************************************************************//*!
    *
@@ -337,23 +334,19 @@ void I2C_IntDisable(I2C_Type *pI2Cx)
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-void I2C_IntEnable(I2C_Type *pI2Cx)
+void I2C_IntEnable(I2C_Type pI2Cx)
 {
     pI2Cx->C1 |= I2C_C1_IICIE_MASK;
     if(pI2Cx == I2C0)
     {
-        NVIC_EnableIRQ(I2C0_IRQn);
+        Enable_Interrupt(I2C0_IRQn);
     }
-    #if defined(CPU_KEA128)
+   
     else if(pI2Cx == I2C1)
     {
-        NVIC_EnableIRQ(I2C1_IRQn);
+        Enable_Interrupt(I2C1_IRQn);
     }
-    #endif
-    else
-    {
-        
-    }
+   
 }
 
 /*****************************************************************************//*!
@@ -361,12 +354,13 @@ void I2C_IntEnable(I2C_Type *pI2Cx)
    * @brief SCL low timeout value that determines the timeout period of SCL low.
    *        
    * @param[in] pI2Cx      point to I2C module type.
+   * @param[in] u16Timeout 
    *
    * @return none.
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-void I2C_SetSCLLowTimeout(I2C_Type *pI2Cx, uint16_t u16Timeout)
+void I2C_SetSCLLowTimeout(I2C_Type pI2Cx, uint16_t u16Timeout)
 {
     pI2Cx->SLTL = (uint8_t)u16Timeout;
     pI2Cx->SLTH = (uint8_t)(u16Timeout>>8);
@@ -381,14 +375,9 @@ void I2C_SetSCLLowTimeout(I2C_Type *pI2Cx, uint16_t u16Timeout)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void I2C_Deinit(I2C_Type *pI2Cx)
+void I2C_Deinit(I2C_Type pI2Cx)
 {
      pI2Cx->C1 &= ~I2C_C1_IICEN_MASK;
-#if defined(CPU_KEA8)
-    SIM->SCGC &= ~SIM_SCGC_IIC_MASK;
-#elif defined(CPU_KEA64)
-    SIM->SCGC &= ~SIM_SCGC_IIC_MASK;
-#elif defined(CPU_KEA128)
     if(pI2Cx == I2C0)
     {
         SIM->SCGC &= ~SIM_SCGC_I2C0_MASK;
@@ -397,7 +386,7 @@ void I2C_Deinit(I2C_Type *pI2Cx)
     {
         SIM->SCGC &= ~SIM_SCGC_I2C1_MASK;
     }
-#endif
+
 }
 
 /*****************************************************************************//*!
@@ -412,7 +401,7 @@ void I2C_Deinit(I2C_Type *pI2Cx)
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
 
-uint8_t I2C_WriteOneByte(I2C_Type *pI2Cx, uint8_t u8WrBuff)
+uint8_t I2C_WriteOneByte(I2C_Type pI2Cx, uint8_t u8WrBuff)
 {
     uint32_t u32Timeout;
     uint8_t u8ErrorStatus;
@@ -466,7 +455,7 @@ uint8_t I2C_WriteOneByte(I2C_Type *pI2Cx, uint8_t u8WrBuff)
    * @ Pass/ Fail criteria:  none
 *****************************************************************************/
 
-uint8_t I2C_ReadOneByte(I2C_Type *pI2Cx, uint8_t *pRdBuff, uint8_t u8Ack)
+uint8_t I2C_ReadOneByte(I2C_Type pI2Cx, uint8_t *pRdBuff, uint8_t u8Ack)
 {
     uint32_t u32Timeout;
     uint8_t u8ErrorStatus;
@@ -516,51 +505,128 @@ uint8_t I2C_ReadOneByte(I2C_Type *pI2Cx, uint8_t *pRdBuff, uint8_t u8Ack)
 
     return u8ErrorStatus;
 }
+
+/*****************************************************************************//*!
+   *
+   * @brief I2C0 master send data with interrupt. 
+   * 
+   * @param[in]  pI2Cx    point to I2C module type.       
+   * @param[in] u16Address I2C slave address. 
+   *
+   * @return error status
+   *
+   * @ Pass/ Fail criteria:  read data
+*****************************************************************************/
+uint8_t I2C_MasterSend(I2C_Type pI2Cx, uint16_t Address )
+{
+	 uint8_t u8Status;
+
+	    if( I2C_IsBusy(I2C0) )
+	    {
+	        return I2C_ERROR_BUS_BUSY;
+	    }
+
+	    /* send out start on bus */
+	    u8Status = I2C_Start(I2C0);
+	    I2C_TxEnable(I2C0);
+	    if( u8Status == I2C_ERROR_NULL )
+	    {
+	        u8Status = I2C_WriteOneByte(I2C0,Address|I2C_WRITE);
+	
+	    }
+	    return u8Status;
+
+}
+
+
 /*****************************************************************************//*!
    *
    * @brief send data to I2C, and wait to complete transfering.
    *   
    * @param[in]  pI2Cx    point to I2C module type.
    * @param[in]  u16SlaveAddress slave address. 
-   * @param[in]  pWrBuff point the first address of transfering data buffer. 
-   * @param[in]  the length of transfering data.
+   * @param[in]  pWrBuff point the first address of transferring data buffer. 
+   * @param[in]  u32Length the length of transferring data.
    *
    * @return error status
    *
    * @ Pass/ Fail criteria:  none
 *****************************************************************************/
 
-uint8_t I2C_MasterSendWait(I2C_Type *pI2Cx,uint16_t u16SlaveAddress,uint8_t *pWrBuff,uint32_t u32Length)
+uint8_t I2C_MasterSendWait(I2C_Type pI2Cx,uint16_t u16SlaveAddress,uint8_t *pWrBuff,uint32_t u32Length)
 {
-    uint32_t i;
-    uint8_t u8ErrorStatus;
+	 uint32_t i;
+	 uint8_t u8ErrorStatus;
+	 
 
-    /* send start signals to bus */
-    u8ErrorStatus = I2C_Start(pI2Cx);
+	/* send start signals to bus */
+	u8ErrorStatus = I2C_Start(pI2Cx);
 
-    /* send device address to slave */
-    u8ErrorStatus = I2C_WriteOneByte(pI2Cx,((uint8_t)u16SlaveAddress<<1) | I2C_WRITE);
+	/* send device address to slave */
+	u8ErrorStatus = I2C_WriteOneByte(pI2Cx,u16SlaveAddress| I2C_WRITE);
 
-    /* if no error occur, received the correct ack from slave
-            continue to send data to slave
-        */
-    if( u8ErrorStatus == I2C_ERROR_NULL )
-    {
-        for(i=0;i<u32Length;i++)
-        {
-            u8ErrorStatus = I2C_WriteOneByte(pI2Cx,pWrBuff[i]);
-            if( u8ErrorStatus != I2C_ERROR_NULL )
-            {
-                return u8ErrorStatus;
-            }
-        }
-     }
+	/* if no error occur, received the correct ack from slave
+			continue to send data to slave
+		*/
+	if( u8ErrorStatus == I2C_ERROR_NULL )
+	{
+		for(i=0;i<u32Length;i++)
+		{
+			u8ErrorStatus = I2C_WriteOneByte(pI2Cx,pWrBuff[i]);
+			if( u8ErrorStatus != I2C_ERROR_NULL )
+			{
+				return u8ErrorStatus;
+			}
+		}
+	 }
 
-     /* send stop signals to bus */
-     u8ErrorStatus = I2C_Stop(pI2Cx);
+	 /* send stop signals to bus */
+	 u8ErrorStatus = I2C_Stop(pI2Cx);
 
-     return u8ErrorStatus;
+	 return u8ErrorStatus;
             
+}
+
+
+
+/*****************************************************************************//*!
+   *
+   * @brief I2C master receive data with interrupt. 
+   * 
+   * @param[in]  pI2Cx    point to I2C module type.       
+   * @param[in] u16Address I2C slave address. 
+   *
+   * @return error status.
+   *
+   * @ Pass/ Fail criteria:  none.
+*****************************************************************************/
+uint8_t I2C_MasterRead(I2C_Type pI2Cx, uint16_t u16Address)
+{
+    
+    uint8_t u8Status;
+    
+  I2C_IntDisable(I2C0);
+   
+   /* send out start on bus */
+   u8Status = I2C_Start(I2C0);
+
+   if( u8Status == I2C_ERROR_NULL )
+   {
+       u8Status = I2C_WriteOneByte(I2C0,u16Address|I2C_READ);
+       if( u8Status == I2C_ERROR_NULL )
+       {
+           
+            /* change to Rx mode */
+            I2C_SendAck(I2C0);
+            I2C_RxEnable(I2C0);
+            I2C_ReadDataReg(I2C0);
+       }
+   }
+
+  I2C_IntEnable(I2C0);
+   
+   return u8Status;
+
 }
 /*****************************************************************************//*!
    *
@@ -569,7 +635,7 @@ uint8_t I2C_MasterSendWait(I2C_Type *pI2Cx,uint16_t u16SlaveAddress,uint8_t *pWr
    * @param[in] pI2Cx    point to I2C module type.
    * @param[in]  u16SlaveAddress slave address. 
    * @param[in]  pRdBuff point the first address of reading data buffer. 
-   * @param[in]  the length of transfering data.
+   * @param[in]  the length of transferring data.
    *
    * @return error status
    *
@@ -578,38 +644,37 @@ uint8_t I2C_MasterSendWait(I2C_Type *pI2Cx,uint16_t u16SlaveAddress,uint8_t *pWr
 
 uint8_t I2C_MasterReadWait(I2C_Type *pI2Cx,uint16_t u16SlaveAddress,uint8_t *pRdBuff,uint32_t u32Length)
 {
-    uint32_t i;
-    uint8_t u8ErrorStatus;
+	 uint32_t i;
+	    uint8_t u8ErrorStatus;
 
-    /* send start signals to bus */
-    u8ErrorStatus = I2C_Start(pI2Cx);
+	    /* send start signals to bus */
+	    u8ErrorStatus = I2C_Start(pI2Cx);
 
-    /* send device address to slave */
-    u8ErrorStatus = I2C_WriteOneByte(pI2Cx,((uint8_t)u16SlaveAddress<<1) | I2C_READ);
+	    /* send device address to slave */
+	    u8ErrorStatus = I2C_WriteOneByte(pI2Cx,u16SlaveAddress | I2C_READ);
 
-    /* if no error occur, received the correct ack from slave
-            continue to send data to slave
-        */
-    /* dummy read one byte to switch to Rx mode */
-    I2C_ReadOneByte(pI2Cx,&pRdBuff[0],I2C_SEND_ACK);
-    
-    if( u8ErrorStatus == I2C_ERROR_NULL )
-    {
-        for(i=0;i<u32Length-1;i++)
-        {
-            u8ErrorStatus = I2C_ReadOneByte(pI2Cx,&pRdBuff[i],I2C_SEND_ACK);
-            if( u8ErrorStatus != I2C_ERROR_NULL )
-            {
-                return u8ErrorStatus;
-            }
-        }
-        u8ErrorStatus = I2C_ReadOneByte(pI2Cx,&pRdBuff[i],I2C_SEND_NACK);
-     }
-     /* send stop signals to bus */
-     u8ErrorStatus = I2C_Stop(pI2Cx);
-     
-     return u8ErrorStatus;
-            
+	    /* if no error occur, received the correct ack from slave
+	            continue to send data to slave
+	        */
+	    /* dummy read one byte to switch to Rx mode */
+	    I2C_ReadOneByte(pI2Cx,&pRdBuff[0],I2C_SEND_ACK);
+	    
+	    if( u8ErrorStatus == I2C_ERROR_NULL )
+	    {
+	        for(i=0;i<u32Length-1;i++)
+	        {
+	            u8ErrorStatus = I2C_ReadOneByte(pI2Cx,&pRdBuff[i],I2C_SEND_ACK);
+	            if( u8ErrorStatus != I2C_ERROR_NULL )
+	            {
+	                return u8ErrorStatus;
+	            }
+	        }
+	        u8ErrorStatus = I2C_ReadOneByte(pI2Cx,&pRdBuff[i],I2C_SEND_NACK);
+	     }
+	     /* send stop signals to bus */
+	     u8ErrorStatus = I2C_Stop(pI2Cx);
+	     
+	     return u8ErrorStatus;
 }
 /*****************************************************************************//*!
    *
@@ -655,7 +720,7 @@ void I2C0_SetCallBack( I2C_CallbackType pCallBack )
    *
    * @ Pass/ Fail criteria:  none
 *****************************************************************************/
-void I2C0_Isr( void )
+void I2C0_IRQHandler( void )
 {
     if( I2C_Callback[0] )
     {
@@ -672,7 +737,7 @@ void I2C0_Isr( void )
    *
    * @ Pass/ Fail criteria:  none
 *****************************************************************************/
-void I2C1_Isr( void )
+void I2C1_IRQHandler( void )
 {
     if( I2C_Callback[1] )
     {

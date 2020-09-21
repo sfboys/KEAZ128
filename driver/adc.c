@@ -24,9 +24,6 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
 *
 * @brief providing APIs for configuring ADC module (ADC). 
 *
@@ -34,12 +31,11 @@
 *
 * provide APIs for configuring ADC module (ADC)
 ******************************************************************************/
-#include "common.h"
 #include "adc.h"
 /******************************************************************************
 * Local function
 ******************************************************************************/
-ADC_CallbackType ADC_Callback[1] = {NULL};
+ADC_CallbackType ADC_Callback[1] = {(0)};
 /******************************************************************************
 * Local variables
 ******************************************************************************/
@@ -67,7 +63,7 @@ ADC_CallbackType ADC_Callback[1] = {NULL};
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-void ADC_Init(ADC_Type *pADC, ADC_ConfigTypePtr pADC_Config)
+void ADC_Init(ADC_MemMapPtr pADC, ADC_ConfigTypePtr pADC_Config)
 {
     if( pADC == ADC)
     {
@@ -117,15 +113,12 @@ void ADC_Init(ADC_Type *pADC, ADC_ConfigTypePtr pADC_Config)
     if( pADC_Config->sSetting.bHardwareTriggerEn )
     {
         ADC_SetHardwareTrigger(pADC);
-    }else
-		{
-		    ADC_SetSoftwareTrigger(pADC);
-		}
+    }
 
     if( pADC_Config->sSetting.bIntEn )
     {
         ADC_IntEnable(pADC);
-        NVIC_EnableIRQ(ADC0_IRQn);
+        Enable_Interrupt(ADC_IRQn);
     } 
 
     if( pADC_Config->sSetting.bLongSampleEn )
@@ -138,8 +131,6 @@ void ADC_Init(ADC_Type *pADC, ADC_ConfigTypePtr pADC_Config)
         ADC_SetLowPower(pADC);
     }
 
-#if !defined(CPU_KEA8)
-
     if( pADC_Config->sSetting.bHTRGMEn )
     {
         ADC_HardwareTriggerMultiple(pADC);
@@ -148,6 +139,7 @@ void ADC_Init(ADC_Type *pADC, ADC_ConfigTypePtr pADC_Config)
     {
 		ADC_HardwareTriggerSingle(pADC);
     }
+    
     if( pADC_Config->sSetting.bHTRGMASKEn )
     {
         ADC_HardwareTriggerMaskEnable(pADC);
@@ -164,7 +156,7 @@ void ADC_Init(ADC_Type *pADC, ADC_ConfigTypePtr pADC_Config)
     {
 		ADC_HardwareTriggerMaskNonAuto(pADC);
     }
-#endif
+
 }
 
 /*****************************************************************************//*!
@@ -177,7 +169,7 @@ void ADC_Init(ADC_Type *pADC, ADC_ConfigTypePtr pADC_Config)
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
-void ADC_DeInit( ADC_Type *pADC )
+void ADC_DeInit( ADC_MemMapPtr pADC )
 {
     ADC_SetChannel(pADC,ADC_CHANNEL_DISABLE);
 
@@ -195,7 +187,7 @@ void ADC_DeInit( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-unsigned int ADC_PollRead( ADC_Type *pADC, uint8_t u8Channel )
+unsigned int ADC_PollRead( ADC_MemMapPtr pADC, uint8_t u8Channel )
 {
 		ADC_SetChannel(pADC,u8Channel);
 		while( !ADC_IsCOCOFlag(pADC) );
@@ -229,7 +221,7 @@ void ADC_SetCallBack(ADC_CallbackType pADC_CallBack)
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-void ADC_SetChannel( ADC_Type *pADC, uint8_t u8Channel )
+void ADC_SetChannel( ADC_MemMapPtr pADC, uint8_t u8Channel )
 {
     uint32_t u32temp;    
     u32temp = pADC->SC1; 
@@ -247,7 +239,7 @@ void ADC_SetChannel( ADC_Type *pADC, uint8_t u8Channel )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-void ADC_VrefSelect( ADC_Type *pADC, uint8_t u8Vref )
+void ADC_VrefSelect( ADC_MemMapPtr pADC, uint8_t u8Vref )
 {
     uint32_t u32Temp;
     u32Temp = pADC->SC2;
@@ -266,7 +258,7 @@ void ADC_VrefSelect( ADC_Type *pADC, uint8_t u8Vref )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-void ADC_SelectClockDivide( ADC_Type *pADC, uint8_t u8Div )
+void ADC_SelectClockDivide( ADC_MemMapPtr pADC, uint8_t u8Div )
 {
     uint32_t u32Temp;
     u32Temp = pADC->SC3;
@@ -285,7 +277,7 @@ void ADC_SelectClockDivide( ADC_Type *pADC, uint8_t u8Div )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-void ADC_SetMode( ADC_Type *pADC, uint8_t u8Mode )
+void ADC_SetMode( ADC_MemMapPtr pADC, uint8_t u8Mode )
 {
     uint32_t u32Temp;
     u32Temp = pADC->SC3;
@@ -303,7 +295,7 @@ void ADC_SetMode( ADC_Type *pADC, uint8_t u8Mode )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-void ADC_SelectClock( ADC_Type *pADC, uint8_t u8Clock )
+void ADC_SelectClock( ADC_MemMapPtr pADC, uint8_t u8Clock )
 {
     uint32_t u32Temp;
     u32Temp = pADC->SC3;
@@ -322,7 +314,7 @@ void ADC_SelectClock( ADC_Type *pADC, uint8_t u8Clock )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-void ADC_SetFifoLevel( ADC_Type *pADC, uint8_t u8FifoLevel )
+void ADC_SetFifoLevel( ADC_MemMapPtr pADC, uint8_t u8FifoLevel )
 {
     uint32_t u32Temp;
     u32Temp = pADC->SC4;
@@ -343,7 +335,7 @@ void ADC_SetFifoLevel( ADC_Type *pADC, uint8_t u8FifoLevel )
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
-void ADC_Isr(void)
+void ADC_IRQHandler(void)
 {
     if( ADC_Callback[0] )
     {

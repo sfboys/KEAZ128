@@ -24,9 +24,6 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
 *
 * @brief header file for Internal Clock Source utilities. 
 *
@@ -40,10 +37,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
 /******************************************************************************
 * Includes
 ******************************************************************************/
-
+#include "derivative.h"
 /******************************************************************************
 * Constants
 ******************************************************************************/
@@ -63,11 +62,10 @@ extern "C" {
  */
 enum
 {
-    ICS_CLK_MODE_FEI = 1,       /*!< FEI mode */
-    ICS_CLK_MODE_FEE,           /*!< FEE mode */
-    ICS_CLK_MODE_FEE_OSC,       /*!< FEE mode with external active oscillator */    
-    ICS_CLK_MODE_FBE,           /*!< FBE mode */
-    ICS_CLK_MODE_FBE_OSC,       /*!< FBE mode with external active oscillator */    
+    ICS_CLK_MODE_FEI = 1,       /*!< FEI mode using the factory IRC trim value */
+    ICS_CLK_MODE_FEI_CUSTOM,   /*!< FEI mode using a custom trim value provided by a programming tool */
+    ICS_CLK_MODE_FEE,           /*!< FEE mode */   
+    ICS_CLK_MODE_FBE,           /*!< FBE mode */ 
     ICS_CLK_MODE_FBI,           /*!< FBI mode */
     ICS_CLK_MODE_FBILP,         /*!< FBILP mode */    
     ICS_CLK_MODE_FBELP,         /*!< FBELP mode */        
@@ -77,6 +75,17 @@ enum
 /******************************************************************************
 * Macros
 ******************************************************************************/
+#define DCO_DIVIDED_BY_1	0
+#define DCO_DIVIDED_BY_2	1
+#define DCO_DIVIDED_BY_4	2
+#define DCO_DIVIDED_BY_8	3
+#define DCO_DIVIDED_BY_16	4
+#define DCO_DIVIDED_BY_32	5
+#define DCO_DIVIDED_BY_64	6
+#define DCO_DIVIDED_BY_128	7
+
+
+
 
 
 /******************************************************************************
@@ -98,9 +107,9 @@ enum
    *    <FEE,FBI>, <FEE,FBE>, <FBI,FBE>, <FBI,FEE>, <FBI,FBILP>, <FBI,FEI>,
    *    <FBE,FBI>, <FBE,FEE>, <FBE,FEI>, <FBE,FBELP>, <FBELP,FBE>, <FBILP,FBI>.
    *    
-   * @param[in] CurMode   current clock mode macro
-   * @param[in] NewMode   new clock mode macro
-   * @param[in] clkFreq     reference clock frequency
+   * @param[in] CurMode   	current clock mode macro
+   * @param[in] NewMode   	new clock mode macro
+   * @param[in] ICS_Config  ICS_Config
    *       
    * @return none
    * @warning FEE_OSC, FBE_OSC can not be used as current mode
@@ -108,7 +117,7 @@ enum
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
 
-#define ICS_SwitchMode(CurMode, NewMode, clkFreq)   CurMode##_to_##NewMode(clkFreq)
+#define ICS_SwitchMode(CurMode, NewMode, ICS_Config)   CurMode##_to_##NewMode(ICS_Config)
        
 /*! @} End of ics_api_list                                                    					*/
 
@@ -131,12 +140,13 @@ enum
  */
 typedef struct
 {
-	uint8_t bRange      : 1;        /*!< 1: high range, 0: low range */
-	uint8_t bGain       : 1;        /*!< 1: high gain, 0: low gain */
-	uint8_t bEnable     : 1;        /*!< 1: enable XOSC, 0: disable XOSC */
-	uint8_t bStopEnable : 1;        /*!< 1: stop enable, 0: stop disable */
-	uint8_t bIsCryst    : 1;        /*!< 1: crystal input, 0: active clock input */
-	uint8_t bWaitInit   : 1;        /*!< 1: wait till XOSC init done, 0: no wait */
+	uint8_t  bRange      : 1;        /*!< 1: high range, 0: low range */
+	uint8_t  bGain       : 1;        /*!< 1: high gain, 0: low gain */
+	uint8_t  bEnable     : 1;        /*!< 1: enable XOSC, 0: disable XOSC */
+	uint8_t  bStopEnable : 1;        /*!< 1: stop enable, 0: stop disable */
+	uint8_t  bIsCryst    : 1;        /*!< 1: crystal input, 0: active clock input */
+	uint8_t  bWaitInit   : 1;        /*!< 1: wait till XOSC init done, 0: no wait */
+	uint32_t u32OscFreq; 			 /*!< oscillator clock frequency in KHz */
 } OSC_ConfigType, *OSC_ConfigPtr;
 /*! @} End of osc_config_type                                                    					*/
 
@@ -158,7 +168,7 @@ typedef struct
 {
    uint8_t    u8ClkMode;        /*!< clock mode to be switched */
    uint8_t    bLPEnable;        /*!< low power mode enable */
-   uint32_t   u32ClkFreq;       /*!< reference clock frequency in KHz; use value 32 for 31.25KHz to 39.0625KHz */  
+   uint8_t    bdiv;       /*!< core fre= DCO */  
    OSC_ConfigType  oscConfig;   /*!< OSC configuration */
 } ICS_ConfigType ;
 
@@ -191,11 +201,12 @@ typedef struct
 * @ Pass/ Fail criteria: none
 * @see    ICS_DisableInt
 *****************************************************************************/
-__STATIC_INLINE void ICS_EnableInt(void)
+ 
+static __inline void ICS_EnableInt(void)
 {
-    ICS->C4 |= (ICS_C4_LOLIE_MASK);    
+   
+    ICS_C4 |= (ICS_C4_LOLIE_MASK);    
 }
-
 /*****************************************************************************//*!
 *
 * @brief disable interrupt.
@@ -207,9 +218,10 @@ __STATIC_INLINE void ICS_EnableInt(void)
 * @ Pass/ Fail criteria: none
 * @see    ICS_EnableInt
 *****************************************************************************/
-__STATIC_INLINE void ICS_DisableInt(void)
+
+static __inline void ICS_DisableInt(void)
 {
-    ICS->C4 &= ~(ICS_C4_LOLIE_MASK);    
+    ICS_C4 &= ~(ICS_C4_LOLIE_MASK);    
 }
 
 /*****************************************************************************//*!
@@ -223,9 +235,10 @@ __STATIC_INLINE void ICS_DisableInt(void)
 * @ Pass/ Fail criteria: none
 * @see    ICS_DisableClockMonitor
 *****************************************************************************/
-__STATIC_INLINE void ICS_EnableClockMonitor(void)
+
+static __inline void ICS_EnableClockMonitor(void)
 {
-    ICS->C4 |= (ICS_C4_CME_MASK);    
+    ICS_C4 |= (ICS_C4_CME_MASK);    
 }
 
 /*****************************************************************************//*!
@@ -239,9 +252,9 @@ __STATIC_INLINE void ICS_EnableClockMonitor(void)
 * @ Pass/ Fail criteria: none
 * @see    ICS_EnableClockMonitor
 *****************************************************************************/
-__STATIC_INLINE void ICS_DisableClockMonitor(void)
+static __inline void ICS_DisableClockMonitor(void)
 {
-    ICS->C4 &= ~(ICS_C4_CME_MASK);    
+    ICS_C4 &= ~(ICS_C4_CME_MASK);    
 }
 
 /*****************************************************************************//*!
@@ -252,9 +265,9 @@ __STATIC_INLINE void ICS_DisableClockMonitor(void)
    * @return  depends on commands
    * @ Pass/ Fail criteria:  
    *****************************************************************************/
-__STATIC_INLINE void ICS_SetBusDivider(uint8_t u8BusDivide)
+static __inline void ICS_SetBusDivider(uint8_t u8BusDivide)
 {
-    ICS->C2 = (ICS->C2 & ~(ICS_C2_BDIV_MASK)) | ICS_C2_BDIV(u8BusDivide);
+    ICS_C2 = (ICS_C2 & ~(ICS_C2_BDIV_MASK)) | ICS_C2_BDIV(u8BusDivide);
 }
 /*! @} End of ics_api_list                                                    					*/
 
@@ -277,9 +290,9 @@ __STATIC_INLINE void ICS_SetBusDivider(uint8_t u8BusDivide)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void OSC_Enable(void)
+static __inline void OSC_Enable(void)
 {
-    OSC->CR |= (OSC_CR_OSCEN_MASK);    
+    OSC_CR |= (OSC_CR_OSCEN_MASK);    
 }
 
 /*****************************************************************************//*!
@@ -292,9 +305,9 @@ __STATIC_INLINE void OSC_Enable(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void OSC_Disable(void)
+static __inline void OSC_Disable(void)
 {
-    OSC->CR &= ~(OSC_CR_OSCEN_MASK);    
+    OSC_CR &= ~(OSC_CR_OSCEN_MASK);    
 }
 
 
@@ -308,9 +321,9 @@ __STATIC_INLINE void OSC_Disable(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void OSC_SetLowRange(void)
+static __inline void OSC_SetLowRange(void)
 {
-    OSC->CR &= ~(OSC_CR_RANGE_MASK);    
+    OSC_CR &= ~(OSC_CR_RANGE_MASK);    
 }
 
 /*!***************************************************************************//*!
@@ -325,9 +338,9 @@ __STATIC_INLINE void OSC_SetLowRange(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void OSC_SetHighRange(void)
+static __inline void OSC_SetHighRange(void)
 {
-    OSC->CR |= (OSC_CR_RANGE_MASK);    
+    OSC_CR |= (OSC_CR_RANGE_MASK);    
 }
 
 
@@ -341,9 +354,9 @@ __STATIC_INLINE void OSC_SetHighRange(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void OSC_SetHighGain(void)
+static __inline void OSC_SetHighGain(void)
 {
-    OSC->CR |= (OSC_CR_HGO_MASK);    
+    OSC_CR |= (OSC_CR_HGO_MASK);    
 }
 
 /*****************************************************************************//*!
@@ -356,9 +369,9 @@ __STATIC_INLINE void OSC_SetHighGain(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void OSC_SetLowGain(void)
+static __inline void OSC_SetLowGain(void)
 {
-    OSC->CR &= ~(OSC_CR_HGO_MASK);    
+    OSC_CR &= ~(OSC_CR_HGO_MASK);    
 }
 
 
@@ -372,9 +385,9 @@ __STATIC_INLINE void OSC_SetLowGain(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void OSC_SelectCrystal(void)
+static __inline void OSC_SelectCrystal(void)
 {
-    OSC->CR |= (OSC_CR_OSCOS_MASK);    
+    OSC_CR |= (OSC_CR_OSCOS_MASK);    
 }
 
 
@@ -388,9 +401,9 @@ __STATIC_INLINE void OSC_SelectCrystal(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void OSC_SelectClock(void)
+static __inline void OSC_SelectClock(void)
 {
-    OSC->CR &= ~(OSC_CR_OSCOS_MASK);    
+    OSC_CR &= ~(OSC_CR_OSCOS_MASK);    
 }
 
 /*****************************************************************************//*!
@@ -403,9 +416,9 @@ __STATIC_INLINE void OSC_SelectClock(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void OSC_ActiveInStop(void)
+static __inline void OSC_ActiveInStop(void)
 {
-    OSC->CR |= (OSC_CR_OSCSTEN_MASK);    
+    OSC_CR |= (OSC_CR_OSCSTEN_MASK);    
 }
 
 /*****************************************************************************//*!
@@ -418,12 +431,27 @@ __STATIC_INLINE void OSC_ActiveInStop(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-__STATIC_INLINE void OSC_InactiveInStop(void)
+static __inline void OSC_InactiveInStop(void)
 {
-    OSC->CR &= ~(OSC_CR_OSCSTEN_MASK);    
+    OSC_CR &= ~(OSC_CR_OSCSTEN_MASK);    
 }
 
 /*! @} End of osc_api_list                                                    					*/
+
+/*****************************************************************************//*!
+*
+* @brief disable OSC in stop mode.
+*        
+* @param   none
+*
+* @return none
+*
+* @ Pass/ Fail criteria: none
+*****************************************************************************/
+static __inline void Stop(void)
+{
+    asm("WFI");    
+}
 
 
 /******************************************************************************
@@ -431,9 +459,9 @@ __STATIC_INLINE void OSC_InactiveInStop(void)
 ******************************************************************************/
 
 void ICS_Init(ICS_ConfigType *pConfig);
-void ICS_DeInit(void);
-void ICS_SetClkDivider(uint32_t u32ClkFreqKHz);
-void ICS_Trim(uint16 u16TrimValue);
+void ICS_SetOscDivider(uint32_t u32OscFreqKHz);
+void ICS_SetCoreClk(uint32_t u32CoreFreqKHz);
+void ICS_Trim(uint16_t u16TrimValue);
 void OSC_Init(OSC_ConfigType *pConfig);
 void OSC_DeInit(void);
 
@@ -453,6 +481,7 @@ void OSC_SetHighGain(void);
 void OSC_SetHighRange(void);
 void OSC_SetLowGain(void);
 void OSC_SetLowRange(void);
+void Stop(void);
 
 /* do not touch the following functions */
 void FEI_to_FEE(ICS_ConfigType *pConfig);
@@ -471,8 +500,6 @@ void FBI_to_FEE(ICS_ConfigType *pConfig);
 void FBI_to_FBILP(ICS_ConfigType *pConfig);
 void FBILP_to_FBI(ICS_ConfigType *pConfig);
 void FBELP_to_FBE(ICS_ConfigType *pConfig);
-void FEI_to_FBE_OSC(ICS_ConfigType *pConfig);
-void FEI_to_FEE_OSC(ICS_ConfigType *pConfig);
 #ifdef __cplusplus
 }
 #endif

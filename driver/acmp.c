@@ -25,9 +25,7 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
 *
-* @date Jun. 25, 2013
 *
 * @brief providing APIs for configuring ACMP. 
 *
@@ -35,7 +33,6 @@
 *
 * provide APIs for configuring ACMP
 ******************************************************************************/
-#include "common.h"
 #include "acmp.h"
 /******************************************************************************
 * Global variables
@@ -57,7 +54,7 @@
 * Local variables
 ******************************************************************************/
 
-ACMP_CallbackPtr ACMP_Callback[2] = {(ACMP_CallbackPtr)NULL};
+ACMP_CallbackPtr ACMP_Callback[2] = {(ACMP_CallbackPtr)(0)};
 
 /******************************************************************************
 * Local functions
@@ -65,8 +62,6 @@ ACMP_CallbackPtr ACMP_Callback[2] = {(ACMP_CallbackPtr)NULL};
 /******************************************************************************
 * Global functions
 ******************************************************************************/
-void ACMP0_Isr(void);
-void ACMP1_Isr(void);
 
 /******************************************************************************
 * ACMP api list.
@@ -89,7 +84,7 @@ void ACMP1_Isr(void);
 * @see   ACMP_DeInit.  
 *
 *****************************************************************************/
-void ACMP_Init(ACMP_Type *pACMPx, ACMP_ConfigType *pConfig) 
+void ACMP_Init(ACMP_MemMapPtr pACMPx, ACMP_ConfigType *pConfig) 
 {
     if(ACMP0 == pACMPx)
     {    
@@ -98,18 +93,17 @@ void ACMP_Init(ACMP_Type *pACMPx, ACMP_ConfigType *pConfig)
  
         /* enable ACMP interrupt */
         if(pConfig->sCtrlStatus.bits.bIntEn)
-            NVIC_EnableIRQ(ACMP0_IRQn);
+           Enable_Interrupt(ACMP0_IRQn);
     }
     else
     {
         SIM->SCGC |= SIM_SCGC_ACMP1_MASK;
-        if(pConfig->sCtrlStatus.bits.bIntEn)
-            NVIC_EnableIRQ(ACMP1_IRQn);            
+        if(pConfig->sCtrlStatus.bits.bIntEn) 
+        Enable_Interrupt(ACMP1_IRQn);
     }
     /* neg and pos pin are not equal */
     pACMPx->C0 = pConfig->sPinSelect.byte;
     ACMP_ConfigDAC(pACMPx, &pConfig->sDacSet );
-    //pACMPx->C1 = pConfig->sDacSet.byte;
     pACMPx->C2 = pConfig->sPinEnable.byte;
     pACMPx->CS = pConfig->sCtrlStatus.byte;
 }
@@ -127,7 +121,7 @@ void ACMP_Init(ACMP_Type *pACMPx, ACMP_ConfigType *pConfig)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void ACMP_ConfigDAC(ACMP_Type *pACMPx, ACMP_DACType *pDACConfig) 
+void ACMP_ConfigDAC(ACMP_MemMapPtr pACMPx, ACMP_DACType *pDACConfig) 
 {
     pACMPx->C1 = pDACConfig->byte;  
 }
@@ -145,17 +139,17 @@ void ACMP_ConfigDAC(ACMP_Type *pACMPx, ACMP_DACType *pDACConfig)
 * @see   ACMP_Init.  
 *
 *****************************************************************************/
-void ACMP_DeInit(ACMP_Type *pACMPx) 
+void ACMP_DeInit(ACMP_MemMapPtr pACMPx) 
 {
     if(ACMP0 == pACMPx)
     {    
         if(pACMPx->CS & ACMP_CS_ACIE_MASK)
-            NVIC_DisableIRQ(ACMP0_IRQn);
+        	Disable_Interrupt(ACMP0_IRQn);
     }
     else
     {
         if(pACMPx->CS & ACMP_CS_ACIE_MASK)
-            NVIC_DisableIRQ(ACMP1_IRQn);            
+        	Disable_Interrupt(ACMP1_IRQn);
     }
     
     pACMPx->CS = 0;
@@ -165,11 +159,11 @@ void ACMP_DeInit(ACMP_Type *pACMPx)
     
     if(ACMP0 == pACMPx)
     {    
-        SIM->SCGC &= ~SIM_SCGC_ACMP0_MASK;
+        SIM_->SCGC &= ~SIM_SCGC_ACMP0_MASK;
     }
     else
     {
-        SIM->SCGC &= ~SIM_SCGC_ACMP1_MASK;           
+        SIM_->SCGC &= ~SIM_SCGC_ACMP1_MASK;
     } 
 }
 
@@ -185,7 +179,7 @@ void ACMP_DeInit(ACMP_Type *pACMPx)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void ACMP_SetCallback(ACMP_Type *pACMPx, ACMP_CallbackPtr pfnCallback)
+void ACMP_SetCallback(ACMP_MemMapPtr pACMPx, ACMP_CallbackPtr pfnCallback)
 {
     if(ACMP0 == pACMPx)
     {
@@ -211,7 +205,7 @@ void ACMP_SetCallback(ACMP_Type *pACMPx, ACMP_CallbackPtr pfnCallback)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void ACMP0_Isr(void)
+void ACMP0_IRQHandler(void)
 {
 
     if(ACMP_Callback[0])
@@ -231,7 +225,7 @@ void ACMP0_Isr(void)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void ACMP1_Isr(void)
+void ACMP1_IRQHandler(void)
 {
 
     if(ACMP_Callback[1])
@@ -239,5 +233,6 @@ void ACMP1_Isr(void)
         ACMP_Callback[1]();             /* call callback routine */
     }
 }
+
 
 

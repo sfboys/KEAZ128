@@ -25,14 +25,9 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
 *
 * @brief provide commond watch dog utilities. 
 *
-* @history:
-* 	Jun.25, 2013	modified the watch dog unlock sequence and disable sequence.
 *******************************************************************************
 *
 * provide APIs for accessing watch dog
@@ -49,8 +44,8 @@ extern "C" {
 /******************************************************************************
 * Includes
 ******************************************************************************/
-#include "sim.h"
 
+#include "derivative.h"
 /******************************************************************************
 * Constants
 ******************************************************************************/
@@ -61,7 +56,6 @@ extern "C" {
 /* wdog_unlock sequence must be performed within 16 bus clock cycles without
  * any interrupt 
  */
-
    
 /* WDOG clock sources option */
 /******************************************************************************
@@ -98,12 +92,26 @@ extern "C" {
  * @brief watchdog unlock routine.
  */
 #define WDOG_Unlock()        WDOG->CNT = 0x20C5; WDOG->CNT = 0x28D9        
-//#define WDOG_Unlock()       DisableInterrupts; WDOG->CNT = 0x20C5; WDOG->CNT = 0x28D9; EnableInterrupts        
 /*! @} End of wdog_api_list                                                    					*/
 
 /******************************************************************************
 * Types
 ******************************************************************************/
+/******************************************************************************
+* WDOG callback function declaration
+*
+*//*! @addtogroup wdog_callback
+* @{
+*******************************************************************************/
+
+/*!
+ * @brief WDOG Callback type.
+ *
+ */
+
+typedef void (*WDOG_CallbackType)(void);
+
+/*! @} End of wdog_callback    
 
 /******************************************************************************
 * define watchdog configuration structure
@@ -161,13 +169,14 @@ typedef struct {
 *
 *****************************************************************************/
 
-__STATIC_INLINE void WDOG_SetTimeOut(uint16_t u16TimeOut)
+static inline void WDOG_SetTimeOut(uint16_t u16TimeOut)
 {
     WDOG->CNT = 0x20C5; 
     WDOG->CNT = 0x28D9;
     WDOG->TOVAL8B.TOVALL  = u16TimeOut;
     WDOG->TOVAL8B.TOVALH  = u16TimeOut >> 8;
 }
+
 
 
 /*****************************************************************************//*!
@@ -182,7 +191,7 @@ __STATIC_INLINE void WDOG_SetTimeOut(uint16_t u16TimeOut)
 *
 *****************************************************************************/
 
-__STATIC_INLINE void WDOG_SetWindow(uint16_t u16WinTime)
+static inline void WDOG_SetWindow(uint16_t u16WinTime)
 {
     WDOG->CNT = 0x20C5; 
     WDOG->CNT = 0x28D9;
@@ -201,16 +210,18 @@ __STATIC_INLINE void WDOG_SetWindow(uint16_t u16WinTime)
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
 
-__STATIC_INLINE uint8_t WDOG_IsReset(void)
-{
-    if(SIM_GetStatus(SIM_SRSID_WDOG_MASK))
+static inline uint8_t WDOG_IsReset(void)
+{	uint32_t    u32Status;
+	u32Status = SIM->SRSID & SIM_SRSID_WDOG_MASK;
+    if(u32Status)
     {
-        return (TRUE);
+        return (1);
     }
-    return (FALSE);
+    return (0);
 }
 
 /*! @} End of wdog_api_list                                                    					*/
+
 
 
 void WDOG_Init(WDOG_ConfigPtr pConfig);
@@ -224,6 +235,7 @@ void WDOG_SetWindow(uint16_t u16WinTime);
 void WDOG_EnableUpdate(void);
 void WDOG_DisableUpdate(void);
 uint8_t WDOG_IsReset(void);
+void WDOG_SetCallback(WDOG_CallbackType pfnCallback);
 
 #ifdef __cplusplus
 }

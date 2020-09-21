@@ -25,9 +25,6 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
 *
 * @brief providing APIs for configuring FTM. 
 *
@@ -35,7 +32,7 @@
 *
 * provide APIs for configuring FTM
 ******************************************************************************/
-#include "common.h"
+
 #include "ftm.h"
 
 /******************************************************************************
@@ -65,7 +62,7 @@
 /******************************************************************************
 * Global functions
 ******************************************************************************/
-FTM_CallbackPtr FTM_Callback[3] = {(FTM_CallbackPtr)NULL};
+FTM_CallbackPtr FTM_Callback[3] = {(FTM_CallbackPtr)(0)};
 
 
 /******************************************************************************
@@ -87,7 +84,7 @@ FTM_CallbackPtr FTM_Callback[3] = {(FTM_CallbackPtr)NULL};
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_ClockSet(FTM_Type *pFTM, uint8_t u8ClockSource, uint8_t u8ClockPrescale)
+void FTM_ClockSet(FTM_Type pFTM, uint8_t u8ClockSource, uint8_t u8ClockPrescale)
 {
     uint8_t   u8Temp;
     u8Temp  = (pFTM->SC & 0xE0);
@@ -97,8 +94,7 @@ void FTM_ClockSet(FTM_Type *pFTM, uint8_t u8ClockSource, uint8_t u8ClockPrescale
 
 /*********************************************************************************//*!
 *
-* @brief general configuration to FTM_No to high ture EPWM mode, clock soure is the 
-*        system clock, MOD, CnV are the initial value.
+* @brief general configuration to FTM_No to PWM mode.
 *        
 * @param[in]    pFTM                  pointer to one of three FTM base register address.
 * @param[in]    PWMModeSelect         select CPWM , EPWM  or combine pwm mode.
@@ -109,11 +105,9 @@ void FTM_ClockSet(FTM_Type *pFTM, uint8_t u8ClockSource, uint8_t u8ClockPrescale
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_PWMInit(FTM_Type *pFTM, uint8_t u8PWMModeSelect, uint8_t u8PWMEdgeSelect)
+void FTM_PWMInit(FTM_Type pFTM, uint8_t u8PWMModeSelect, uint8_t u8PWMEdgeSelect)
 {
     uint8_t   channels, i;
-    
-    ASSERT((FTM0== pFTM) || (FTM1== pFTM) || (FTM2== pFTM));
     
     /* open the clock gate */
 	if (FTM0 == pFTM)
@@ -124,9 +118,6 @@ void FTM_PWMInit(FTM_Type *pFTM, uint8_t u8PWMModeSelect, uint8_t u8PWMEdgeSelec
     else if(FTM1 == pFTM)
     {
         channels = 2;
-#if !defined(CPU_KEA64)
-        SIM->SCGC |= SIM_SCGC_FTM1_MASK;
-#endif
     }        
     else
     {
@@ -143,7 +134,7 @@ void FTM_PWMInit(FTM_Type *pFTM, uint8_t u8PWMModeSelect, uint8_t u8PWMEdgeSelec
     }
     else if(FTM_PWMMODE_COMBINE == u8PWMModeSelect)     /* enable combine pwm mode */
     {
-        ASSERT(FTM2 == pFTM);
+   
         pFTM->MODE    |= FTM_MODE_WPDIS_MASK | FTM_MODE_FTMEN_MASK;
         pFTM->COMBINE = FTM_COMBINE_COMBINE0_MASK | FTM_COMBINE_COMP0_MASK | FTM_COMBINE_SYNCEN0_MASK | FTM_COMBINE_DTEN0_MASK |
                         FTM_COMBINE_COMBINE1_MASK | FTM_COMBINE_COMP1_MASK | FTM_COMBINE_SYNCEN1_MASK | FTM_COMBINE_DTEN1_MASK |
@@ -184,34 +175,27 @@ void FTM_PWMInit(FTM_Type *pFTM, uint8_t u8PWMModeSelect, uint8_t u8PWMEdgeSelec
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_InputCaptureInit(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8CaptureMode)
+void FTM_InputCaptureInit(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8CaptureMode)
 { 
-    ASSERT(((FTM0 == pFTM) && (u8FTM_Channel < 2))   || 
-           ((FTM1 == pFTM) && (u8FTM_Channel < 2))   || 
-           ((FTM2 == pFTM) && (u8FTM_Channel < 6))
-           );
 
-    
     /* open the clock gate */
 	if ((FTM0 == pFTM) && (u8FTM_Channel < 2))
     {
         SIM->SCGC |= SIM_SCGC_FTM0_MASK;
-        NVIC_EnableIRQ(FTM0_IRQn);
+        Enable_Interrupt(FTM0_IRQn);
     }
     else if((FTM1 == pFTM)  && (u8FTM_Channel < 2))
     {
-#if !defined(CPU_KEA64)
         SIM->SCGC |= SIM_SCGC_FTM1_MASK;
-        NVIC_EnableIRQ(FTM1_IRQn);
-#endif
+        Enable_Interrupt(FTM1_IRQn);
     }        
     else 
     {
         SIM->SCGC |= SIM_SCGC_FTM2_MASK;
-        NVIC_EnableIRQ(FTM2_IRQn);
+        Enable_Interrupt(FTM2_IRQn);
     }
     
-    pFTM->SC  = 0x0;     /* diable counter */ 
+    pFTM->SC  = 0x0;     /* disable counter */ 
     pFTM->MOD = 0xFFFF;  /* free running */
     
     if(FTM_INPUTCAPTURE_RISINGEDGE == u8CaptureMode)        /* enable interrupt, Capture on rising edge */
@@ -226,8 +210,6 @@ void FTM_InputCaptureInit(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8Captu
     {
         pFTM->CONTROLS[u8FTM_Channel].CnSC = FTM_CnSC_CHIE_MASK | FTM_CnSC_ELSA_MASK | FTM_CnSC_ELSB_MASK;       
     }
-		
-		
 }
 
 /*********************************************************************************//*!
@@ -246,10 +228,9 @@ void FTM_InputCaptureInit(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8Captu
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_DualEdgeCaptureInit(FTM_Type *pFTM, uint8_t u8ChannelPair, uint8_t u8CaptureMode, 
+void FTM_DualEdgeCaptureInit(FTM_Type pFTM, uint8_t u8ChannelPair, uint8_t u8CaptureMode, 
                                  uint8_t u8Channel_N_Edge, uint8_t u8Channel_Np1_Edge)
 { 
-    ASSERT((FTM2 == pFTM)  && (u8ChannelPair < 6) && !(u8ChannelPair & 1) );
     
     SIM->SCGC |= SIM_SCGC_FTM2_MASK;
     if((0 == u8ChannelPair) || (2== u8ChannelPair))
@@ -285,7 +266,7 @@ void FTM_DualEdgeCaptureInit(FTM_Type *pFTM, uint8_t u8ChannelPair, uint8_t u8Ca
 
 /*********************************************************************************//*!
 *
-* @brief general configuration to FTM_No to input capture mode.
+* @brief general configuration to FTM_No to ouput compare mode.
 *        
 * @param[in]    pFTM                  pointer to one of three FTM base register address.
 * @param[in]    Channel               channel number to be configured.
@@ -296,13 +277,9 @@ void FTM_DualEdgeCaptureInit(FTM_Type *pFTM, uint8_t u8ChannelPair, uint8_t u8Ca
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_OutputCompareInit(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8CompareMode)
+void FTM_OutputCompareInit(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8CompareMode)
 {
-    ASSERT(((FTM0 == pFTM) && (u8FTM_Channel < 2))   || 
-           ((FTM1 == pFTM) && (u8FTM_Channel < 2))   || 
-           ((FTM2 == pFTM) && (u8FTM_Channel < 6))
-           );
-    
+   
     /* open the clock gate */
 	if(FTM0 == pFTM)
     {
@@ -310,23 +287,17 @@ void FTM_OutputCompareInit(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8Comp
     }
     else if(FTM1 == pFTM)
     {
-#if !defined(CPU_KEA64)
         SIM->SCGC |= SIM_SCGC_FTM1_MASK;
-#endif
     }        
     else
     {
         SIM->SCGC |= SIM_SCGC_FTM2_MASK;
     }
-		 pFTM->OUTMASK = 0x01; //channel 0 通道输出已屏蔽//SE02自行增加的部分
+    
     pFTM->SC  = 0x0;                                                                    /* diable counter */
     pFTM->MOD = FTM_MOD_INIT; 
     pFTM->CONTROLS[u8FTM_Channel].CnSC = (FTM_CnSC_MSA_MASK | (u8CompareMode << 2));    /* select detec edge */
-    pFTM->CONTROLS[u8FTM_Channel].CnV  = 5000;//16ms 128分频，40MHZ
-			
-	  pFTM->SYNC =0;//channel 0 通道输出已屏蔽//SE02自行增加的部分
-		
-
+    pFTM->CONTROLS[u8FTM_Channel].CnV  = FTM_C0V_INIT;
 }
 
 /*********************************************************************************//*!
@@ -340,9 +311,9 @@ void FTM_OutputCompareInit(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8Comp
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_SoftwareSync(FTM_Type *pFTM)
+void FTM_SoftwareSync(FTM_Type pFTM)
 {
-    ASSERT(FTM2 == pFTM);
+  
 
     pFTM->SYNCONF   |= FTM_SYNCONF_SYNCMODE_MASK;   /* recommend enhanced sync mode */
     pFTM->SYNC      |= FTM_SYNC_SWSYNC_MASK;
@@ -360,9 +331,8 @@ void FTM_SoftwareSync(FTM_Type *pFTM)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_HardwareSync(FTM_Type *pFTM, uint8_t u8TriggerN)
+void FTM_HardwareSync(FTM_Type pFTM, uint8_t u8TriggerN)
 {
-    ASSERT(FTM2 == pFTM);
     
     pFTM->SYNCONF   |= FTM_SYNCONF_SYNCMODE_MASK;   /* recommend enhanced sync mode */
     
@@ -394,10 +364,8 @@ void FTM_HardwareSync(FTM_Type *pFTM, uint8_t u8TriggerN)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_HardwareSyncCombine(FTM_Type *pFTM, uint8_t u8TriggerMask)
+void FTM_HardwareSyncCombine(FTM_Type pFTM, uint8_t u8TriggerMask)
 {
-    ASSERT(FTM2 == pFTM);
-    
     pFTM->SYNCONF   |= FTM_SYNCONF_SYNCMODE_MASK;   /* recommend enhanced sync mode */
     pFTM->SYNC      &= 0x8F;
     pFTM->SYNC      |= (u8TriggerMask & 0x70);
@@ -414,19 +382,14 @@ void FTM_HardwareSyncCombine(FTM_Type *pFTM, uint8_t u8TriggerMask)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_GenerateTrig2(FTM_Type *pFTM)
+void FTM_GenerateTrig2(FTM_Type pFTM)
 {
-    ASSERT(FTM2 == pFTM);
-    
+   
     if(pFTM->SYNC & FTM_SYNC_TRIG2_MASK)
     {
-#if defined(CPU_KEA8)
-        SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;
-#elif defined(CPU_KEA64)
-        SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;
-#elif defined(CPU_KEA128)
+
         SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;
-#endif
+
     }
 }
 
@@ -444,9 +407,8 @@ void FTM_GenerateTrig2(FTM_Type *pFTM)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_PWMDeadtimeSet(FTM_Type *pFTM, uint8_t u8PrescalerValue, uint8_t u8DeadtimeValue)
+void FTM_PWMDeadtimeSet(FTM_Type pFTM, uint8_t u8PrescalerValue, uint8_t u8DeadtimeValue)
 {
-    ASSERT(FTM2 == pFTM);
     
     pFTM->COMBINE |= 0x101010;              /* enable dead time insertion */
 
@@ -476,9 +438,9 @@ void FTM_PWMDeadtimeSet(FTM_Type *pFTM, uint8_t u8PrescalerValue, uint8_t u8Dead
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_OutputMaskSet(FTM_Type *pFTM, uint8_t u8FTM_Channel)
+void FTM_OutputMaskSet(FTM_Type pFTM, uint8_t u8FTM_Channel)
 {
-    ASSERT((FTM2 == pFTM) && (u8FTM_Channel < 6));
+   
 
     pFTM->OUTMASK |= (1 << u8FTM_Channel);
     
@@ -492,14 +454,8 @@ void FTM_OutputMaskSet(FTM_Type *pFTM, uint8_t u8FTM_Channel)
         else if(pFTM->SYNCONF & FTM_SYNCONF_HWOM_MASK)  /* if hardware sync is needed*/
         {
             pFTM->SYNC |= FTM_SYNC_TRIG2_MASK;
-            
-#if defined(CPU_KEA8)
-            SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;         /* hardware sync */ 
-#elif defined(CPU_KEA64)
-            SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;         /* hardware sync */ 
-#elif defined(CPU_KEA128)
             SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;         /* hardware sync */ 
-#endif
+
         }
         else
         {
@@ -523,9 +479,8 @@ void FTM_OutputMaskSet(FTM_Type *pFTM, uint8_t u8FTM_Channel)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_SWOutputControlSet(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8ChannelValue)
+void FTM_SWOutputControlSet(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8ChannelValue)
 {
-    ASSERT((FTM2 == pFTM) && (u8FTM_Channel < 6));
     
     if(FTM_SWOCTRL_HIGH == u8ChannelValue)
     {
@@ -546,14 +501,8 @@ void FTM_SWOutputControlSet(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8Cha
         else if(pFTM->SYNCONF & FTM_SYNCONF_HWSOC_MASK)     /* if hardware sync is needed*/
         {
             pFTM->SYNC |= FTM_SYNC_TRIG2_MASK;
-
-#if defined(CPU_KEA8)
-            SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;             /* hardware sync */ 
-#elif defined(CPU_KEA64)
-            SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;             /* hardware sync */ 
-#elif defined(CPU_KEA128)
             SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;             /* hardware sync */ 
-#endif
+
         }
     }
     else  /* no need to sync, update on the next rising edge of system clock  */
@@ -566,7 +515,7 @@ void FTM_SWOutputControlSet(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8Cha
 * @brief set PWM polarity.
 *        
 * @param[in]    pFTM                  pointer to one of three FTM base register address.
-* @param[in]    Channel               pwm channel needed to be controlled by software.
+* @param[in]    Channel               pwm channel.
 * @param[in]    ActiveValue           the value to be set,  0 or 1.
 *
 * @return none.
@@ -574,9 +523,8 @@ void FTM_SWOutputControlSet(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8Cha
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_PolaritySet(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8ActiveValue)
+void FTM_PolaritySet(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8ActiveValue)
 {
-    ASSERT((FTM2 == pFTM) && (u8FTM_Channel < 6));
     
     if(FTM_POLARITY_HIGHACTIVE == u8ActiveValue)
     {
@@ -600,9 +548,8 @@ void FTM_PolaritySet(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8ActiveValu
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_SetDebugModeBehavior(FTM_Type *pFTM, uint8_t u8DebugMode)
+void FTM_SetDebugModeBehavior(FTM_Type pFTM, uint8_t u8DebugMode)
 {
-    ASSERT((FTM2 == pFTM));
     pFTM->CONF &= ~FTM_CONF_BDMMODE_MASK;
     pFTM->CONF |= FTM_CONF_BDMMODE(u8DebugMode);
 }
@@ -619,9 +566,8 @@ void FTM_SetDebugModeBehavior(FTM_Type *pFTM, uint8_t u8DebugMode)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_SetTOFFrequency(FTM_Type *pFTM, uint8_t u8TOFNUM)
+void FTM_SetTOFFrequency(FTM_Type pFTM, uint8_t u8TOFNUM)
 {
-    ASSERT((FTM2 == pFTM));
     pFTM->CONF &= ~FTM_CONF_NUMTOF_MASK;
     pFTM->CONF |= FTM_CONF_NUMTOF(u8TOFNUM);
 }
@@ -638,9 +584,8 @@ void FTM_SetTOFFrequency(FTM_Type *pFTM, uint8_t u8TOFNUM)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_InvertChannel(FTM_Type *pFTM, uint8_t u8ChannelPair)
+void FTM_InvertChannel(FTM_Type pFTM, uint8_t u8ChannelPair)
 {
-    ASSERT((FTM2 == pFTM)  && u8ChannelPair <= 2);
 
     pFTM->INVCTRL |= 1<<u8ChannelPair;
     if(pFTM->SYNCONF & FTM_SYNCONF_INVC_MASK)       /* if PWM sync is needed */
@@ -654,13 +599,9 @@ void FTM_InvertChannel(FTM_Type *pFTM, uint8_t u8ChannelPair)
         {
             pFTM->SYNC |= FTM_SYNC_TRIG2_MASK;
 
-#if defined(CPU_KEA8)
-            SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;             /* hardware sync */ 
-#elif defined(CPU_KEA64)
-            SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;             /* hardware sync */ 
-#elif defined(CPU_KEA128)
+
             SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;             /* hardware sync */ 
-#endif
+
         }
     }
     else  /* no need to sync, update on the next rising edge of system clock  */
@@ -681,58 +622,75 @@ void FTM_InvertChannel(FTM_Type *pFTM, uint8_t u8ChannelPair)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void FTM_Init(FTM_Type *pFTM, FTM_ConfigType *pConfig)
+void FTM_Init(FTM_Type pFTM, FTM_ConfigType *pConfig)
 {
-    ASSERT((FTM0 == pFTM) || (FTM1 == pFTM) || (FTM2 == pFTM));
     if(FTM0 == pFTM)
     {
         SIM->SCGC |= SIM_SCGC_FTM0_MASK;
     }
-#if !defined(CPU_KEA64)
+
     else if(FTM1 == pFTM)
     {
         SIM->SCGC |= SIM_SCGC_FTM1_MASK;
     }
-#endif
     else
     {
         SIM->SCGC |= SIM_SCGC_FTM2_MASK;
     }
         
-    /* diable counter */
+    /* disable counter */
     pFTM->SC = 0; 
- 	pFTM->MODE = pConfig->mode;       
+    
+    if(FTM2 == pFTM)
+    {
+     		pFTM->MODE |= pConfig->mode;
+			pFTM->COMBINE   = pConfig->combine;      
+			pFTM->CNTIN     = pConfig->cntin;      
+			pFTM->SYNC      = pConfig->sync;      
+			pFTM->OUTINIT   = pConfig->outinit;      
+			pFTM->OUTMASK   = pConfig->outmask;      
+			pFTM->DEADTIME  = pConfig->deadtime;      
+			pFTM->EXTTRIG   = pConfig->exttrig;      
+			pFTM->POL       = pConfig->pol;      
+			pFTM->FMS       = pConfig->fms;      
+			pFTM->FILTER    = pConfig->filter;      
+			pFTM->FLTCTRL   = pConfig->fltctrl;    /* fault control */ 
+			pFTM->FLTPOL    = pConfig->fltpol;      
+			pFTM->CONF      = pConfig->conf;      
+			pFTM->SYNCONF   = pConfig->synconf;      
+			pFTM->SWOCTRL   = pConfig->swoctrl;      
+			pFTM->PWMLOAD   = pConfig->pwmload;      
+
+    }
 	pFTM->MOD = pConfig->modulo;
 	pFTM->CNT = pConfig->cnt;
-        
-    if( pFTM->MODE & FTM_MODE_FTMEN_MASK  ) 
-    {
-        /* when FTMEN = 1, all other registers can be written */
-        pFTM->COMBINE   = pConfig->combine;      
-        pFTM->CNTIN     = pConfig->cntin;      
-        pFTM->SYNC      = pConfig->sync;      
-        pFTM->OUTINIT   = pConfig->outinit;      
-        pFTM->OUTMASK   = pConfig->outmask;      
-        pFTM->DEADTIME  = pConfig->deadtime;      
-        pFTM->EXTTRIG   = pConfig->exttrig;      
-        pFTM->POL       = pConfig->pol;      
-        pFTM->FMS       = pConfig->fms;      
-        pFTM->FILTER    = pConfig->filter;      
-        pFTM->FLTCTRL   = pConfig->fltctrl;    /* fault control */ 
-        pFTM->FLTPOL    = pConfig->fltpol;      
-        pFTM->CONF      = pConfig->conf;      
-        pFTM->SYNCONF   = pConfig->synconf;      
-        pFTM->SWOCTRL   = pConfig->swoctrl;      
-        pFTM->PWMLOAD   = pConfig->pwmload;      
-    }
+    
     /* write SC to enable clock */
-    pFTM->SC = pConfig->sc;
+    pFTM->SC |= pConfig->clk_source<<3|pConfig->prescaler<<0|pConfig->cpwms<<5|pConfig->toie<<6;
+    if( pConfig->toie)
+    {
+    	if(FTM0 == pFTM)
+		{
+			Enable_Interrupt(FTM0_IRQn);
+
+		}
+		else if(FTM1 == pFTM)
+		{
+			Enable_Interrupt(FTM1_IRQn);
+
+		}
+		else
+		{
+			Enable_Interrupt(FTM2_IRQn);
+
+		}	
+    }
 }
 
 
 /*****************************************************************************//*!
 *
-* @brief  close the FTM moudle.
+* @brief  close the FTM module.
 *        
 * @param[in]    pFTM          pointer to one of three FTM base register address.
 *
@@ -741,9 +699,8 @@ void FTM_Init(FTM_Type *pFTM, FTM_ConfigType *pConfig)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void FTM_DeInit(FTM_Type *pFTM)
+void FTM_DeInit(FTM_Type pFTM)
 {
-    ASSERT((FTM0 == pFTM) || (FTM1 == pFTM) || (FTM2 == pFTM));
     pFTM->SC = 0;       
 	pFTM->MOD = 0;
 	pFTM->CNT = 0;
@@ -771,19 +728,19 @@ void FTM_DeInit(FTM_Type *pFTM)
 	if (FTM0 == pFTM)
     {
         SIM->SCGC &= ~SIM_SCGC_FTM0_MASK;
-        NVIC_DisableIRQ(FTM0_IRQn);
+        Disable_Interrupt(FTM0_IRQn);
     }
-#if !defined(CPU_KEA64)    
+#if !defined(CPU_KE04)    
     else if(FTM1 == pFTM)
     {
         SIM->SCGC &= ~SIM_SCGC_FTM1_MASK;
-        NVIC_DisableIRQ(FTM1_IRQn);
+        Disable_Interrupt(FTM1_IRQn);
     } 
 #endif
     else if (FTM2 == pFTM)
     {
         SIM->SCGC &= ~SIM_SCGC_FTM2_MASK;
-        NVIC_DisableIRQ(FTM2_IRQn);
+        Disable_Interrupt(FTM2_IRQn);
     }
 }
     
@@ -800,64 +757,97 @@ void FTM_DeInit(FTM_Type *pFTM)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void FTM_ChannelInit(FTM_Type *pFTM, uint8_t u8FTM_Channel, FTM_ChParamsType *pTFTMCH_Params)
-{
-    ASSERT((FTM0 == pFTM) || (FTM1 == pFTM) || (FTM2 == pFTM));  
+void FTM_ChannelInit(FTM_Type pFTM, uint8_t u8FTM_Channel, FTM_ChParamsType pTFTMCH_Params)
+{ 
     
 	if (FTM0 == pFTM)
     {
-        ASSERT(u8FTM_Channel < 2);
         SIM->SCGC |= SIM_SCGC_FTM0_MASK;
     }
- #if !defined(CPU_KEA64)
+
     else if(FTM1 == pFTM)
     {
-        ASSERT(u8FTM_Channel < 2);
         SIM->SCGC |= SIM_SCGC_FTM1_MASK;
     }        
-#endif
+
     else
     {
-        ASSERT(u8FTM_Channel < 6);
+     
         SIM->SCGC |= SIM_SCGC_FTM2_MASK;
     }
     
-    pFTM->CONTROLS[u8FTM_Channel].CnSC = pTFTMCH_Params->u8CnSC;
-    pFTM->CONTROLS[u8FTM_Channel].CnV = pTFTMCH_Params->u16CnV; 
+    
+    if( pTFTMCH_Params.ctrl.bits.bMode==FTM_INPUT_CAPTURE)
+    {
+        pFTM->CONTROLS[u8FTM_Channel].CnSC |= 0b00<<4;
+    	 pFTM->CONTROLS[u8FTM_Channel].CnSC |= pTFTMCH_Params.ctrl.bits.bEdge<<2;
+    }
+    else if( pTFTMCH_Params.ctrl.bits.bMode==FTM_OUTPUT_COMPARE)
+    {
+        pFTM->CONTROLS[u8FTM_Channel].CnSC |= FTM_CnSC_MSA_MASK;
+     	 pFTM->CONTROLS[u8FTM_Channel].CnSC |= pTFTMCH_Params.ctrl.bits.bOutCmp<<2;
+    }
+    else if( pTFTMCH_Params.ctrl.bits.bMode==FTM_PWMMODE_EDGEALLIGNED)
+    {
+    	 pFTM->CONTROLS[u8FTM_Channel].CnSC |= FTM_CnSC_MSB_MASK;
+    	pFTM->CONTROLS[u8FTM_Channel].CnSC |= pTFTMCH_Params.ctrl.bits.bPWMPol<<2;
+    }
+    
+    else if (pTFTMCH_Params.ctrl.bits.bMode==FTM_PWMMODE_CENTERALLIGNED)
+    {
+    	pFTM->SC|=FTM_SC_CPWMS_MASK;
+    	pFTM->CONTROLS[u8FTM_Channel].CnSC |= pTFTMCH_Params.ctrl.bits.bPWMPol<<2;
+
+    }
+    else if (pTFTMCH_Params.ctrl.bits.bMode==FTM_PWMMODE_COMBINE)
+    {
+    	pFTM->CONTROLS[u8FTM_Channel].CnSC |= FTM_CnSC_MSA_MASK|FTM_CnSC_MSB_MASK|pTFTMCH_Params.ctrl.bits.bPWMPol<<2;
+
+    }
+    else if (pTFTMCH_Params.ctrl.bits.bMode==FTM_INPUTCAPTURE_DUALEDGE)
+    {
+    	pFTM->CONTROLS[u8FTM_Channel].CnSC |= pTFTMCH_Params.ctrl.bits.bEdge<<2;
+    	if(pTFTMCH_Params.ctrl.bits.bDualCapMode==FTM_INPUTCAPTURE_DUALEDGE_ONESHOT)
+    	{
+    		pFTM->CONTROLS[u8FTM_Channel].CnSC &= ~FTM_CnSC_MSA_MASK;
+
+    	}
+    	else if(pTFTMCH_Params.ctrl.bits.bDualCapMode==FTM_INPUTCAPTURE_DUALEDGE_CONTINUOUS)
+    	{
+    		pFTM->CONTROLS[u8FTM_Channel].CnSC |= FTM_CnSC_MSA_MASK;
+
+    	}
+    
+    }
+
+
+    	
+    if(1==pTFTMCH_Params.ctrl.bits.bCHIE)
+    {
+    	pFTM->CONTROLS[u8FTM_Channel].CnSC |=FTM_CnSC_CHIE_MASK;
+    	if(FTM0 == pFTM)
+    	{
+        	Enable_Interrupt(FTM0_IRQn);
+
+    	}
+    	else if(FTM1 == pFTM)
+    	{
+        	Enable_Interrupt(FTM1_IRQn);
+
+    	}
+    	else
+    	{
+        	Enable_Interrupt(FTM2_IRQn);
+
+    	}
+
+    }
+    
+    pFTM->CONTROLS[u8FTM_Channel].CnV = pTFTMCH_Params.u16CnV; 
     
     return;
 }
 
-/*****************************************************************************//*!
-*
-* @brief set the FTM channel value register per duty cycle and modulo for combine mode
-*        odd channel no must be provided and even channel value register is not changed.
-*
-* @param[in]    pFTM            pointer to one of three FTM base register address.
-* @param[in]    FTM_Channel     odd channel no:1,3,5.
-* @param[in]    dutyCycle       duty cycle in percentage. e.g. 10, means 10%.
-*
-* @return none.
-*
-* @ Pass/ Fail criteria: none.
-*
-*****************************************************************************/
-void  FTM_SetDutyCycleCombine(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8DutyCycle)
-{
-    uint16_t   cnv = pFTM->CONTROLS[u8FTM_Channel-1].CnV;
-    uint16_t   modulo = pFTM->MOD; 
-    
-    ASSERT((1 == u8FTM_Channel) || (3 == u8FTM_Channel) || (5 == u8FTM_Channel));
-    
-    cnv += (u8DutyCycle * (modulo+1))  / 100;
-    if(cnv > modulo)
-    {
-        cnv = modulo - 1;
-    }
-    pFTM->CONTROLS[u8FTM_Channel].CnV = cnv ;    
-    
-    pFTM->PWMLOAD |= FTM_PWMLOAD_LDOK_MASK | (1<<u8FTM_Channel);     
-}
 
 /*****************************************************************************//*!
 *
@@ -871,9 +861,8 @@ void  FTM_SetDutyCycleCombine(FTM_Type *pFTM, uint8_t u8FTM_Channel, uint8_t u8D
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void  FTM_SyncConfigActivate(FTM_Type *pFTM, uint32_t u32ConfigValue)
+void  FTM_SyncConfigActivate(FTM_Type pFTM, uint32_t u32ConfigValue)
 {
-    ASSERT((FTM2 == pFTM));
     pFTM->SYNCONF |= u32ConfigValue;   
 }
 
@@ -889,9 +878,8 @@ void  FTM_SyncConfigActivate(FTM_Type *pFTM, uint32_t u32ConfigValue)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void  FTM_SyncConfigDeactivate(FTM_Type *pFTM, uint32_t u32ConfigValue)
+void  FTM_SyncConfigDeactivate(FTM_Type pFTM, uint32_t u32ConfigValue)
 {
-    ASSERT((FTM2 == pFTM));
     pFTM->SYNCONF &= ~u32ConfigValue;   
 }
 
@@ -907,7 +895,7 @@ void  FTM_SyncConfigDeactivate(FTM_Type *pFTM, uint32_t u32ConfigValue)
 * @ Pass/ Fail criteria: none
 *
 *****************************************************************************/
-void  FTM_SetCallback(FTM_Type *pFTM, FTM_CallbackPtr pfnCallback)
+void  FTM_SetCallback(FTM_Type pFTM, FTM_CallbackPtr pfnCallback)
 {
    FTM_Callback[((uint32_t)pFTM - (uint32_t)FTM0_BASE)>>12] = pfnCallback;
 }
@@ -926,7 +914,7 @@ void  FTM_SetCallback(FTM_Type *pFTM, FTM_CallbackPtr pfnCallback)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void FTM0_Isr(void)
+void FTM0_IRQHandler(void)
 {
     if(FTM_Callback[0])
     {
@@ -945,7 +933,7 @@ void FTM0_Isr(void)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void FTM1_Isr(void)
+void FTM1_IRQHandler(void)
 {
     if(FTM_Callback[1])
     {
@@ -964,13 +952,12 @@ void FTM1_Isr(void)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void FTM2_Isr(void)
+
+void FTM2_IRQHandler(void)
 {
     if(FTM_Callback[2])
     {
         FTM_Callback[2]();
     }
 }
-
-
 

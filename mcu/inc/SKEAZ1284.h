@@ -134,7 +134,7 @@ typedef enum IRQn {
   UART0_IRQn                   = 12,               /**< UART0 status and error */
   UART1_IRQn                   = 13,               /**< UART1 status and error */
   UART2_IRQn                   = 14,               /**< UART2 status and error */
-  ADC0_IRQn                    = 15,               /**< ADC interrupt */
+  ADC_IRQn                     = 15,               /**< ADC interrupt */
   ACMP0_IRQn                   = 16,               /**< ACMP0 interrupt */
   FTM0_IRQn                    = 17,               /**< FTM0 single interrupt vector for all sources */
   FTM1_IRQn                    = 18,               /**< FTM1 single interrupt vector for all sources */
@@ -1833,7 +1833,7 @@ typedef struct {
   __IO uint8_t A1;                                 /**< I2C Address Register 1, offset: 0x0 */
   __IO uint8_t F;                                  /**< I2C Frequency Divider register, offset: 0x1 */
   __IO uint8_t C1;                                 /**< I2C Control Register 1, offset: 0x2 */
-  __IO uint8_t S;                                  /**< I2C Status register, offset: 0x3 */
+  __IO uint8_t S1;                                 /**< I2C Status register 1, offset: 0x3 */
   __IO uint8_t D;                                  /**< I2C Data I/O register, offset: 0x4 */
   __IO uint8_t C2;                                 /**< I2C Control Register 2, offset: 0x5 */
   __IO uint8_t FLT;                                /**< I2C Programmable Input Glitch Filter register, offset: 0x6 */
@@ -1842,7 +1842,7 @@ typedef struct {
   __IO uint8_t A2;                                 /**< I2C Address Register 2, offset: 0x9 */
   __IO uint8_t SLTH;                               /**< I2C SCL Low Timeout Register High, offset: 0xA */
   __IO uint8_t SLTL;                               /**< I2C SCL Low Timeout Register Low, offset: 0xB */
-} I2C_Type;
+} I2C_Type, *I2C_MemMapPtr;
 
 /* ----------------------------------------------------------------------------
    -- I2C - Register accessor macros

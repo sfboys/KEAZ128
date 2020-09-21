@@ -25,25 +25,21 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
-*
 * @brief providing APIs for configuring SPI module (SPI). 
 *
 *******************************************************************************
 *
 * provide APIs for configuring SPI module (SPI).
 ******************************************************************************/
-#include "common.h"
 #include "spi.h"
+#include "nvic.h"
 
 
 /******************************************************************************
 * Local variables
 ******************************************************************************/
 
-SPI_CallbackType SPI_Callback[MAX_SPI_NO] = {(SPI_CallbackType)NULL};
+SPI_CallbackType SPI_Callback[MAX_SPI_NO] = {(SPI_CallbackType)(0)};
 
 
 /******************************************************************************
@@ -75,59 +71,49 @@ SPI_CallbackType SPI_Callback[MAX_SPI_NO] = {(SPI_CallbackType)NULL};
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
-void SPI_Init(SPI_Type *pSPI, SPI_ConfigType *pConfig)
+void SPI_Init(SPI_MemMapPtr pSPI, SPI_ConfigType *pConfig)
 {
-#if defined(CPU_KE04)  
-     /* sanity check */
-    ASSERT((pSPI == SPI0));
-    SIM->SCGC |= SIM_SCGC_SPI0_MASK;
-#else
-    /* sanity check */
-    ASSERT((pSPI == SPI0) ||  (pSPI == SPI1));
+
     
     /* enable SPI clock gating on */
     if( pSPI == SPI0)
     {
-        SIM->SCGC |= SIM_SCGC_SPI0_MASK;
+        SIM_SCGC |= SIM_SCGC_SPI0_MASK;
     }
     else
     {
-        SIM->SCGC |= SIM_SCGC_SPI1_MASK;     
+        SIM_SCGC |= SIM_SCGC_SPI1_MASK;     
     }
-#endif
+
     /* configure other control bits */
     if( pConfig->sSettings.bIntEn)
     {
         SPI_IntEnable(pSPI);
-#if defined(CPU_KE04)  
-        NVIC_EnableIRQ(SPI0_IRQn);  
-#else
+        //Enable_Interrupt(INT_SPI1);
+
         if( pSPI == SPI0 )
         {
-			NVIC_EnableIRQ(SPI0_IRQn);
+			Enable_Interrupt(SPI0_IRQn);
         }
         else
         {
-			NVIC_EnableIRQ(SPI1_IRQn);
+			Enable_Interrupt(SPI1_IRQn);
         }
-#endif
+
     }
 
     if( pConfig->sSettings.bTxIntEn)
     {
         SPI_TxIntEnable(pSPI);
-#if defined(CPU_KE04)  
-        NVIC_EnableIRQ(SPI0_IRQn);  
-#else
+
         if( pSPI == SPI0 )
         {
-			NVIC_EnableIRQ(SPI0_IRQn);
+        	Enable_Interrupt(SPI0_IRQn);
         }
         else
         {
-			NVIC_EnableIRQ(SPI1_IRQn);
+        	Enable_Interrupt(SPI1_IRQn);
         }
-#endif
     }
     if( pConfig->sSettings.bMasterMode)
     {
@@ -142,9 +128,17 @@ void SPI_Init(SPI_Type *pSPI, SPI_ConfigType *pConfig)
     {
     	SPI_SetClockPol(pSPI,1);
     }
+    else
+    {
+    	SPI_SetClockPol(pSPI,0);
+    }
     if( pConfig->sSettings.bClkPhase1)
     {
         SPI_SetClockPhase(pSPI,1);
+    }
+    else
+    {
+    	  SPI_SetClockPhase(pSPI,0);
     }
       
     if( pConfig->sSettings.bShiftLSBFirst)
@@ -194,7 +188,7 @@ void SPI_Init(SPI_Type *pSPI, SPI_ConfigType *pConfig)
 
 /*****************************************************************************//*!
    *
-   * @brief SPI set band rate.
+   * @brief SPI set baud rate.
    *        
    * @param[in]  pSPI   point to SPI module type.
    * @param[in]  u32BusClock   Bus clock.
@@ -204,7 +198,7 @@ void SPI_Init(SPI_Type *pSPI, SPI_ConfigType *pConfig)
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
-void SPI_SetBaudRate(SPI_Type *pSPI,uint32_t u32BusClock,uint32_t u32Bps)
+void SPI_SetBaudRate(SPI_MemMapPtr pSPI,uint32_t u32BusClock,uint32_t u32Bps)
 {
 	uint32_t u32BitRateDivisor;
 	uint8_t u8Sppr;
@@ -254,7 +248,7 @@ void SPI_SetBaudRate(SPI_Type *pSPI,uint32_t u32BusClock,uint32_t u32Bps)
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
-ResultType SPI_TransferWait(SPI_Type *pSPI, SPI_WidthType* pRdBuff, SPI_WidthType *pWrBuff,uint32 uiLength)
+ResultType SPI_TransferWait(SPI_MemMapPtr pSPI, SPI_WidthType* pRdBuff, SPI_WidthType *pWrBuff,uint32_t uiLength)
 {
     ResultType err = SPI_ERR_SUCCESS;
     uint32_t  i;
@@ -285,9 +279,9 @@ ResultType SPI_TransferWait(SPI_Type *pSPI, SPI_WidthType* pRdBuff, SPI_WidthTyp
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
-void SPI_DeInit(SPI_Type *pSPI)
+void SPI_DeInit(SPI_MemMapPtr pSPI)
 {  
-    int16 i;
+    int16_t i;
     pSPI->C1 = SPI_C1_DEFAULT;
     pSPI->C2 = SPI_C2_DEFAULT;
     pSPI->BR = SPI_BR_DEFAULT;
@@ -306,10 +300,9 @@ void SPI_DeInit(SPI_Type *pSPI)
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-void SPI_SetCallback(SPI_Type *pSPI,SPI_CallbackType pfnCallback)
+void SPI_SetCallback(SPI_MemMapPtr pSPI,SPI_CallbackType pfnCallback)
 {
     uint32_t    u32Port = ((uint32_t)pSPI-(uint32_t)SPI0)>>12;
-    ASSERT(u32Port <2);
     SPI_Callback[u32Port] = pfnCallback;
 }
 
@@ -326,7 +319,7 @@ void SPI_SetCallback(SPI_Type *pSPI,SPI_CallbackType pfnCallback)
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
 
-void SPI0_Isr(void)
+void SPI0_IRQHandler(void)
 {
     if( SPI_Callback[0] )
     {
@@ -344,7 +337,7 @@ void SPI0_Isr(void)
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
 
-void SPI1_Isr(void)
+void SPI1_IRQHandler(void)
 {
     if( SPI_Callback[1] )
     {

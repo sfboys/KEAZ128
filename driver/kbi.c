@@ -1,7 +1,7 @@
 /******************************************************************************
 *
 * Freescale Semiconductor Inc.
-* (c) Copyright 2013 Freescale Semiconductor, Inc.
+* (c) Copyright 2014 Freescale Semiconductor, Inc.
 * ALL RIGHTS RESERVED.
 *
 ***************************************************************************
@@ -24,17 +24,13 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
-*
 * @brief providing APIs for configuring KBI. 
 *
 *******************************************************************************
 *
 * provide APIs for configuring KBI
 ******************************************************************************/
-#include "common.h"
+
 #include "kbi.h"
 /******************************************************************************
 * External objects
@@ -43,12 +39,13 @@
 /******************************************************************************
 * Global variables
 ******************************************************************************/
-KBI_CallbackType KBI_Callback[KBI_MAX_NO] = {(KBI_CallbackType)NULL};
-
+KBI_CallbackType KBI_Callback[KBI_MAX_NO] = {(KBI_CallbackType)(0)};
+uint32_t u8Port,sc;
 /******************************************************************************
 * Constants and macros
 ******************************************************************************/
-
+#define KBI_MAX_PINS_PER_PORT   32                  /*!< max number of pins */
+#define KBI_Type KBI_MemMapPtr
 /******************************************************************************
 * Local types
 ******************************************************************************/
@@ -90,37 +87,8 @@ KBI_CallbackType KBI_Callback[KBI_MAX_NO] = {(KBI_CallbackType)NULL};
 * @see KBI_DeInit.
 *
 *****************************************************************************/
-void KBI_Init(KBI_Type *pKBI, KBI_ConfigType *pConfig)
-{
-#if defined(CPU_KEA8)
-    uint16_t    i;
-    uint8_t     sc = 0;
-    uint8_t     u8Port;
-    uint8_t     u8PinPos;
-    uint16_t    u16PinMapping[KBI_MAX_NO][8] = 
-    {
-        {
-            0, 1, 2, 3, 8, 9, 10, 11           /* KBI0 pins position in GPIOA register */
-        },
-        {
-            24, 25, 26, 27, 28, 29, 30, 31      /* KBI1 pins position in GPIOA register */
-        }
-    };
-#elif defined(CPU_KEA64)
-    uint16_t    i;
-    uint8_t     sc = 0;
-    uint8_t     u8Port;
-    uint8_t     u8PinPos;
-    uint16_t    u16PinMapping[KBI_MAX_NO][8] = 
-    {
-        {
-            0, 1, 2, 3, 8, 9, 10, 11           /* KBI0 pins position in GPIOA register */
-        },
-        {
-            20, 21, 16, 17, 18, 19, 12, 13      /* KBI1 pins position in GPIOA register */
-        }
-    };
-#elif defined(CPU_KEA128)
+void KBI_Init(KBI_Type pKBI, KBI_ConfigType *pConfig)
+{	
      uint32_t    i;
      uint32_t     sc = 0;
      uint32_t     u8Port;
@@ -135,13 +103,13 @@ void KBI_Init(KBI_Type *pKBI, KBI_ConfigType *pConfig)
 			0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31		   
         }
     };
-#endif	 
+ 
  
     
     if(KBI0 == pKBI)
     {
         SIM->SCGC   |= SIM_SCGC_KBI0_MASK;             /* enable clock to KBI0 */\
-        u8Port      =  0;
+         u8Port      =  0;
     }
     else if (KBI1 == pKBI)
     {        
@@ -150,7 +118,8 @@ void KBI_Init(KBI_Type *pKBI, KBI_ConfigType *pConfig)
     }
     
     /* mask keyboard interrupts first */
-    pKBI->SC    = 0;
+     sc          = pConfig->sBits.bMode;
+    pKBI->SC    = sc;
 
     /* configure KBI pin polarity and others */
     for (i = 0; i < KBI_MAX_PINS_PER_PORT; i++)
@@ -160,53 +129,32 @@ void KBI_Init(KBI_Type *pKBI, KBI_ConfigType *pConfig)
             pKBI->PE    |= (1<<i);                      /* enable this KBI pin */
             pKBI->ES    = (pKBI->ES & ~(1<<i)) | (pConfig->sPin[i].bEdge << i);     
             u8PinPos = u16PinMapping[u8Port][i];
-            ASSERT(!(u8PinPos & 0x80));
-		#if defined(CPU_KEA8)|| defined(CPU_KEA64)	
-            FGPIOA->PIDR  &= ~(1<<u8PinPos);              /* enable GPIO input */     
-            FGPIOA->PDDR  &= ~(1<<u8PinPos);              /* configure pin as input */
-            if (pConfig->sPin[i].bEdge)                   /* if detect Falling edge/Low level, enable pullup for the pin */
-            	PORT->PUE0  &= ~(1<<u8PinPos);
-            else
-                PORT->PUE0  |= (1<<u8PinPos);
-        #elif defined(CPU_KEA128)
+            
 		   if (u8Port == 0)   /* KBI0 */
            {
 		   	FGPIOA->PIDR  &= ~(1<<u8PinPos);              /* enable GPIO input */    
             FGPIOA->PDDR  &= ~(1<<u8PinPos);              /* configure pin as input */ 
-            if (pConfig->sPin[i].bEdge)                  /* if detect Falling edge/Low level, enable pullup for the pin */
-            	PORT->PUE0  &= ~(1<<u8PinPos);
-            else
-                PORT->PUE0  |= (1<<u8PinPos);
            }
 		   else if (u8Port == 1)   /* KBI1 */
            {
 		   	FGPIOB->PIDR  &= ~(1<<u8PinPos);              /* enable GPIO input */     
             FGPIOB->PDDR  &= ~(1<<u8PinPos);              /* configure pin as input */ 
-            if (pConfig->sPin[i].bEdge)                   /* if detect Falling edge/Low level, enable pullup for the pin */
-            	PORT->PUE1  &= ~(1<<u8PinPos);
-            else
-                PORT->PUE1  |= (1<<u8PinPos);
            }
-		#endif  
+		
 		}
     }
     
-	/* write to KBACK to clear any false interrupts */
-    pKBI->SC    = KBI_SC_KBACK_MASK;
-    
-    /* set detection mode */
-    sc          = pConfig->sBits.bMode;
-    pKBI->SC   |= sc;
-    
-    #if defined(CPU_KEA128)
+    /*Reset KBI_SP register*/
+	sc = pConfig->sBits.bRstKbsp<<KBI_SC_RSTKBSP_SHIFT;
+	pKBI->SC    |= sc;
+	
     /*Real KBI_SP register enable*/
 	sc = pConfig->sBits.bKbspEn<<KBI_SC_KBSPEN_SHIFT;
 	pKBI->SC    |= sc;
-
-	/*Reset KBI_SP register*/
-	sc = pConfig->sBits.bRstKbsp<<KBI_SC_RSTKBSP_SHIFT;
-	pKBI->SC    |= sc;	
-    #endif
+	
+  
+	/* write to KBACK to clear any false interrupts */
+    pKBI->SC    = sc;
     
     /* enable interrupt if needed */
     if(pConfig->sBits.bIntEn)
@@ -215,11 +163,12 @@ void KBI_Init(KBI_Type *pKBI, KBI_ConfigType *pConfig)
         
         if(KBI0 == pKBI)
         {
-            NVIC_EnableIRQ(KBI0_IRQn);
+            Enable_Interrupt(KBI0_IRQn);
         }
-        else
+        if(KBI1 == pKBI)
         {
-            NVIC_EnableIRQ(KBI1_IRQn);            
+          
+            Enable_Interrupt(KBI1_IRQn);
         }
     }
 }
@@ -236,7 +185,7 @@ void KBI_Init(KBI_Type *pKBI, KBI_ConfigType *pConfig)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void KBI_SetCallback(KBI_Type *pKBI, KBI_CallbackType pfnCallback)
+void KBI_SetCallback(KBI_Type pKBI, KBI_CallbackType pfnCallback)
 {
     if(KBI0 == pKBI)
     {
@@ -261,15 +210,16 @@ void KBI_SetCallback(KBI_Type *pKBI, KBI_CallbackType pfnCallback)
 * @see KBI_Init.
 *
 *****************************************************************************/
-void KBI_DeInit(KBI_Type *pKBI)
+void KBI_DeInit(KBI_Type pKBI)
 {
     if(KBI0 == pKBI)
     {
-        NVIC_DisableIRQ(KBI0_IRQn);
+        
+        Disable_Interrupt(KBI0_IRQn);
     }
     else
     {
-        NVIC_DisableIRQ(KBI1_IRQn);        
+    	 Disable_Interrupt(KBI1_IRQn);
     }
     
     pKBI->PE = 0;
@@ -280,7 +230,7 @@ void KBI_DeInit(KBI_Type *pKBI)
     {
         SIM->SCGC   &= ~SIM_SCGC_KBI0_MASK;             /* disable clock to KBI0 */
     }
-    else
+    else 
     {
         SIM->SCGC   &= ~SIM_SCGC_KBI1_MASK;             /* disable clock to KBI1 */       
     }
@@ -302,7 +252,8 @@ void KBI_DeInit(KBI_Type *pKBI)
 
 void KBI0_IRQHandler(void)	
 {
-  KBI0->SC |= KBI_SC_KBACK_MASK;                        /* clear interrupt flag */
+  KBI_MemMapPtr pKBI = KBI0;
+  pKBI->SC |= KBI_SC_KBACK_MASK;                        /* clear interrupt flag */
 
   if(KBI_Callback[0])
   {
@@ -326,7 +277,8 @@ void KBI0_IRQHandler(void)
 
 void KBI1_IRQHandler(void)	
 {
-  KBI1->SC |= KBI_SC_KBACK_MASK;                        /* clear interrupt flag */
+  KBI_MemMapPtr pKBI = KBI1;
+  pKBI->SC |= KBI_SC_KBACK_MASK;                        /* clear interrupt flag */
  
   if(KBI_Callback[1])
   {

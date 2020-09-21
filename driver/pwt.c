@@ -24,16 +24,12 @@
 *
 * @author   Freescale
 *
-* @version  0.0.1
-*
-* @date     Jun 25, 2013
-*
 * @brief    Pulse Width Timer (PWT) source code. 
 *
 ******************************************************************************/
-#include "common.h"
-#include "pwt.h"
 
+#include "pwt.h"
+#include "nvic.h"
 /******************************************************************************
 * Global variables
 ******************************************************************************/
@@ -57,12 +53,12 @@
  * @brief global variable to store PWT callbacks.
  *
  */
-PWT_CallbackType PWT_Callback[1] = {(PWT_CallbackType)NULL}; /*!< PWT initial callback */
+PWT_CallbackType PWT_Callback[1] = {(PWT_CallbackType)(0)}; /*!< PWT initial callback */
 
 /******************************************************************************
 * Local functions
 ******************************************************************************/
-void PWT_Isr(void);
+
 
 /******************************************************************************
 * Global functions
@@ -79,7 +75,7 @@ void PWT_Isr(void);
 *
 * @brief initialize pwt module.
 *        
-* @param[in]   u8Channel_No channel number
+*
 * @param[in]   pConfig point to configuration  
 *
 * @return none
@@ -104,12 +100,12 @@ void PWT_Init(PWT_ConfigType *pConfig)
 
     if (pConfig->bPWTIntEn)            
     {                                     
-        NVIC_EnableIRQ(PWT_IRQn); 
+        Enable_Interrupt(PWT_IRQn);
         u32PWTR1Value |= PWT_R1_PWTIE_MASK;
     }                   
     else                                     
-    {                     
-        NVIC_DisableIRQ(PWT_IRQn);       
+    {                       
+        Disable_Interrupt(PWT_IRQn);
     }
  
     if (pConfig->bOverflowIntEn)            
@@ -169,7 +165,8 @@ void PWT_SetCallback(PWT_CallbackType pfnCallback)
 *****************************************************************************/
 void PWT_DeInit(void)
 {
-    NVIC_DisableIRQ(PWT_IRQn);
+    
+    Disable_Interrupt(PWT_IRQn);
     PWT_DisableInt();
     PWT_DisableReadyInt();
     PWT_DisableOverFlowInt();
@@ -194,7 +191,7 @@ void PWT_DeInit(void)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void PWT_Isr(void) 
+void PWT_IRQHandler(void) 
 {   
 
     if (PWT_Callback[0])

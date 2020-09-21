@@ -7,12 +7,14 @@
 
 typedef enum
 {
-	OFF =0,
-	RED,
-	GREEN,
-	BLUE,
-    WHITE
+	LED_OFF =0,
+	LED_RED,
+	LED_GREEN,
+	LED_BLUE,
+    LED_WHITE
 }LED_ENUM;
 
 void SetLedDisplay(LED_ENUM status);
+void HalKBIInit(void);
+void HalGpioInit(void);
 #endif

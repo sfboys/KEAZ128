@@ -24,14 +24,9 @@
 *
 * @author   Freescale
 *
-* @version  0.0.1
-*
-* @date     Jun 25, 2013
-*
 * @brief    Cyclic redundancy check (CRC) source code. 
 *
 ******************************************************************************/
-#include "common.h"
 #include "crc.h"
 
 /******************************************************************************
@@ -104,7 +99,7 @@ void CRC_Init(CRC_ConfigType *pConfig)
     }
     else 
     {
-        CRC0->GPOLY_ACCESS16BIT.GPOLYL = pConfig->u32PolyData;  /*!< only 16-bit write allowed */             
+        CRC0->GPOLY_ACCESS16BIT.GPOLYL = pConfig->u32PolyData;  /* Only 16-bit write allowed */
     }  
     
 }     
@@ -220,7 +215,7 @@ uint32_t CRC_Cal32(uint32_t seed, uint8_t *msg, uint32_t sizeBytes)
     }
     if (i==1)
     {
-       CRC0->ACCESS8BIT.DATALL = data_in;                /*!< write last byte */
+       CRC0->ACCESS8BIT.DATALL = data_in;                /* Write last byte */
     }
 #elif  defined(BYTE_ENABLES_7_E)                         
     /*!< write three bytes */
@@ -234,20 +229,20 @@ uint32_t CRC_Cal32(uint32_t seed, uint8_t *msg, uint32_t sizeBytes)
       {
         i = 0;
         /*write first  char*/
-        CRC0->ACCESS8BIT.DATAHL  = (data_in>>16) & 0xff; /*!< write low byte of high word */
+        CRC0->ACCESS8BIT.DATAHL  = (data_in>>16) & 0xff; /* Write low byte of high word */
         /*write last two chars*/
-        CRC0->ACCESS16BIT.DATAL = data_in & 0x00ffff;    /*!< write low word */
+        CRC0->ACCESS16BIT.DATAL = data_in & 0x00ffff;    /* Write low word */
        }
     }
     if ( i == 2)
     {
-       CRC0->ACCESS16BIT.DATAL = (data_in);              /*!< write last 2 bytes */
+       CRC0->ACCESS16BIT.DATAL = (data_in);              /* Write last 2 bytes */
     }
     else if (i == 1)
     {
-       CRC0->ACCESS8BIT.DATALL = data_in;                /*!< write last byte */      
+       CRC0->ACCESS8BIT.DATALL = data_in;                /* Write last byte */
     }
-#else                                                    /*!< write low byte only */
+#else                                                    /* Write low byte only */
     for(;j<sizeBytes;j++)
     {     
        *pCRCBytes = msg[j];
@@ -272,11 +267,11 @@ uint32_t CRC_Cal32(uint32_t seed, uint8_t *msg, uint32_t sizeBytes)
 *****************************************************************************/
 void CRC_DeInit(void)
 {  
-   CRC0->CTRL  = 0x3000000; /*!< prepare for write 32-bit seed*/ 
-   CRC0->DATA  = 0xFFFFFFFF;/*!< write 32-bit seed to data register*/ 
+   CRC0->CTRL  = 0x3000000; 								/* Prepare for write 32-bit seed*/
+   CRC0->DATA  = 0xFFFFFFFF;								/* Write 32-bit seed to data register*/
    while(!(CRC0->DATA == 0xFFFFFFFF));
    CRC0->GPOLY = 0x00001021; 
-   CRC0->CTRL  = 0;         /*!< reset ctrl register*/  
+   CRC0->CTRL  = 0;         								/* Reset ctrl register*/
    SIM->SCGC &= ~SIM_SCGC_CRC_MASK;
 }
 

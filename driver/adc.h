@@ -24,9 +24,6 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
 *
 * @brief header file for ADC module utilities (ADC). 
 *
@@ -40,22 +37,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	
 /******************************************************************************
 * Macros
 ******************************************************************************/
+#include "derivative.h"
 /******************************************************************************
 *define ADC refernce voltage 
 *
 *//*! @addtogroup adc_ref_list
 * @{
 *******************************************************************************/
-	
-	
-#include "SKEAZ1284.h"
 
 #define ADC_VREF_VREFH                 0x00			/*!< ADC reference voltage is VREFH*/
 #define ADC_VREF_VDDA                  0x01			/*!< ADC reference voltage is VDDA*/
+//#define ADC ADC_BASE_PTR
+//#define SIM SIM_BASE_PTR
 
 /*! @} End of adc_ref_list                                                    						*/
 
@@ -196,14 +192,11 @@ typedef struct
     uint16_t bLongSampleEn          :1;     /*!< 1: long sample mode, 0: short sample mode */
     uint16_t bFiFoScanModeEn        :1;     /*!< 1: FIFO scan mode enable, 0: FIFO scan mode disable */
     uint16_t bCompareAndEn          :1;     /*!< 1: Compare and logic, 0: Compare and logic */
-#ifdef CPU_KEA8 
-    uint16_t bReverse               :7;    
-#else
     uint16_t bHTRGMEn               :1;     /*!< one hardware trigger pulse trigger multiple conversions in fifo mode */      
     uint16_t bHTRGMASKEn            :1;		/*!< Hardware trigger mask enable. */
     uint16_t bHTRGMASKSEL           :1;		/*!< This field selects hardware trigger mask mode. */
-    uint16_t Reserve                :4;
-#endif
+  
+
 }ADC_SettingType;
 /*! @} End of adc_setting_type                                               						*/
 
@@ -244,7 +237,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_IntEnable( ADC_Type *pADC )
+static inline void ADC_IntEnable( ADC_MemMapPtr pADC )
 {
     pADC->SC1 |= ADC_SC1_AIEN_MASK;   
 }
@@ -258,7 +251,7 @@ __STATIC_INLINE void ADC_IntEnable( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_IntDisable( ADC_Type *pADC )
+static inline void ADC_IntDisable( ADC_MemMapPtr pADC )
 {
     pADC->SC1 &= ~ADC_SC1_AIEN_MASK;   
 }
@@ -272,7 +265,7 @@ __STATIC_INLINE void ADC_IntDisable( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_ContinuousConversion( ADC_Type *pADC )
+static inline void ADC_ContinuousConversion( ADC_MemMapPtr pADC )
 {
     pADC->SC1 |= ADC_SC1_ADCO_MASK;   
 }
@@ -286,7 +279,7 @@ __STATIC_INLINE void ADC_ContinuousConversion( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_SingleConversion( ADC_Type *pADC )
+static inline void ADC_SingleConversion( ADC_MemMapPtr pADC )
 {
     pADC->SC1 &= ~ADC_SC1_ADCO_MASK;   
 }
@@ -300,7 +293,7 @@ __STATIC_INLINE void ADC_SingleConversion( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
-__STATIC_INLINE void ADC_SetHardwareTrigger( ADC_Type *pADC )
+static inline void ADC_SetHardwareTrigger( ADC_MemMapPtr pADC )
 {
     pADC->SC2 |= ADC_SC2_ADTRG_MASK;
 }
@@ -314,7 +307,7 @@ __STATIC_INLINE void ADC_SetHardwareTrigger( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_SetSoftwareTrigger( ADC_Type *pADC )
+static inline void ADC_SetSoftwareTrigger( ADC_MemMapPtr pADC )
 {
     pADC->SC2 &= ~ADC_SC2_ADTRG_MASK;
 }
@@ -328,7 +321,7 @@ __STATIC_INLINE void ADC_SetSoftwareTrigger( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_CompareEnable( ADC_Type *pADC )
+static inline void ADC_CompareEnable( ADC_MemMapPtr pADC )
 {
     pADC->SC2 |= ADC_SC2_ACFE_MASK;
 }
@@ -342,7 +335,7 @@ __STATIC_INLINE void ADC_CompareEnable( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_CompareDisable( ADC_Type *pADC )
+static inline void ADC_CompareDisable( ADC_MemMapPtr pADC )
 {
     pADC->SC2 &= ~ADC_SC2_ACFE_MASK;
 }
@@ -356,7 +349,7 @@ __STATIC_INLINE void ADC_CompareDisable( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_CompareGreaterFunction( ADC_Type *pADC )
+static inline void ADC_CompareGreaterFunction( ADC_MemMapPtr pADC )
 {
     pADC->SC2 |= ADC_SC2_ACFGT_MASK;
 }
@@ -370,7 +363,7 @@ __STATIC_INLINE void ADC_CompareGreaterFunction( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_CompareLessFunction( ADC_Type *pADC )
+static inline void ADC_CompareLessFunction( ADC_MemMapPtr pADC )
 {
     pADC->SC2 &= ~ADC_SC2_ACFGT_MASK;
 }
@@ -384,7 +377,7 @@ __STATIC_INLINE void ADC_CompareLessFunction( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_SetLowPower( ADC_Type *pADC )
+static inline void ADC_SetLowPower( ADC_MemMapPtr pADC )
 {
     pADC->SC3 |= ADC_SC3_ADLPC_MASK;
 }
@@ -398,7 +391,7 @@ __STATIC_INLINE void ADC_SetLowPower( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_SetHighSpeed( ADC_Type *pADC )
+static inline void ADC_SetHighSpeed( ADC_MemMapPtr pADC )
 {
     pADC->SC3 &= ~ADC_SC3_ADLPC_MASK;
 }
@@ -412,7 +405,7 @@ __STATIC_INLINE void ADC_SetHighSpeed( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_SetLongSample( ADC_Type *pADC )
+static inline void ADC_SetLongSample( ADC_MemMapPtr pADC )
 {
     pADC->SC3 |= ADC_SC3_ADLSMP_MASK;
 }
@@ -426,7 +419,7 @@ __STATIC_INLINE void ADC_SetLongSample( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_SetShortSample( ADC_Type *pADC )
+static inline void ADC_SetShortSample( ADC_MemMapPtr pADC )
 {
     pADC->SC3 &= ~ADC_SC3_ADLSMP_MASK;
 }
@@ -440,7 +433,7 @@ __STATIC_INLINE void ADC_SetShortSample( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
-__STATIC_INLINE void ADC_FifoScanModeEnable( ADC_Type *pADC )
+static inline void ADC_FifoScanModeEnable( ADC_MemMapPtr pADC )
 {
     pADC->SC4 |= ADC_SC4_ASCANE_MASK;
 }
@@ -454,7 +447,7 @@ __STATIC_INLINE void ADC_FifoScanModeEnable( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_FifoScanModeDisable( ADC_Type *pADC )
+static inline void ADC_FifoScanModeDisable( ADC_MemMapPtr pADC )
 {
     pADC->SC4 &= ~ADC_SC4_ASCANE_MASK;
 }
@@ -468,7 +461,7 @@ __STATIC_INLINE void ADC_FifoScanModeDisable( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_CompareFifoOr( ADC_Type *pADC )
+static inline void ADC_CompareFifoOr( ADC_MemMapPtr pADC )
 {
     pADC->SC4 &= ~ADC_SC4_ACFSEL_MASK;
 }
@@ -482,7 +475,7 @@ __STATIC_INLINE void ADC_CompareFifoOr( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_CompareFifoAnd( ADC_Type *pADC )
+static inline void ADC_CompareFifoAnd( ADC_MemMapPtr pADC )
 {
     pADC->SC4 |= ADC_SC4_ACFSEL_MASK;
 }
@@ -496,7 +489,7 @@ __STATIC_INLINE void ADC_CompareFifoAnd( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE uint16_t ADC_ReadResultReg( ADC_Type *pADC )
+static inline uint16_t ADC_ReadResultReg( ADC_MemMapPtr pADC )
 {
     return (uint16_t)pADC->R;
 }
@@ -511,7 +504,7 @@ __STATIC_INLINE uint16_t ADC_ReadResultReg( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_SetCompareValue( ADC_Type *pADC, uint16_t u16Compare )
+static inline void ADC_SetCompareValue( ADC_MemMapPtr pADC, uint16_t u16Compare )
 {
     pADC->CV = u16Compare;
 }
@@ -526,7 +519,7 @@ __STATIC_INLINE void ADC_SetCompareValue( ADC_Type *pADC, uint16_t u16Compare )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_PinControlEnable( ADC_Type *pADC, uint16_t u16PinNumber)
+static inline void ADC_PinControlEnable( ADC_MemMapPtr pADC, uint16_t u16PinNumber)
 {
     pADC->APCTL1 &= ~(0x01<<u16PinNumber);
 }
@@ -541,7 +534,7 @@ __STATIC_INLINE void ADC_PinControlEnable( ADC_Type *pADC, uint16_t u16PinNumber
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_PinControlDisable( ADC_Type *pADC, uint16_t u16PinNumber)
+static inline void ADC_PinControlDisable( ADC_MemMapPtr pADC, uint16_t u16PinNumber)
 {
     pADC->APCTL1 |= (0x01<<u16PinNumber);
 }
@@ -555,7 +548,7 @@ __STATIC_INLINE void ADC_PinControlDisable( ADC_Type *pADC, uint16_t u16PinNumbe
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE uint8_t ADC_IsConversionActiveFlag( ADC_Type *pADC )
+static inline uint8_t ADC_IsConversionActiveFlag( ADC_MemMapPtr pADC )
 {
     return(pADC->SC2 & ADC_SC2_ADACT_MASK);
 }
@@ -569,7 +562,7 @@ __STATIC_INLINE uint8_t ADC_IsConversionActiveFlag( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE uint8_t ADC_IsCOCOFlag( ADC_Type *pADC )
+static inline uint8_t ADC_IsCOCOFlag( ADC_MemMapPtr pADC )
 {
     return(pADC->SC1 & ADC_SC1_COCO_MASK);
 }
@@ -583,7 +576,7 @@ __STATIC_INLINE uint8_t ADC_IsCOCOFlag( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE uint8_t ADC_IsFIFOEmptyFlag( ADC_Type *pADC )
+static inline uint8_t ADC_IsFIFOEmptyFlag( ADC_MemMapPtr pADC )
 {
     return(pADC->SC2 & ADC_SC2_FEMPTY_MASK);
 }
@@ -597,11 +590,11 @@ __STATIC_INLINE uint8_t ADC_IsFIFOEmptyFlag( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE uint8_t ADC_IsFIFOFullFlag( ADC_Type *pADC )
+static inline uint8_t ADC_IsFIFOFullFlag( ADC_MemMapPtr pADC )
 {
     return(pADC->SC2 & ADC_SC2_FFULL_MASK);
 }
-#ifndef CPU_KEA8
+#ifndef CPU_KE02
 /*****************************************************************************//*!
    *
    * @brief Hardware Trigger Multiple Conversion Enable
@@ -612,7 +605,7 @@ __STATIC_INLINE uint8_t ADC_IsFIFOFullFlag( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_HardwareTriggerMultiple( ADC_Type *pADC )
+static inline void ADC_HardwareTriggerMultiple( ADC_MemMapPtr pADC )
 {
     pADC->SC4 |= ADC_SC4_HTRGME_MASK;
 }
@@ -626,7 +619,7 @@ __STATIC_INLINE void ADC_HardwareTriggerMultiple( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_HardwareTriggerSingle( ADC_Type *pADC )
+static inline void ADC_HardwareTriggerSingle( ADC_MemMapPtr pADC )
 {
     pADC->SC4 &= ~ADC_SC4_HTRGME_MASK;
 }
@@ -640,7 +633,7 @@ __STATIC_INLINE void ADC_HardwareTriggerSingle( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_HardwareTriggerMaskEnable( ADC_Type *pADC )
+static inline void ADC_HardwareTriggerMaskEnable( ADC_MemMapPtr pADC )
 {
     pADC->SC5 |= ADC_SC5_HTRGMASKE_MASK;
 }
@@ -654,7 +647,7 @@ __STATIC_INLINE void ADC_HardwareTriggerMaskEnable( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_HardwareTriggerMaskDisable( ADC_Type *pADC )
+static inline void ADC_HardwareTriggerMaskDisable( ADC_MemMapPtr pADC )
 {
     pADC->SC5 &= ~ADC_SC5_HTRGMASKE_MASK;
 }
@@ -668,7 +661,7 @@ __STATIC_INLINE void ADC_HardwareTriggerMaskDisable( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_HardwareTriggerMaskAuto( ADC_Type *pADC )
+static inline void ADC_HardwareTriggerMaskAuto( ADC_MemMapPtr pADC )
 {
     pADC->SC5 |= ADC_SC5_HTRGMASKSEL_MASK;
 }
@@ -682,60 +675,62 @@ __STATIC_INLINE void ADC_HardwareTriggerMaskAuto( ADC_Type *pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void ADC_HardwareTriggerMaskNonAuto( ADC_Type *pADC )
+static inline void ADC_HardwareTriggerMaskNonAuto( ADC_MemMapPtr pADC )
 {
     pADC->SC5 &= ~ADC_SC5_HTRGMASKSEL_MASK;
 }
 #endif
+
+
+
 /******************************************************************************
 * Global function
 ******************************************************************************/
 
-void ADC_SetChannel( ADC_Type *pADC, uint8_t u8Channel );
-void ADC_IntEnable( ADC_Type *pADC );
-void ADC_IntDisable( ADC_Type *pADC );
-void ADC_ContinuousConversion( ADC_Type *pADC );
-void ADC_SingleConversion( ADC_Type *pADC );
-void ADC_SetSoftwareTrigger( ADC_Type *pADC );
-void ADC_SetHardwareTrigger( ADC_Type *pADC );
-void ADC_VrefSelect( ADC_Type *pADC, uint8_t u8Vref );
-void ADC_CompareEnable( ADC_Type *pADC );
-void ADC_CompareDisable( ADC_Type *pADC );
-void ADC_CompareGreaterFunction( ADC_Type *pADC );
-void ADC_CompareLessFunction( ADC_Type *pADC );
-void ADC_SetLowPower( ADC_Type *pADC );
-void ADC_SetHighSpeed( ADC_Type *pADC );
-void ADC_SelectClockDivide( ADC_Type *pADC, uint8_t u8Div);
-void ADC_SetLongSample(ADC_Type *pADC);
-void ADC_SetShortSample(ADC_Type *pADC);
-void ADC_SetMode(ADC_Type *pADC, uint8_t u8Mode);
-void ADC_SelectClock(ADC_Type *pADC, uint8_t u8Clock);
-void ADC_FifoScanModeEnable(ADC_Type *pADC);
-void ADC_FifoScanModeDisable(ADC_Type *pADC);
-void ADC_CompareFifoOr(ADC_Type *pADC);
-void ADC_CompareFifoAnd(ADC_Type *pADC);
-void ADC_SetFifoLevel(ADC_Type *pADC, uint8_t u8FifoLevel);
-uint16_t ADC_ReadResultReg(ADC_Type *pADC );
-void ADC_SetCompareValue(ADC_Type *pADC, uint16_t u16Compare );
-void ADC_PinControlEnable(ADC_Type *pADC, uint16_t u16PinNumber);
-void ADC_PinControlDisable(ADC_Type *pADC, uint16_t u16PinNumber);
-uint8_t ADC_IsConversionActiveFlag(ADC_Type *pADC);
-uint8_t ADC_IsCOCOFlag(ADC_Type *pADC);
-uint8_t ADC_IsFIFOEmptyFlag(ADC_Type *pADC);
-uint8_t ADC_IsFIFOFullFlag(ADC_Type *pADC);
-void ADC_HardwareTriggerMaskNonAuto(ADC_Type *pADC);
-void ADC_HardwareTriggerMaskAuto(ADC_Type *pADC);
-void ADC_HardwareTriggerMaskDisable( ADC_Type *pADC );
-void ADC_HardwareTriggerMaskEnable( ADC_Type *pADC );
-void ADC_HardwareTriggerSingle( ADC_Type *pADC );
-void ADC_HardwareTriggerMultiple( ADC_Type *pADC );
-unsigned int ADC_PollRead( ADC_Type *pADC, uint8_t u8Channel);
+void ADC_SetChannel( ADC_MemMapPtr pADC, uint8_t u8Channel );
+void ADC_IntEnable( ADC_MemMapPtr pADC );
+void ADC_IntDisable( ADC_MemMapPtr pADC );
+void ADC_ContinuousConversion( ADC_MemMapPtr pADC );
+void ADC_SingleConversion( ADC_MemMapPtr pADC );
+void ADC_SetSoftwareTrigger( ADC_MemMapPtr pADC );
+void ADC_SetHardwareTrigger( ADC_MemMapPtr pADC );
+void ADC_VrefSelect( ADC_MemMapPtr pADC, uint8_t u8Vref );
+void ADC_CompareEnable( ADC_MemMapPtr pADC );
+void ADC_CompareDisable( ADC_MemMapPtr pADC );
+void ADC_CompareGreaterFunction( ADC_MemMapPtr pADC );
+void ADC_CompareLessFunction( ADC_MemMapPtr pADC );
+void ADC_SetLowPower( ADC_MemMapPtr pADC );
+void ADC_SetHighSpeed( ADC_MemMapPtr pADC );
+void ADC_SelectClockDivide( ADC_MemMapPtr pADC, uint8_t u8Div);
+void ADC_SetLongSample(ADC_MemMapPtr pADC);
+void ADC_SetShortSample(ADC_MemMapPtr pADC);
+void ADC_SetMode(ADC_MemMapPtr pADC, uint8_t u8Mode);
+void ADC_SelectClock(ADC_MemMapPtr pADC, uint8_t u8Clock);
+void ADC_FifoScanModeEnable(ADC_MemMapPtr pADC);
+void ADC_FifoScanModeDisable(ADC_MemMapPtr pADC);
+void ADC_CompareFifoOr(ADC_MemMapPtr pADC);
+void ADC_CompareFifoAnd(ADC_MemMapPtr pADC);
+void ADC_SetFifoLevel(ADC_MemMapPtr pADC, uint8_t u8FifoLevel);
+uint16_t ADC_ReadResultReg(ADC_MemMapPtr pADC );
+void ADC_SetCompareValue(ADC_MemMapPtr pADC, uint16_t u16Compare );
+void ADC_PinControlEnable(ADC_MemMapPtr pADC, uint16_t u16PinNumber);
+void ADC_PinControlDisable(ADC_MemMapPtr pADC, uint16_t u16PinNumber);
+uint8_t ADC_IsConversionActiveFlag(ADC_MemMapPtr pADC);
+uint8_t ADC_IsCOCOFlag(ADC_MemMapPtr pADC);
+uint8_t ADC_IsFIFOEmptyFlag(ADC_MemMapPtr pADC);
+uint8_t ADC_IsFIFOFullFlag(ADC_MemMapPtr pADC);
+void ADC_HardwareTriggerMaskNonAuto(ADC_MemMapPtr pADC);
+void ADC_HardwareTriggerMaskAuto(ADC_MemMapPtr pADC);
+void ADC_HardwareTriggerMaskDisable( ADC_MemMapPtr pADC );
+void ADC_HardwareTriggerMaskEnable( ADC_MemMapPtr pADC );
+void ADC_HardwareTriggerSingle( ADC_MemMapPtr pADC );
+void ADC_HardwareTriggerMultiple( ADC_MemMapPtr pADC );
+unsigned int ADC_PollRead( ADC_MemMapPtr pADC, uint8_t u8Channel);
 void ADC_SetCallBack(ADC_CallbackType pADC_CallBack);
-void ADC_DeInit(ADC_Type *pADC);
-void ADC_Init(ADC_Type *pADC, ADC_ConfigTypePtr pADC_Config);
+void ADC_DeInit(ADC_MemMapPtr pADC);
+void ADC_Init(ADC_MemMapPtr pADC, ADC_ConfigTypePtr pADC_Config);
+
 /*! @} End of adc_api_list                                               						*/
 
-#ifdef __cplusplus
-}
-#endif
+
 #endif /* ADC_H_ */

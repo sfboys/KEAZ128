@@ -24,9 +24,6 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
 *
 * @brief header file for ACMP utilities. 
 *
@@ -42,7 +39,8 @@ extern "C" {
 /******************************************************************************
 * Includes
 ******************************************************************************/
-
+#include "derivative.h"
+#include "nvic.h"
 /******************************************************************************
 * Constants
 ******************************************************************************/
@@ -61,8 +59,10 @@ enum
 /******************************************************************************
  * ACMP module number definition                                               *
  ******************************************************************************/
-#define     MAX_ACMP_NO             2
-
+#define MAX_ACMP_NO             2
+#define ACMP_0	ACMP0_BASE_PTR
+#define ACMP_1	ACMP1_BASE_PTR
+#define SIM_		SIM_BASE_PTR
 /******************************************************************************
 * ACMP positive and negative pin select definition
 *
@@ -262,9 +262,9 @@ typedef struct
 * @see    ACMP_Disable.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_Enable(ACMP_Type *pACMPx)
+static inline void ACMP_Enable(ACMP_MemMapPtr pACMPx)
 {
-    pACMPx->CS |= ACMP_CS_ACE_MASK;
+    pACMPx ->CS|= ACMP_CS_ACE_MASK;
 }
 
 /*****************************************************************************//*!
@@ -280,7 +280,7 @@ __STATIC_INLINE void ACMP_Enable(ACMP_Type *pACMPx)
 * @see    ACMP_Enable.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_Disable(ACMP_Type *pACMPx)
+static inline void ACMP_Disable(ACMP_MemMapPtr pACMPx)
 {
     pACMPx->CS &= ~ACMP_CS_ACE_MASK;
 }
@@ -297,7 +297,7 @@ __STATIC_INLINE void ACMP_Disable(ACMP_Type *pACMPx)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_SelectIntMode(ACMP_Type *pACMPx, uint8_t u8EdgeSelect)
+static inline void ACMP_SelectIntMode(ACMP_MemMapPtr pACMPx, uint8_t u8EdgeSelect)
 {
     pACMPx->CS &= ~ACMP_CS_ACMOD_MASK;
     pACMPx->CS |= ACMP_CS_ACMOD(u8EdgeSelect & 0x3);
@@ -316,7 +316,7 @@ __STATIC_INLINE void ACMP_SelectIntMode(ACMP_Type *pACMPx, uint8_t u8EdgeSelect)
 * @see    ACMP_DisablePinOut.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_EnablePinOut(ACMP_Type *pACMPx)
+static inline void ACMP_EnablePinOut(ACMP_MemMapPtr pACMPx)
 {
     pACMPx->CS |= ACMP_CS_ACOPE_MASK;
 }
@@ -334,7 +334,7 @@ __STATIC_INLINE void ACMP_EnablePinOut(ACMP_Type *pACMPx)
 * @see    ACMP_EnablePinOut.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_DisablePinOut(ACMP_Type *pACMPx)
+static inline void ACMP_DisablePinOut(ACMP_MemMapPtr pACMPx)
 {
     pACMPx->CS &= ~ACMP_CS_ACOPE_MASK;
 }
@@ -351,7 +351,7 @@ __STATIC_INLINE void ACMP_DisablePinOut(ACMP_Type *pACMPx)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_SelectHyst(ACMP_Type *pACMPx, uint8_t u8HystSelect)
+static inline void ACMP_SelectHyst(ACMP_MemMapPtr pACMPx, uint8_t u8HystSelect)
 {
     pACMPx->CS &= ~ACMP_CS_HYST_MASK;
     pACMPx->CS |= u8HystSelect;
@@ -370,7 +370,7 @@ __STATIC_INLINE void ACMP_SelectHyst(ACMP_Type *pACMPx, uint8_t u8HystSelect)
 * @see    ACMP_DisableInterrupt.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_EnableInterrupt(ACMP_Type *pACMPx)
+static inline void ACMP_EnableInterrupt(ACMP_MemMapPtr pACMPx)
 {
     pACMPx->CS |= ACMP_CS_ACIE_MASK;
 }
@@ -388,7 +388,7 @@ __STATIC_INLINE void ACMP_EnableInterrupt(ACMP_Type *pACMPx)
 * @see    ACMP_EnableInterrupt.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_DisableInterrupt(ACMP_Type *pACMPx)
+static inline void ACMP_DisableInterrupt(ACMP_MemMapPtr pACMPx)
 {
     pACMPx->CS &= ~ACMP_CS_ACIE_MASK;
 }
@@ -406,7 +406,7 @@ __STATIC_INLINE void ACMP_DisableInterrupt(ACMP_Type *pACMPx)
 * @see    ACMP_ClrFlag.
 *
 *****************************************************************************/
-__STATIC_INLINE uint8_t ACMP_GetFlag(ACMP_Type *pACMPx)
+static inline uint8_t ACMP_GetFlag(ACMP_MemMapPtr pACMPx)
 {
     return (pACMPx->CS & ACMP_CS_ACF_MASK);
 }
@@ -424,7 +424,7 @@ __STATIC_INLINE uint8_t ACMP_GetFlag(ACMP_Type *pACMPx)
 * @see    ACMP_GetFlag.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_ClrFlag(ACMP_Type *pACMPx)
+static inline void ACMP_ClrFlag(ACMP_MemMapPtr pACMPx)
 {
     pACMPx->CS &= ~ACMP_CS_ACF_MASK;
 }
@@ -443,7 +443,7 @@ __STATIC_INLINE void ACMP_ClrFlag(ACMP_Type *pACMPx)
 * @see    ACMP_NegativeInputSelect.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_PositiveInputSelect(ACMP_Type *pACMPx, uint8_t u8PosPinSel)
+static inline void ACMP_PositiveInputSelect(ACMP_MemMapPtr pACMPx, uint8_t u8PosPinSel)
 {
     pACMPx->C0 &= ~ACMP_C0_ACPSEL_MASK;
     pACMPx->C0 |= u8PosPinSel;
@@ -463,7 +463,7 @@ __STATIC_INLINE void ACMP_PositiveInputSelect(ACMP_Type *pACMPx, uint8_t u8PosPi
 * @see    ACMP_PositiveInputSelect.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_NegativeInputSelect(ACMP_Type *pACMPx, uint8_t u8NegPinSel)
+static inline void ACMP_NegativeInputSelect(ACMP_MemMapPtr pACMPx, uint8_t u8NegPinSel)
 {
     pACMPx->C0 &= ~ACMP_C0_ACNSEL_MASK;
     pACMPx->C0 |= u8NegPinSel;
@@ -482,7 +482,7 @@ __STATIC_INLINE void ACMP_NegativeInputSelect(ACMP_Type *pACMPx, uint8_t u8NegPi
 * @see    ACMP_DacDisable.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_DacEnable(ACMP_Type *pACMPx)
+static inline void ACMP_DacEnable(ACMP_MemMapPtr pACMPx)
 {
     pACMPx->C1 |= ACMP_C1_DACEN_MASK;
 }
@@ -500,7 +500,7 @@ __STATIC_INLINE void ACMP_DacEnable(ACMP_Type *pACMPx)
 * @see    ACMP_DacEnable.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_DacDisable(ACMP_Type *pACMPx)
+static inline void ACMP_DacDisable(ACMP_MemMapPtr pACMPx)
 {
     pACMPx->C1 &= ~ACMP_C1_DACEN_MASK;
 }
@@ -517,7 +517,7 @@ __STATIC_INLINE void ACMP_DacDisable(ACMP_Type *pACMPx)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_DacReferenceSelect(ACMP_Type *pACMPx, uint8_t u8RefSelect)
+static inline void ACMP_DacReferenceSelect(ACMP_MemMapPtr pACMPx, uint8_t u8RefSelect)
 {
     pACMPx->C1 &= ~ACMP_C1_DACREF_MASK;
     pACMPx->C1 |= u8RefSelect;
@@ -535,9 +535,8 @@ __STATIC_INLINE void ACMP_DacReferenceSelect(ACMP_Type *pACMPx, uint8_t u8RefSel
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_DacOutputSet(ACMP_Type *pACMPx, uint8_t u8DacValue)
+static inline void ACMP_DacOutputSet(ACMP_MemMapPtr pACMPx, uint8_t u8DacValue)
 {
-    ASSERT(!(u8DacValue & (~ACMP_C1_DACVAL_MASK)));
     pACMPx->C1 &= ~ACMP_C1_DACVAL_MASK;
     pACMPx->C1 |= ACMP_C1_DACVAL(u8DacValue);
 }
@@ -554,9 +553,8 @@ __STATIC_INLINE void ACMP_DacOutputSet(ACMP_Type *pACMPx, uint8_t u8DacValue)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_InputPinEnable(ACMP_Type *pACMPx, uint8_t u8InputPin)
+static inline void ACMP_InputPinEnable(ACMP_MemMapPtr pACMPx, uint8_t u8InputPin)
 {
-    ASSERT(!(u8InputPin & (~ACMP_C2_ACIPE_MASK)));
     pACMPx->C2 |= ACMP_C2_ACIPE(u8InputPin);
 }
 
@@ -572,7 +570,7 @@ __STATIC_INLINE void ACMP_InputPinEnable(ACMP_Type *pACMPx, uint8_t u8InputPin)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-__STATIC_INLINE void ACMP_InputPinDisable(ACMP_Type *pACMPx, uint8_t u8InputPin)
+static inline void ACMP_InputPinDisable(ACMP_MemMapPtr pACMPx, uint8_t u8InputPin)
 {
     ASSERT(!(u8InputPin & (~ACMP_C2_ACIPE_MASK)));
     pACMPx->C2 &= ~ACMP_C2_ACIPE(u8InputPin);
@@ -583,10 +581,12 @@ __STATIC_INLINE void ACMP_InputPinDisable(ACMP_Type *pACMPx, uint8_t u8InputPin)
 /******************************************************************************
 * Global functions
 ******************************************************************************/
-void ACMP_Init(ACMP_Type *pACMPx, ACMP_ConfigType *pConfig);
-void ACMP_DeInit(ACMP_Type *pACMPx); 
-void ACMP_ConfigDAC(ACMP_Type *pACMPx, ACMP_DACType *pDACConfig);
-void ACMP_SetCallback(ACMP_Type *pACMPx, ACMP_CallbackPtr pfnCallback);
+void ACMP_Init(ACMP_MemMapPtr pACMPx, ACMP_ConfigType *pConfig);
+void ACMP_DeInit(ACMP_MemMapPtr pACMPx); 
+void ACMP_ConfigDAC(ACMP_MemMapPtr pACMPx, ACMP_DACType *pDACConfig);
+void ACMP_SetCallback(ACMP_MemMapPtr pACMPx, ACMP_CallbackPtr pfnCallback);
+void Enable_Interrupt(uint8_t vector_number);
+void Disable_Interrupt(uint8_t vector_number);
 
 #ifdef __cplusplus
 }

@@ -25,17 +25,12 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
-*
 * @brief providing APIs for configuring PMC. 
 *
 *******************************************************************************
 *
 * provide APIs for configuring PMC
 ******************************************************************************/
-#include <SKEAZ1284.h>
 #include "pmc.h"
 
 /******************************************************************************
@@ -120,18 +115,29 @@ void PMC_SetMode(PMC_Type *pPMC,uint8_t u8PmcMode)
         case PmcModeRun:    
             break;
         case PmcModeWait:
-            wait();
+        	/* Clear the SLEEPDEEP bit to make sure we go into WAIT (sleep) mode instead
+        	 * of deep sleep.
+        	 */
+        	SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
+            /* Not using KEIL's uVision, so use the standard assembly command */
+        	asm("WFI");
             break;
         case PmcModeStop4:
             /* enable LVD in stop mode */
-            pPMC->SPMSC1 |= (PMC_SPMSC1_LVDE_MASK | PMC_SPMSC1_LVDSE_MASK);	
-            stop();   
-            break;
+            pPMC->SPMSC1 |= (PMC_SPMSC1_LVDE_MASK | PMC_SPMSC1_LVDSE_MASK);
+        	/* Set the SLEEPDEEP bit to enable deep sleep mode (STOP) */
+        	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+        	/* Not using KEIL's uVision, so use the standard assembly command */
+        	asm("WFI");
+        	break;
         case PmcModeStop3: 
             /* disable LVD in stop mode */
-            pPMC->SPMSC1 &= ~(PMC_SPMSC1_LVDE_MASK | PMC_SPMSC1_LVDRE_MASK | PMC_SPMSC1_LVDSE_MASK);	
-            stop();  
-            break;
+            pPMC->SPMSC1 &= ~(PMC_SPMSC1_LVDE_MASK | PMC_SPMSC1_LVDRE_MASK | PMC_SPMSC1_LVDSE_MASK);
+        	/* Set the SLEEPDEEP bit to enable deep sleep mode (STOP) */
+        	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+        	/* Not using KEIL's uVision, so use the standard assembly command */
+        	asm("WFI");
+        	break;
         default: 
             break;
     }

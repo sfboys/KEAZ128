@@ -25,14 +25,8 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
-*
 * @brief Provide BME utilities. 
 *
-* @history:
-* 	Jun. 25, 2013	created macros
 ******************************************************************************/
 
 #ifndef __BME_H
@@ -47,13 +41,13 @@ extern "C" {
 * @{
 *******************************************************************************/
 
-#define BME_OPCODE_AND		1               /*!< AND opcode */
-#define BME_OPCODE_OR		2               /*!< OR opcode */
-#define BME_OPCODE_XOR		3               /*!< XOR opcode */
-#define BME_OPCODE_BITFIELD	4               /*!< Bit field opcode */
+#define BME_OPCODE_AND		1               /* AND opcode */
+#define BME_OPCODE_OR		2               /* OR opcode */
+#define BME_OPCODE_XOR		3               /* XOR opcode */
+#define BME_OPCODE_BITFIELD	4               /* Bit field opcode */
 
-#define BME_OPCODE_BIT_CLEAR    2           /*!< Bit clear opcode */
-#define BME_OPCODE_BIT_SET      3           /*!< Bit set opcode */
+#define BME_OPCODE_BIT_CLEAR    2           /* Bit clear opcode */
+#define BME_OPCODE_BIT_SET      3           /* Bit set opcode */
 /*! @} End of BME_OPCode                                                   */
 
 /******************************************************************************
@@ -219,7 +213,7 @@ extern "C" {
     *******************************************************************************/
     #define BME_BIT_CLEAR(ADDR,bit)        (*(volatile uint32_t *)(((uint32_t)ADDR)   \
                                   | (BME_OPCODE_BIT_CLEAR <<26)  \
-                                  | ((bit & 0x1F)<<21)))                                                /*!< Bit clear operation */
+                                  | ((bit & 0x1F)<<21)))                                                /* Bit clear operation */
 
     /******************************************************************************
     * macro used to generate hardcoded load 1 bit set address (LAS1).
@@ -227,7 +221,7 @@ extern "C" {
     *******************************************************************************/
     #define BME_BIT_SET(ADDR,bit)        (*(volatile uint32_t *)(((uint32_t)ADDR)   \
                                   | (BME_OPCODE_BIT_SET <<26)  \
-                                  | ((bit & 0x1F)<<21)))                                                /*!< Bit set operation */
+                                  | ((bit & 0x1F)<<21)))                                                /* Bit set operation */
 
     /******************************************************************************
     * macro used to generate hardcoded bit field insert address (BFI).
@@ -235,7 +229,7 @@ extern "C" {
     *******************************************************************************/
     #define BME_BITFIELD_INSERT(ADDR,bit,width)        (*(volatile uint32_t *)(((uint32_t)ADDR)   \
                                   | (BME_OPCODE_BITFIELD <<26)  \
-                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /*!< Bitfield insert operation */
+                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /* Bitfield insert operation */
 
 
     /******************************************************************************
@@ -244,7 +238,7 @@ extern "C" {
     *******************************************************************************/
     #define BME_BITFIELD_EXTRACT(ADDR,bit,width)        (*(volatile uint32_t *)(((uint32_t)ADDR)    \
                                   | (BME_OPCODE_BITFIELD <<26)  \
-                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /*!< Bitfield extract operation */
+                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /* Bitfield extract operation */
 
 #endif
 
@@ -408,7 +402,7 @@ extern "C" {
     *******************************************************************************/
     #define BME_BIT_CLEAR_8b(ADDR,bit)        (*(volatile uint8_t *)(((uint32_t)ADDR)   \
                                   | (BME_OPCODE_BIT_CLEAR <<26)  \
-                                  | ((bit & 0x1F)<<21)))                                                /*!< Bit clear operation on 8-bit*/
+                                  | ((bit & 0x1F)<<21)))                                                /* Bit clear operation on 8-bit*/
 
     /******************************************************************************
     * macro used to generate hardcoded load 1 bit set address (LAS1).
@@ -416,7 +410,7 @@ extern "C" {
     *******************************************************************************/
     #define BME_BIT_SET_8b(ADDR,bit)        (*(volatile uint8_t *)(((uint32_t)ADDR)   \
                                   | (BME_OPCODE_BIT_SET <<26)  \
-                                  | ((bit & 0x1F)<<21)))                                                /*!< Bit set operation on 8-bit */
+                                  | ((bit & 0x1F)<<21)))                                                /* Bit set operation on 8-bit */
 
     /******************************************************************************
     * macro used to generate hardcoded bit field insert address (BFI).
@@ -424,7 +418,7 @@ extern "C" {
     *******************************************************************************/
     #define BME_BITFIELD_INSERT_8b(ADDR,bit,width)        (*(volatile uint8_t *)(((uint32_t)ADDR)   \
                                   | (BME_OPCODE_BITFIELD <<26)  \
-                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /*!< Bitfield insert operation on 8-bit */
+                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /* Bitfield insert operation on 8-bit */
 
   /******************************************************************************
     * macro used to generate hardcoded bit field extract address (UBFX).
@@ -433,7 +427,7 @@ extern "C" {
 
     #define BME_BITFIELD_EXTRACT_8b(ADDR,bit,width)        (*(volatile uint8_t *)(((uint32_t)ADDR)    \
                                   | (BME_OPCODE_BITFIELD <<26)  \
-                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /*!< Bitfield extract operation on 8-bit*/
+                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /* Bitfield extract operation on 8-bit*/
 #endif
 
 
@@ -602,7 +596,7 @@ extern "C" {
     *******************************************************************************/
     #define BME_BIT_CLEAR_16b(ADDR,bit)        (*(volatile uint16_t *)(((uint32_t)ADDR)   \
                                   | (BME_OPCODE_BIT_CLEAR <<26)  \
-                                  | ((bit & 0x1F)<<21)))                                                /*!< Bit clear operation on 16-bit*/
+                                  | ((bit & 0x1F)<<21)))                                                /* Bit clear operation on 16-bit*/
 
     /******************************************************************************
     * macro used to generate hardcoded load 1 bit set address (LAS1).
@@ -610,7 +604,7 @@ extern "C" {
     *******************************************************************************/
     #define BME_BIT_SET_16b(ADDR,bit)        (*(volatile uint16_t *)(((uint32_t)ADDR)   \
                                   | (BME_OPCODE_BIT_SET <<26)  \
-                                  | ((bit & 0x1F)<<21)))                                                /*!< Bit set operation on 16-bit */
+                                  | ((bit & 0x1F)<<21)))                                                /* Bit set operation on 16-bit */
 
     /******************************************************************************
     * macro used to generate hardcoded bit field insert address (BFI).
@@ -618,7 +612,7 @@ extern "C" {
     *******************************************************************************/
     #define BME_BITFIELD_INSERT_16b(ADDR,bit,width)        (*(volatile uint16_t *)(((uint32_t)ADDR)   \
                                   | (BME_OPCODE_BITFIELD <<26)  \
-                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /*!< Bitfield insert operation on 16-bit */
+                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /* Bitfield insert operation on 16-bit */
 
 
     /******************************************************************************
@@ -627,7 +621,7 @@ extern "C" {
     *******************************************************************************/
     #define BME_BITFIELD_EXTRACT_16b(ADDR,bit,width)        (*(volatile uint16_t *)(((uint32_t)ADDR)    \
                                   | (BME_OPCODE_BITFIELD <<26)  \
-                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /*!< Bitfield extract operation on 16-bit*/
+                                  | ((bit & 0x1F)<<23) | ((width-1) & 0xF)<<19))                        /* Bitfield extract operation on 16-bit*/
 #endif
 
 /*! @} End of BME_Utilities                                                   */

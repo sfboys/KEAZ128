@@ -25,14 +25,7 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
-*
-* @brief Provide Bit-band utilities. 
-*
-* @history:
-* 	Jun. 25, 2013	created macros
+* @brief Provide Bit-band utilities.
 ******************************************************************************/
 
 #ifndef __BIT_BAND_H
@@ -40,9 +33,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-                                      
+
 /******************************************************************************
-* 
+*
 *
 *//*! @addtogroup BIT_BandType
 * @{
@@ -53,38 +46,38 @@ extern "C" {
  */
 typedef struct
 {
-		uint32_t bBit0;				/*!< aliase to 0th bit */
-		uint32_t bBit1;				/*!< aliase to 1th bit */
-		uint32_t bBit2;				/*!< aliase to 2th bit */
-		uint32_t bBit3;				/*!< aliase to 3th bit */
-		uint32_t bBit4;				/*!< aliase to 4th bit */
-		uint32_t bBit5;				/*!< aliase to 5th bit */
-		uint32_t bBit6;				/*!< aliase to 6th bit */
-		uint32_t bBit7;				/*!< aliase to 7th bit */
-		uint32_t bBit8;				/*!< aliase to 8th bit */
-		uint32_t bBit9;				/*!< aliase to 9th bit */
-		uint32_t bBit10;				/*!< aliase to 10th bit */
-		uint32_t bBit11;				/*!< aliase to 11th bit */
-		uint32_t bBit12;				/*!< aliase to 12th bit */
-		uint32_t bBit13;				/*!< aliase to 13th bit */
-		uint32_t bBit14;				/*!< aliase to 14th bit */
-		uint32_t bBit15;				/*!< aliase to 15th bit */
-		uint32_t bBit16;				/*!< aliase to 16th bit */
-		uint32_t bBit17;				/*!< aliase to 17th bit */
-		uint32_t bBit18;				/*!< aliase to 18th bit */
-		uint32_t bBit19;				/*!< aliase to 19th bit */
-		uint32_t bBit20;				/*!< aliase to 20th bit */
-		uint32_t bBit21;				/*!< aliase to 21th bit */
-		uint32_t bBit22;				/*!< aliase to 22th bit */
-		uint32_t bBit23;				/*!< aliase to 23th bit */
-		uint32_t bBit24;				/*!< aliase to 24th bit */
-		uint32_t bBit25;				/*!< aliase to 25th bit */
-		uint32_t bBit26;				/*!< aliase to 26th bit */
-		uint32_t bBit27;				/*!< aliase to 27th bit */
-		uint32_t bBit28;				/*!< aliase to 28th bit */
-		uint32_t bBit29;				/*!< aliase to 29th bit */
-		uint32_t bBit30;				/*!< aliase to 30th bit */
-		uint32_t bBit31;				/*!< aliase to 31th bit */
+		uint32_t bBit0;					/* Alias to 0th bit */
+		uint32_t bBit1;					/* Alias to 1th bit */
+		uint32_t bBit2;					/* Alias to 2th bit */
+		uint32_t bBit3;					/* Alias to 3th bit */
+		uint32_t bBit4;					/* Alias to 4th bit */
+		uint32_t bBit5;					/* Alias to 5th bit */
+		uint32_t bBit6;					/* Alias to 6th bit */
+		uint32_t bBit7;					/* Alias to 7th bit */
+		uint32_t bBit8;					/* Alias to 8th bit */
+		uint32_t bBit9;					/* Alias to 9th bit */
+		uint32_t bBit10;				/* Alias to 10th bit */
+		uint32_t bBit11;				/* Alias to 11th bit */
+		uint32_t bBit12;				/* Alias to 12th bit */
+		uint32_t bBit13;				/* Alias to 13th bit */
+		uint32_t bBit14;				/* Alias to 14th bit */
+		uint32_t bBit15;				/* Alias to 15th bit */
+		uint32_t bBit16;				/* Alias to 16th bit */
+		uint32_t bBit17;				/* Alias to 17th bit */
+		uint32_t bBit18;				/* Alias to 18th bit */
+		uint32_t bBit19;				/* Alias to 19th bit */
+		uint32_t bBit20;				/* Alias to 20th bit */
+		uint32_t bBit21;				/* Alias to 21th bit */
+		uint32_t bBit22;				/* Alias to 22th bit */
+		uint32_t bBit23;				/* Alias to 23th bit */
+		uint32_t bBit24;				/* Alias to 24th bit */
+		uint32_t bBit25;				/* Alias to 25th bit */
+		uint32_t bBit26;				/* Alias to 26th bit */
+		uint32_t bBit27;				/* Alias to 27th bit */
+		uint32_t bBit28;				/* Alias to 28th bit */
+		uint32_t bBit29;				/* Alias to 29th bit */
+		uint32_t bBit30;				/* Alias to 30th bit */
+		uint32_t bBit31;				/* Alias to 31th bit */
 }BIT_BandType,*BIT_BandPtr;
 /*! @} End of BIT_BandType                                               */
 
@@ -97,24 +90,25 @@ typedef struct
 /*****************************************************************************//*!
    *
    * @brief bit-band initialize pointer, so that invoke the pointer to access alisaed bitband.
-   *        
+   *
    * @param[in]  pVariableAddress - point to variable.
-   * @param[in]  pBitbandPtr - point to alisaed bitband address. 
+   * @param[in]  pBitbandPtr - point to alisaed bitband address.
    *
    * @return none
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
-__STATIC_INLINE void BIT_BandVariableInit( uint32_t *pVariableAddress,BIT_BandPtr *pBitbandPtr )
+__STATIC_INLINE uint8_t BIT_BandVariableInit( uint32_t *pVariableAddress,BIT_BandPtr *pBitbandPtr )
 {
-#if defined(CPU_KE04)
-	ASSERT( ((uint32)pVariableAddress >= 0x20000000)&&((uint32_t)pVariableAddress <= 0x200002FF) );
-#elif defined(CPU_KE06)
-	ASSERT( ((uint32)pVariableAddress >= 0x20000000)&&((uint32_t)pVariableAddress <= (0x20000000+12*1024)));
-#else
-	#error "don't support this function on this device"
-#endif
-    *pBitbandPtr = (BIT_BandPtr)(((uint32_t)pVariableAddress-0x20000000)*32+0x22000000);   
+
+	if(!(((uint32_t)pVariableAddress >= 0x20000000)&&((uint32_t)pVariableAddress <= (0x20000000+12*1024))))
+		{
+			return 0;
+		}
+
+    *pBitbandPtr = (BIT_BandPtr)(((uint32_t)pVariableAddress-0x20000000)*32+0x22000000);
+
+    return 1;
 }
 /*! @} End of bit_band_api_list                                                    					*/
 #ifdef __cplusplus

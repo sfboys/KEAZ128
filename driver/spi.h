@@ -24,9 +24,6 @@
 *
 * @author Freescale
 *
-* @version 0.0.1
-*
-* @date Jun. 25, 2013
 *
 * @brief header file for SPI module utilities (SPI). 
 *
@@ -43,7 +40,7 @@ extern "C" {
 /******************************************************************************
 * Includes
 ******************************************************************************/
-
+#include "derivative.h"
 /******************************************************************************
 * Constants
 ******************************************************************************/
@@ -53,7 +50,6 @@ extern "C" {
 ******************************************************************************/
 /* maximum number of SPIs */
 #define     MAX_SPI_NO              2
-
 
 
 /******************************************************************************
@@ -167,7 +163,7 @@ typedef struct
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
 
- __STATIC_INLINE void SPI_SetLSBFirst(SPI_Type *pSPI)
+ static inline void SPI_SetLSBFirst(SPI_MemMapPtr pSPI)
 {
 	pSPI->C1 |= SPI_C1_LSBFE_MASK;
 }
@@ -182,7 +178,7 @@ typedef struct
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
 
- __STATIC_INLINE void SPI_SetMSBFirst(SPI_Type *pSPI)
+ static inline void SPI_SetMSBFirst(SPI_MemMapPtr pSPI)
 {
 	pSPI->C1 &= ~SPI_C1_LSBFE_MASK;
 }
@@ -197,7 +193,7 @@ typedef struct
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
 
- __STATIC_INLINE void SPI_SetClockPol(SPI_Type *pSPI,uint8_t u8PolLow)
+ static inline void SPI_SetClockPol(SPI_MemMapPtr pSPI,uint8_t u8PolLow)
 {
 	if( u8PolLow )
 	{
@@ -220,7 +216,7 @@ typedef struct
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
 
- __STATIC_INLINE void SPI_SetClockPhase(SPI_Type *pSPI,uint8_t u8Phase)
+ static inline void SPI_SetClockPhase(SPI_MemMapPtr pSPI,uint8_t u8Phase)
 {
 	if( u8Phase )
 	{
@@ -242,7 +238,7 @@ typedef struct
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
 
- __STATIC_INLINE void SPI_Enable(SPI_Type *pSPI)
+ static inline void SPI_Enable(SPI_MemMapPtr pSPI)
 {
 	pSPI->C1 |= SPI_C1_SPE_MASK;
 }
@@ -257,7 +253,7 @@ typedef struct
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
 
- __STATIC_INLINE void SPI_Disable(SPI_Type *pSPI)
+ static inline void SPI_Disable(SPI_MemMapPtr pSPI)
 {
 	pSPI->C1 &= ~SPI_C1_SPE_MASK;
 }
@@ -272,7 +268,7 @@ typedef struct
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
 
- __STATIC_INLINE void SPI_IntEnable(SPI_Type *pSPI)
+ static inline void SPI_IntEnable(SPI_MemMapPtr pSPI)
 {
 	pSPI->C1 |= SPI_C1_SPIE_MASK;
 }
@@ -286,7 +282,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_IntDisable(SPI_Type *pSPI)
+ static inline void SPI_IntDisable(SPI_MemMapPtr pSPI)
 {
 	pSPI->C1 &= ~SPI_C1_SPIE_MASK;
 }
@@ -300,7 +296,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_SetMasterMode(SPI_Type *pSPI)
+ static inline void SPI_SetMasterMode(SPI_MemMapPtr pSPI)
 {
 	pSPI->C1 |= SPI_C1_MSTR_MASK;
 }
@@ -314,7 +310,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_SetSlaveMode(SPI_Type *pSPI)
+ static inline void SPI_SetSlaveMode(SPI_MemMapPtr pSPI)
 {
 	pSPI->C1 &= ~SPI_C1_MSTR_MASK;
 }
@@ -328,7 +324,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
- __STATIC_INLINE void SPI_TxIntEnable(SPI_Type *pSPI)
+ static inline void SPI_TxIntEnable(SPI_MemMapPtr pSPI)
 {
 	pSPI->C1 |= SPI_C1_SPTIE_MASK;
 }
@@ -342,7 +338,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_TxIntDisable(SPI_Type *pSPI)
+ static inline void SPI_TxIntDisable(SPI_MemMapPtr pSPI)
 {
 	pSPI->C1 &= ~SPI_C1_SPTIE_MASK;
 }
@@ -356,7 +352,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_SSOutputEnable(SPI_Type *pSPI )
+ static inline void SPI_SSOutputEnable(SPI_MemMapPtr pSPI )
 {
 	pSPI->C1 |= SPI_C1_SSOE_MASK;
 }
@@ -370,7 +366,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_SSOutputDisable(SPI_Type *pSPI )
+ static inline void SPI_SSOutputDisable(SPI_MemMapPtr pSPI )
 {
 	pSPI->C1 &= ~SPI_C1_SSOE_MASK;
 }
@@ -384,7 +380,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_MatchIntEnable(SPI_Type *pSPI )
+ static inline void SPI_MatchIntEnable(SPI_MemMapPtr pSPI )
 {
 	pSPI->C2 |= SPI_C2_SPMIE_MASK;
 }
@@ -398,7 +394,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
- __STATIC_INLINE void SPI_MatchIntDisable(SPI_Type *pSPI )
+ static inline void SPI_MatchIntDisable(SPI_MemMapPtr pSPI )
 {
 	pSPI->C2 &= ~SPI_C2_SPMIE_MASK;
 }
@@ -412,7 +408,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
- __STATIC_INLINE void SPI_ModfDisable(SPI_Type *pSPI )
+ static inline void SPI_ModfDisable(SPI_MemMapPtr pSPI )
 {
 	pSPI->C2 &= ~SPI_C2_MODFEN_MASK;
 }
@@ -427,7 +423,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
- __STATIC_INLINE void SPI_ModfEnable(SPI_Type *pSPI )
+ static inline void SPI_ModfEnable(SPI_MemMapPtr pSPI )
 {
 	pSPI->C2 |= SPI_C2_MODFEN_MASK;
 }
@@ -441,7 +437,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
- __STATIC_INLINE void SPI_BidirOutEnable(SPI_Type *pSPI )
+ static inline void SPI_BidirOutEnable(SPI_MemMapPtr pSPI )
 {
 	pSPI->C2 |= SPI_C2_BIDIROE_MASK;
 }
@@ -455,7 +451,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
- __STATIC_INLINE void SPI_BidirOutDisable(SPI_Type *pSPI )
+ static inline void SPI_BidirOutDisable(SPI_MemMapPtr pSPI )
 {
 	pSPI->C2 &= ~SPI_C2_BIDIROE_MASK;
 }
@@ -469,7 +465,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
- __STATIC_INLINE void SPI_ClockStopDisable(SPI_Type *pSPI )
+ static inline void SPI_ClockStopDisable(SPI_MemMapPtr pSPI )
 {
 	pSPI->C2 &= ~SPI_C2_SPISWAI_MASK;
 }
@@ -483,7 +479,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_ClockStopEnable(SPI_Type *pSPI )
+ static inline void SPI_ClockStopEnable(SPI_MemMapPtr pSPI )
 {
 	pSPI->C2 |= SPI_C2_SPISWAI_MASK;
 }
@@ -497,7 +493,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_BidirPinEnable(SPI_Type *pSPI)
+ static inline void SPI_BidirPinEnable(SPI_MemMapPtr pSPI)
 {
 	pSPI->C2 |= SPI_C2_SPC0_MASK;
 }
@@ -511,7 +507,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_BidirPinDisable(SPI_Type *pSPI)
+ static inline void SPI_BidirPinDisable(SPI_MemMapPtr pSPI)
 {
 	pSPI->C2 &= ~SPI_C2_SPC0_MASK;
 }
@@ -525,7 +521,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
- __STATIC_INLINE uint8_t SPI_IsSPRF(SPI_Type *pSPI )
+ static inline uint8_t SPI_IsSPRF(SPI_MemMapPtr pSPI )
 {
 	return(pSPI->S & SPI_S_SPRF_MASK);
 }
@@ -539,7 +535,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
- __STATIC_INLINE uint8_t SPI_IsSPMF(SPI_Type *pSPI )
+ static inline uint8_t SPI_IsSPMF(SPI_MemMapPtr pSPI )
 {
 	return(pSPI->S & SPI_S_SPMF_MASK);
 }
@@ -553,7 +549,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE uint8_t SPI_IsSPTEF(SPI_Type *pSPI )
+ static inline uint8_t SPI_IsSPTEF(SPI_MemMapPtr pSPI )
 {
 	return(pSPI->S & SPI_S_SPTEF_MASK);
 }
@@ -567,7 +563,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE uint8_t SPI_IsMODF(SPI_Type *pSPI )
+ static inline uint8_t SPI_IsMODF(SPI_MemMapPtr pSPI )
 {
 	return(pSPI->S & SPI_S_MODF_MASK);
 }
@@ -581,7 +577,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE uint8_t SPI_ReadDataReg(SPI_Type *pSPI )
+ static inline uint8_t SPI_ReadDataReg(SPI_MemMapPtr pSPI )
 {
 	return pSPI->D;
 }
@@ -596,7 +592,7 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_WriteDataReg(SPI_Type *pSPI, uint8_t u8WrBuff )
+ static inline void SPI_WriteDataReg(SPI_MemMapPtr pSPI, uint8_t u8WrBuff )
 {
 	pSPI->D = u8WrBuff;
 }
@@ -611,49 +607,49 @@ typedef struct
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
- __STATIC_INLINE void SPI_WriteMatchValue(SPI_Type *pSPI, uint8_t u8WrBuff )
+ static inline void SPI_WriteMatchValue(SPI_MemMapPtr pSPI, uint8_t u8WrBuff )
 {
 	pSPI->M = u8WrBuff;
 }
 /******************************************************************************
 * Global functions
 ******************************************************************************/
-void SPI_Enable(SPI_Type *pSPI);
-void SPI_Disable(SPI_Type *pSPI);
-void SPI_SetLSBFirst(SPI_Type *pSPI);
-void SPI_SetMSBFirst(SPI_Type *pSPI);
-void SPI_IntEnable(SPI_Type *pSPI);
-void SPI_IntDisable(SPI_Type *pSPI);
-void SPI_SetMasterMode(SPI_Type *pSPI);
-void SPI_SetSlaveMode(SPI_Type *pSPI);
-void SPI_TxIntEnable(SPI_Type *pSPI);
-void SPI_TxIntDisable(SPI_Type *pSPI);
-void SPI_SSOutputEnable(SPI_Type *pSPI );
-void SPI_SSOutputDisable(SPI_Type *pSPI );
-void SPI_MatchIntEnable(SPI_Type *pSPI );
-void SPI_MatchIntDisable(SPI_Type *pSPI );
-void SPI_ModfDisable(SPI_Type *pSPI );
-void SPI_ModfEnable(SPI_Type *pSPI );
-void SPI_BidirOutEnable(SPI_Type *pSPI );
-void SPI_BidirOutDisable(SPI_Type *pSPI );
-void SPI_ClockStopDisable(SPI_Type *pSPI );
-void SPI_ClockStopEnable(SPI_Type *pSPI );
-void SPI_BidirPinEnable(SPI_Type *pSPI );
-void SPI_BidirPinDisable(SPI_Type *pSPI );
-void SPI_SetClockPol(SPI_Type *pSPI,uint8_t u8PolLow);
-void SPI_SetClockPhase(SPI_Type *pSPI,uint8_t u8Phase);
-void SPI_SetBaudRate(SPI_Type *pSPI,uint32_t u32BusClock,uint32_t u32Bps );
-uint8_t SPI_IsSPRF(SPI_Type *pSPI );
-uint8_t SPI_IsSPMF(SPI_Type *pSPI );
-uint8_t SPI_IsSPTEF(SPI_Type *pSPI );
-uint8_t SPI_IsMODF(SPI_Type *pSPI );
-uint8_t SPI_ReadDataReg(SPI_Type *pSPI );
-void SPI_WriteDataReg(SPI_Type *pSPI, uint8_t u8WrBuff );
-void SPI_WriteMatchValue(SPI_Type *pSPI, uint8_t u8WrBuff );
-void SPI_Init(SPI_Type *pSPI, SPI_ConfigType *pConfig);
-void SPI_DeInit(SPI_Type *pSPI);
-ResultType SPI_TransferWait(SPI_Type *pSPI, SPI_WidthType* pRdBuff, SPI_WidthType *pWrBuff,uint32 uiLength);
-void SPI_SetCallback(SPI_Type *pSPI,SPI_CallbackType pfnCallback);
+void SPI_Enable(SPI_MemMapPtr pSPI);
+void SPI_Disable(SPI_MemMapPtr pSPI);
+void SPI_SetLSBFirst(SPI_MemMapPtr pSPI);
+void SPI_SetMSBFirst(SPI_MemMapPtr pSPI);
+void SPI_IntEnable(SPI_MemMapPtr pSPI);
+void SPI_IntDisable(SPI_MemMapPtr pSPI);
+void SPI_SetMasterMode(SPI_MemMapPtr pSPI);
+void SPI_SetSlaveMode(SPI_MemMapPtr pSPI);
+void SPI_TxIntEnable(SPI_MemMapPtr pSPI);
+void SPI_TxIntDisable(SPI_MemMapPtr pSPI);
+void SPI_SSOutputEnable(SPI_MemMapPtr pSPI );
+void SPI_SSOutputDisable(SPI_MemMapPtr pSPI );
+void SPI_MatchIntEnable(SPI_MemMapPtr pSPI );
+void SPI_MatchIntDisable(SPI_MemMapPtr pSPI );
+void SPI_ModfDisable(SPI_MemMapPtr pSPI );
+void SPI_ModfEnable(SPI_MemMapPtr pSPI );
+void SPI_BidirOutEnable(SPI_MemMapPtr pSPI );
+void SPI_BidirOutDisable(SPI_MemMapPtr pSPI );
+void SPI_ClockStopDisable(SPI_MemMapPtr pSPI );
+void SPI_ClockStopEnable(SPI_MemMapPtr pSPI );
+void SPI_BidirPinEnable(SPI_MemMapPtr pSPI );
+void SPI_BidirPinDisable(SPI_MemMapPtr pSPI );
+void SPI_SetClockPol(SPI_MemMapPtr pSPI,uint8_t u8PolLow);
+void SPI_SetClockPhase(SPI_MemMapPtr pSPI,uint8_t u8Phase);
+void SPI_SetBaudRate(SPI_MemMapPtr pSPI,uint32_t u32BusClock,uint32_t u32Bps );
+uint8_t SPI_IsSPRF(SPI_MemMapPtr pSPI );
+uint8_t SPI_IsSPMF(SPI_MemMapPtr pSPI );
+uint8_t SPI_IsSPTEF(SPI_MemMapPtr pSPI );
+uint8_t SPI_IsMODF(SPI_MemMapPtr pSPI );
+uint8_t SPI_ReadDataReg(SPI_MemMapPtr pSPI );
+void SPI_WriteDataReg(SPI_MemMapPtr pSPI, uint8_t u8WrBuff );
+void SPI_WriteMatchValue(SPI_MemMapPtr pSPI, uint8_t u8WrBuff );
+void SPI_Init(SPI_MemMapPtr pSPI, SPI_ConfigType *pConfig);
+void SPI_DeInit(SPI_MemMapPtr pSPI);
+ResultType SPI_TransferWait(SPI_MemMapPtr pSPI, SPI_WidthType* pRdBuff, SPI_WidthType *pWrBuff,uint32_t uiLength);
+void SPI_SetCallback(SPI_MemMapPtr pSPI,SPI_CallbackType pfnCallback);
 
 /*! @} End of spi_api_list                                            */
 #ifdef __cplusplus

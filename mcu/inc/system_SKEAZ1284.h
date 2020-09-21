@@ -90,7 +90,7 @@ extern "C" {
 #define DISABLE_WDOG    1
 
 #ifndef CLOCK_SETUP
-  #define CLOCK_SETUP   0
+  #define CLOCK_SETUP   1
 #endif
 /* Predefined clock setups
    0 ... Internal Clock Source (ICS) in FLL Engaged Internal (FEI) mode
