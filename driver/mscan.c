@@ -34,6 +34,7 @@
 *
 * provide APIs for configuring MSCAN module (MSCAN).
 ******************************************************************************/
+#include <string.h>
 #include "common.h"
 #include "mscan.h"
 

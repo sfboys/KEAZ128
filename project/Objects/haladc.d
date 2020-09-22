@@ -1,1 +1,16 @@
 .\objects\haladc.o: ..\bsp\HalADC.c
+.\objects\haladc.o: ..\bsp\HalADC.h
+.\objects\haladc.o: ..\common\common.h
+.\objects\haladc.o: ..\common\arm_cm0.h
+.\objects\haladc.o: ..\common\kea128_config.h
+.\objects\haladc.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\haladc.o: ..\mcu\inc\SKEAZ1284.h
+.\objects\haladc.o: ..\mcu\inc\core_cm0plus.h
+.\objects\haladc.o: ..\mcu\inc\core_cmInstr.h
+.\objects\haladc.o: ..\mcu\inc\core_cmFunc.h
+.\objects\haladc.o: ..\mcu\inc\system_SKEAZ1284.h
+.\objects\haladc.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\haladc.o: ..\common\assert.h
+.\objects\haladc.o: ..\driver\adc.h
+.\objects\haladc.o: ..\mcu\inc\derivative.h
+.\objects\haladc.o: ..\mcu\inc\SKEAZ1284.h

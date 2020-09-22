@@ -18,3 +18,4 @@ void SetLedDisplay(LED_ENUM status);
 void HalKBIInit(void);
 void HalGpioInit(void);
 #endif
+

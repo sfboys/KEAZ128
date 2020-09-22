@@ -1,6 +1,8 @@
 #include "includes.h"
 #include "HalIO.h"
 
+extern OS_EVENT *kbiMsgQueue; 
+
 void HalGpioInit(void)
 {
     CONFIG_PIN_AS_GPIO(PTH,PTH0,OUTPUT);
@@ -46,16 +48,19 @@ void SetLedDisplay(LED_ENUM status)
 }
 
 
+uint8 g_buttonPressedName =0;
 void KBI1_Task(void)
 {   
+    INT8U err;
     OSIntEnter();
     if(KBI_GetSP(KBI1)== 0x0000010)    
     {           
-        printf("\nSW2 pressed!\n");     
+        g_buttonPressedName= 1; 
     }else if(KBI_GetSP(KBI1)== 0x0000020)
-    {           
-        printf("\nSW3 pressed!\n");     
+    {  
+        g_buttonPressedName= 2;
     }
+    err = OSQPost(kbiMsgQueue, (void *)&g_buttonPressedName); 
     OSIntExit();
     KBI_RstSP(KBI1);    
     KBI_ClrFlags(KBI1);

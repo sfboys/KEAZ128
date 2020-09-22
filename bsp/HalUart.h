@@ -6,3 +6,4 @@
 
 void HalUartInit(void);
 #endif
+

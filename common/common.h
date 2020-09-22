@@ -40,7 +40,7 @@
 typedef unsigned long   dword;
 typedef unsigned short  word;
 
-#define NULL ((void *)0)
+//#define NULL ((void *)0)
 
 typedef enum { FALSE =0 , TRUE = !FALSE} Bool;
 
