@@ -33,10 +33,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /******************************************************************************
 * Includes
 ******************************************************************************/
 #include "derivative.h"
+
+#if defined(MCU_SKEAZ1284)
 /******************************************************************************
 * Constants
 ******************************************************************************/
@@ -411,5 +414,10 @@ void PWT_DeInit(void);
 
 #ifdef __cplusplus
 }
+#endif
+#elif defined(MCU_SKEAZN642)
+/* PWT is not supported in KEAZN642. */
+#else
+/* If your device supports PWT, enable it and add any additional PWT features. */
 #endif
 #endif /* PWT_H_ */

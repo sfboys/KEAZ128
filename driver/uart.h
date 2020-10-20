@@ -254,7 +254,7 @@ typedef enum
 /* callback types */
 
 
-typedef void (*UART_CallbackType) (UART_MemMapPtr pUART);
+typedef void (*UART_CallbackType) (void);
 
 /******************************************************************************
 * Global variables
@@ -619,7 +619,7 @@ uint8_t UART_CheckFlag(UART_MemMapPtr *pUART, UART_FlagType FlagType);
 void UART_SendWait(UART_MemMapPtr pUART, uint8_t *pSendBuff, uint32_t u32Length);
 void UART_ReceiveWait(UART_MemMapPtr pUART, uint8_t *pReceiveBuff, uint32_t u32Length);
 void UART_WaitTxComplete(UART_MemMapPtr pUART);
-void UART_SetCallback(UART_CallbackType pfnCallback);
+void UART_SetCallback(UART_MemMapPtr pUART, UART_CallbackType pfnCallback);
 void UART0_Isr(void);
 void UART1_Isr(void);
 void UART2_Isr(void);

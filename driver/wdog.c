@@ -31,6 +31,7 @@
 
 ******************************************************************************/
 #include "wdog.h"
+#include "nvic.h"
 #include "derivative.h" 
 /******************************************************************************
 * Global variables
@@ -39,8 +40,10 @@
 /******************************************************************************
 * Constants and macros
 ******************************************************************************/
-#define DisableInterrupts asm(" CPSID i");
-#define EnableInterrupts asm(" CPSIE i");
+//#define DisableInterrupts asm(" CPSID i");
+#define DisableInterrupts __asm(" CPSID i");
+//#define EnableInterrupts asm(" CPSIE i");
+#define EnableInterrupts __asm(" CPSIE i");
 /******************************************************************************
 * Local types
 ******************************************************************************/

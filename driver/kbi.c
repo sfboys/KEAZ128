@@ -45,7 +45,7 @@ uint32_t u8Port,sc;
 * Constants and macros
 ******************************************************************************/
 #define KBI_MAX_PINS_PER_PORT   32                  /*!< max number of pins */
-#define KBI_Type KBI_MemMapPtr
+//#define KBI_Type KBI_MemMapPtr
 /******************************************************************************
 * Local types
 ******************************************************************************/
@@ -57,7 +57,8 @@ uint32_t u8Port,sc;
 /******************************************************************************
 * Local variables
 ******************************************************************************/
-
+static KBI_Type* pKBI0 = (KBI_Type*)KBI0;
+static KBI_Type* pKBI1 = (KBI_Type*)KBI1;
 /******************************************************************************
 * Local functions
 ******************************************************************************/
@@ -87,7 +88,7 @@ uint32_t u8Port,sc;
 * @see KBI_DeInit.
 *
 *****************************************************************************/
-void KBI_Init(KBI_Type pKBI, KBI_ConfigType *pConfig)
+void KBI_Init(KBI_Type* pKBI, KBI_ConfigType *pConfig)
 {	
      uint32_t    i;
      uint32_t     sc = 0;
@@ -106,12 +107,12 @@ void KBI_Init(KBI_Type pKBI, KBI_ConfigType *pConfig)
  
  
     
-    if(KBI0 == pKBI)
+    if(pKBI0 == pKBI)
     {
         SIM->SCGC   |= SIM_SCGC_KBI0_MASK;             /* enable clock to KBI0 */\
          u8Port      =  0;
     }
-    else if (KBI1 == pKBI)
+    else if (pKBI1 == pKBI)
     {        
         SIM->SCGC   |= SIM_SCGC_KBI1_MASK;             /* enable clock to KBI1 */
         u8Port      =  1;
@@ -144,6 +145,7 @@ void KBI_Init(KBI_Type pKBI, KBI_ConfigType *pConfig)
 		}
     }
     
+#if defined(MCU_SKEAZ1284)
     /*Reset KBI_SP register*/
 	sc = pConfig->sBits.bRstKbsp<<KBI_SC_RSTKBSP_SHIFT;
 	pKBI->SC    |= sc;
@@ -151,6 +153,11 @@ void KBI_Init(KBI_Type pKBI, KBI_ConfigType *pConfig)
     /*Real KBI_SP register enable*/
 	sc = pConfig->sBits.bKbspEn<<KBI_SC_KBSPEN_SHIFT;
 	pKBI->SC    |= sc;
+#elif defined(MCU_SKEAZN642)
+	/* KEAZN64 family has neither RSTKBSP or KBSPEN fields because those registers do not exist in the family's KBI peripheral. */
+#else
+	/* If your device has more KBI_SC fields add them here. */
+#endif
 	
   
 	/* write to KBACK to clear any false interrupts */
@@ -161,11 +168,11 @@ void KBI_Init(KBI_Type pKBI, KBI_ConfigType *pConfig)
     {
         pKBI->SC    |=  KBI_SC_KBIE_MASK;
         
-        if(KBI0 == pKBI)
+        if(pKBI0 == pKBI)
         {
             Enable_Interrupt(KBI0_IRQn);
         }
-        if(KBI1 == pKBI)
+        if(pKBI1 == pKBI)
         {
           
             Enable_Interrupt(KBI1_IRQn);
@@ -185,9 +192,9 @@ void KBI_Init(KBI_Type pKBI, KBI_ConfigType *pConfig)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void KBI_SetCallback(KBI_Type pKBI, KBI_CallbackType pfnCallback)
+void KBI_SetCallback(KBI_Type* pKBI, KBI_CallbackType pfnCallback)
 {
-    if(KBI0 == pKBI)
+    if(pKBI0 == pKBI)
     {
         KBI_Callback[0] = pfnCallback;
     }
@@ -210,9 +217,9 @@ void KBI_SetCallback(KBI_Type pKBI, KBI_CallbackType pfnCallback)
 * @see KBI_Init.
 *
 *****************************************************************************/
-void KBI_DeInit(KBI_Type pKBI)
+void KBI_DeInit(KBI_Type* pKBI)
 {
-    if(KBI0 == pKBI)
+    if(pKBI0 == pKBI)
     {
         
         Disable_Interrupt(KBI0_IRQn);
@@ -226,7 +233,7 @@ void KBI_DeInit(KBI_Type pKBI)
     pKBI->SC = 0;
     pKBI->ES = 0;
     
-    if(KBI0 == pKBI)
+    if(pKBI0 == pKBI)
     {
         SIM->SCGC   &= ~SIM_SCGC_KBI0_MASK;             /* disable clock to KBI0 */
     }
@@ -252,7 +259,7 @@ void KBI_DeInit(KBI_Type pKBI)
 
 void KBI0_IRQHandler(void)	
 {
-  KBI_MemMapPtr pKBI = KBI0;
+  KBI_MemMapPtr pKBI = (KBI_MemMapPtr)KBI0;
   pKBI->SC |= KBI_SC_KBACK_MASK;                        /* clear interrupt flag */
 
   if(KBI_Callback[0])
@@ -277,7 +284,7 @@ void KBI0_IRQHandler(void)
 
 void KBI1_IRQHandler(void)	
 {
-  KBI_MemMapPtr pKBI = KBI1;
+  KBI_MemMapPtr pKBI = (KBI_MemMapPtr)KBI1;
   pKBI->SC |= KBI_SC_KBACK_MASK;                        /* clear interrupt flag */
  
   if(KBI_Callback[1])

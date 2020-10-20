@@ -49,12 +49,8 @@ extern "C" {
 /******************************************************************************
 * Macros
 ******************************************************************************/
-#define FTM_Type FTM_MemMapPtr
-//#define FTM0 FTM0_BASE_PTR
-//#define FTM1 FTM1_BASE_PTR
-//#define FTM2 FTM2_BASE_PTR
-//#define SIM SIM_BASE_PTR
-#define FTM0_BASE 0x40038000u
+//#define FTM_Type FTM_MemMapPtr
+
 /******************************************************************************
 * FTM return status definition
 *
@@ -100,10 +96,10 @@ extern "C" {
 #define FTM_OUTPUT_COMPARE  		  		5  	  	  /*!< Output compare */
 #define FTM_INPUTCAPTURE_DUALEDGE		  	6		  /*!< Dual Edge Capture*/
 
-/*! @} End of ftm_channels modes 
+/*! @} End of ftm_channels modes */
 
 
-/******************************************************************************
+/*******************************************************************************
 * FTM init value definition
 *
 *//*! @addtogroup ftm_initvalue
@@ -356,7 +352,7 @@ typedef struct
 * @see FTM_DisableOverflowInt.
 *
 *****************************************************************************/
-static inline void FTM_EnableOverflowInt(FTM_Type pFTM)
+static inline void FTM_EnableOverflowInt(FTM_Type* pFTM)
 {
     if(pFTM->SC & FTM_SC_TOF_MASK)
     {
@@ -378,7 +374,7 @@ static inline void FTM_EnableOverflowInt(FTM_Type pFTM)
 * @see FTM_EnableOverflowInt.
 *
 *****************************************************************************/
-static inline void FTM_DisableOverflowInt(FTM_Type pFTM)
+static inline void FTM_DisableOverflowInt(FTM_Type* pFTM)
 {
     pFTM->SC &= ~FTM_SC_TOIE_MASK;
 }
@@ -397,7 +393,7 @@ static inline void FTM_DisableOverflowInt(FTM_Type pFTM)
 * @see FTM_DisableChannelInt.
 *
 *****************************************************************************/
-static inline void FTM_EnableChannelInt(FTM_Type pFTM, uint8_t u8FTM_Channel)
+static inline void FTM_EnableChannelInt(FTM_Type* pFTM, uint8_t u8FTM_Channel)
 {
     pFTM->CONTROLS[u8FTM_Channel].CnSC |= FTM_CnSC_CHIE_MASK;
 }
@@ -416,7 +412,7 @@ static inline void FTM_EnableChannelInt(FTM_Type pFTM, uint8_t u8FTM_Channel)
 * @see FTM_EnableChannelInt.
 *
 *****************************************************************************/
-static inline void FTM_DisableChannelInt(FTM_Type pFTM, uint8_t u8FTM_Channel)
+static inline void FTM_DisableChannelInt(FTM_Type* pFTM, uint8_t u8FTM_Channel)
 {
     pFTM->CONTROLS[u8FTM_Channel].CnSC &= ~FTM_CnSC_CHIE_MASK;
 }
@@ -434,7 +430,7 @@ static inline void FTM_DisableChannelInt(FTM_Type pFTM, uint8_t u8FTM_Channel)
 * @see FTM_ClrOverFlowFlag.
 *
 *****************************************************************************/
-static inline uint8_t FTM_GetOverFlowFlag(FTM_Type pFTM)
+static inline uint8_t FTM_GetOverFlowFlag(FTM_Type* pFTM)
 {
     return (pFTM->SC & FTM_SC_TOF_MASK);
 }
@@ -452,7 +448,7 @@ static inline uint8_t FTM_GetOverFlowFlag(FTM_Type pFTM)
 * @see FTM_GetOverFlowFlag.
 *
 *****************************************************************************/
-static inline void FTM_ClrOverFlowFlag(FTM_Type pFTM)
+static inline void FTM_ClrOverFlowFlag(FTM_Type* pFTM)
 {
     if(pFTM->SC & FTM_SC_TOF_MASK)
     {
@@ -474,7 +470,7 @@ static inline void FTM_ClrOverFlowFlag(FTM_Type pFTM)
 * @see FTM_ClrChannelFlag.
 *
 *****************************************************************************/
-static inline uint8_t FTM_GetChannelFlag(FTM_Type pFTM, uint8_t u8FTM_Channel)
+static inline uint8_t FTM_GetChannelFlag(FTM_Type* pFTM, uint8_t u8FTM_Channel)
 {
     return (pFTM->CONTROLS[u8FTM_Channel].CnSC & FTM_CnSC_CHF_MASK);
 }
@@ -492,9 +488,10 @@ static inline uint8_t FTM_GetChannelFlag(FTM_Type pFTM, uint8_t u8FTM_Channel)
 * @see FTM_GetChannelFlag.
 *
 *****************************************************************************/
-static inline void FTM_ClrChannelFlag(FTM_Type pFTM, uint8_t u8FTM_Channel)
+static inline void FTM_ClrChannelFlag(FTM_Type* pFTM, uint8_t u8FTM_Channel)
 {
-    pFTM->CONTROLS[u8FTM_Channel].CnSC &= ~FTM_CnSC_CHF_MASK;
+    (void) pFTM->CONTROLS[u8FTM_Channel].CnSC; //Dummy read while CHF is set
+	pFTM->CONTROLS[u8FTM_Channel].CnSC &= ~FTM_CnSC_CHF_MASK;
 }
 
 /*********************************************************************************//*!
@@ -510,7 +507,7 @@ static inline void FTM_ClrChannelFlag(FTM_Type pFTM, uint8_t u8FTM_Channel)
 * @see FTM_WriteProtectionDisable.
 *
 *********************************************************************************/
-static inline void FTM_WriteProtectionEnable(FTM_Type pFTM)
+static inline void FTM_WriteProtectionEnable(FTM_Type* pFTM)
 {
     pFTM->FMS |= FTM_FMS_WPEN_MASK;
 }
@@ -528,7 +525,7 @@ static inline void FTM_WriteProtectionEnable(FTM_Type pFTM)
 * @see FTM_WriteProtectionDisable.
 *
 *********************************************************************************/
-static inline void FTM_WriteProtectionDisable(FTM_Type pFTM)
+static inline void FTM_WriteProtectionDisable(FTM_Type* pFTM)
 {
     if (pFTM->FMS & FTM_FMS_WPEN_MASK)
     {
@@ -549,7 +546,7 @@ static inline void FTM_WriteProtectionDisable(FTM_Type pFTM)
 * @see FTM_SetFTMBasic.
 *
 *****************************************************************************/
-static inline void FTM_SetFTMEnhanced(FTM_Type pFTM)
+static inline void FTM_SetFTMEnhanced(FTM_Type* pFTM)
 {
     if(pFTM->MODE & FTM_MODE_WPDIS_MASK)   /* if not write protected */
     {
@@ -577,7 +574,7 @@ static inline void FTM_SetFTMEnhanced(FTM_Type pFTM)
 * @see FTM_SetFTMEnhanced.
 *
 *****************************************************************************/
-static inline void FTM_SetFTMBasic(FTM_Type pFTM)
+static inline void FTM_SetFTMBasic(FTM_Type* pFTM)
 {
     if(pFTM->MODE & FTM_MODE_WPDIS_MASK)    /* if not write protected */
     {
@@ -605,11 +602,11 @@ static inline void FTM_SetFTMBasic(FTM_Type pFTM)
 * @see FTM_SetChannelValue.
 *
 *****************************************************************************/
-static inline void FTM_SetModValue(FTM_Type pFTM, uint16_t u16ModValue)
+static inline void FTM_SetModValue(FTM_Type* pFTM, uint16_t u16ModValue)
 {
     pFTM->CNT = 0;
     pFTM->MOD = u16ModValue;
-    if(FTM2 == pFTM)
+    if((FTM_Type*)FTM2 == pFTM)
     {
         if(pFTM->MODE & FTM_MODE_FTMEN_MASK)
         {
@@ -639,10 +636,10 @@ static inline void FTM_SetModValue(FTM_Type pFTM, uint16_t u16ModValue)
 * @see FTM_SetModValue.
 *
 *****************************************************************************/
-static inline void FTM_SetChannelValue(FTM_Type pFTM, uint8_t u8FTM_Channel, uint16_t u16ChannelValue)
+static inline void FTM_SetChannelValue(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint16_t u16ChannelValue)
 {
     pFTM->CONTROLS[u8FTM_Channel].CnV = u16ChannelValue;
-    if(FTM2 == pFTM)
+    if((FTM_Type*)FTM2 == pFTM)
     {
         if(pFTM->MODE & FTM_MODE_FTMEN_MASK)
         {
@@ -683,7 +680,7 @@ static inline void FTM_SetChannelValue(FTM_Type pFTM, uint8_t u8FTM_Channel, uin
 * @see FTM_SetModValue.
 *
 *****************************************************************************/
-static inline void FTM_SetCounterInitValue(FTM_Type pFTM, uint16_t u16CounterValue)
+static inline void FTM_SetCounterInitValue(FTM_Type* pFTM, uint16_t u16CounterValue)
 {
     pFTM->CNTIN = u16CounterValue;
     if(pFTM->MODE & FTM_MODE_FTMEN_MASK)
@@ -709,7 +706,7 @@ static inline void FTM_SetCounterInitValue(FTM_Type pFTM, uint16_t u16CounterVal
 * @see FTM_UnMaskChannels.
 *
 *****************************************************************************/
-static inline void FTM_MaskChannels(FTM_Type pFTM, uint16_t u16ChMask)
+static inline void FTM_MaskChannels(FTM_Type* pFTM, uint16_t u16ChMask)
 {
      pFTM->OUTMASK |= u16ChMask;
 }
@@ -728,7 +725,7 @@ static inline void FTM_MaskChannels(FTM_Type pFTM, uint16_t u16ChMask)
 * @see FTM_MaskChannels.
 *
 *****************************************************************************/
-static inline void FTM_UnMaskChannels(FTM_Type pFTM, uint16_t u16ChMask)
+static inline void FTM_UnMaskChannels(FTM_Type* pFTM, uint16_t u16ChMask)
 {
      pFTM->OUTMASK &= ~u16ChMask;
 }
@@ -747,7 +744,7 @@ static inline void FTM_UnMaskChannels(FTM_Type pFTM, uint16_t u16ChMask)
 * @see FTM_GetChannelsPolarity.
 *
 *********************************************************************************/
-static inline void FTM_SetChannelsPolarity(FTM_Type pFTM, uint8_t u8ChsPolValue)
+static inline void FTM_SetChannelsPolarity(FTM_Type* pFTM, uint8_t u8ChsPolValue)
 {
     pFTM->POL = u8ChsPolValue;
 }
@@ -765,7 +762,7 @@ static inline void FTM_SetChannelsPolarity(FTM_Type pFTM, uint8_t u8ChsPolValue)
 * @see FTM_SetChannelsPolarity.
 *
 *********************************************************************************/
-static inline uint8_t FTM_GetChannelsPolarity(FTM_Type pFTM)
+static inline uint8_t FTM_GetChannelsPolarity(FTM_Type* pFTM)
 {
     return (pFTM->POL);
 }
@@ -783,7 +780,7 @@ static inline uint8_t FTM_GetChannelsPolarity(FTM_Type pFTM)
 * @see FTM_DisableEnhancedSYNCMode.
 *
 *********************************************************************************/
-static inline void FTM_EnableEnhancedSYNCMode(FTM_Type pFTM)
+static inline void FTM_EnableEnhancedSYNCMode(FTM_Type* pFTM)
 {
     pFTM->SYNCONF   |= FTM_SYNCONF_SYNCMODE_MASK;   /* recommend enhanced sync mode */
 }
@@ -801,7 +798,7 @@ static inline void FTM_EnableEnhancedSYNCMode(FTM_Type pFTM)
 * @see FTM_EnableEnhancedSYNCMode.
 *
 *********************************************************************************/
-static inline void FTM_DisableEnhancedSYNCMode(FTM_Type pFTM)
+static inline void FTM_DisableEnhancedSYNCMode(FTM_Type* pFTM)
 {
     pFTM->SYNCONF   &= ~FTM_SYNCONF_SYNCMODE_MASK;   /* recommend enhanced sync mode */
 }
@@ -820,7 +817,7 @@ static inline void FTM_DisableEnhancedSYNCMode(FTM_Type pFTM)
 * @see FTM_GetExternalTriggerFlag.
 *
 *********************************************************************************/
-static inline void FTM_SetExternalTrigger(FTM_Type pFTM, uint8_t u8TirggerSource)
+static inline void FTM_SetExternalTrigger(FTM_Type* pFTM, uint8_t u8TirggerSource)
 {
     pFTM->EXTTRIG   = u8TirggerSource;
 }
@@ -838,7 +835,7 @@ static inline void FTM_SetExternalTrigger(FTM_Type pFTM, uint8_t u8TirggerSource
 * @see FTM_SetExternalTrigger.
 *
 *********************************************************************************/
-static inline uint8_t FTM_GetExternalTriggerFlag(FTM_Type pFTM)
+static inline uint8_t FTM_GetExternalTriggerFlag(FTM_Type* pFTM)
 {
     return (pFTM->EXTTRIG & FTM_EXTTRIG_TRIGF_MASK);
 }
@@ -856,7 +853,7 @@ static inline uint8_t FTM_GetExternalTriggerFlag(FTM_Type pFTM)
 * @see FTM_SetLoadMatchChannel.
 *
 *********************************************************************************/
-static inline void FTM_SetLoadEnable(FTM_Type pFTM)
+static inline void FTM_SetLoadEnable(FTM_Type* pFTM)
 {
     pFTM->PWMLOAD |= FTM_PWMLOAD_LDOK_MASK;
 }
@@ -875,7 +872,7 @@ static inline void FTM_SetLoadEnable(FTM_Type pFTM)
 * @see FTM_SetLoadEnable.
 *
 *********************************************************************************/
-static inline void FTM_SetLoadMatchChannel(FTM_Type pFTM, uint8_t u8Matchchannel)
+static inline void FTM_SetLoadMatchChannel(FTM_Type* pFTM, uint8_t u8Matchchannel)
 {
     pFTM->PWMLOAD |= u8Matchchannel;
 }
@@ -894,7 +891,7 @@ static inline void FTM_SetLoadMatchChannel(FTM_Type pFTM, uint8_t u8Matchchannel
 * @see FTM_InputCaptureFilterSet.
 *
 *********************************************************************************/
-static inline void FTM_InputCaptureFilterClr(FTM_Type pFTM, uint8_t u8FTM_Channel)
+static inline void FTM_InputCaptureFilterClr(FTM_Type* pFTM, uint8_t u8FTM_Channel)
 {
     pFTM->FILTER &= ~(0x000F << (u8FTM_Channel << 2));
 }
@@ -914,7 +911,7 @@ static inline void FTM_InputCaptureFilterClr(FTM_Type pFTM, uint8_t u8FTM_Channe
 * @see FTM_InputCaptureFilterClr.
 *
 *********************************************************************************/
-static inline void FTM_InputCaptureFilterSet(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8FilterValue)
+static inline void FTM_InputCaptureFilterSet(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint8_t u8FilterValue)
 {
     if (u8FilterValue)
     {
@@ -941,7 +938,7 @@ static inline void FTM_InputCaptureFilterSet(FTM_Type pFTM, uint8_t u8FTM_Channe
 * @see FTM_FaultPinDisable.
 *
 *********************************************************************************/
-static inline void FTM_FaultPinEnable(FTM_Type pFTM, uint8_t u8FaultPin)
+static inline void FTM_FaultPinEnable(FTM_Type* pFTM, uint8_t u8FaultPin)
 {
     if (pFTM->MODE & FTM_MODE_WPDIS_MASK) /* if not protected */
     {
@@ -969,7 +966,7 @@ static inline void FTM_FaultPinEnable(FTM_Type pFTM, uint8_t u8FaultPin)
 * @see FTM_FaultPinEnable.
 *
 *********************************************************************************/
-static inline void FTM_FaultPinDisable(FTM_Type pFTM, uint8_t u8FaultPin)
+static inline void FTM_FaultPinDisable(FTM_Type* pFTM, uint8_t u8FaultPin)
 {
     if (pFTM->MODE & FTM_MODE_WPDIS_MASK) /* if not protected */
     {
@@ -997,7 +994,7 @@ static inline void FTM_FaultPinDisable(FTM_Type pFTM, uint8_t u8FaultPin)
 * @see FTM_FaultPinFilterDisable.
 *
 *********************************************************************************/
-static inline void FTM_FaultPinFilterEnable(FTM_Type pFTM, uint8_t u8FaultPin)
+static inline void FTM_FaultPinFilterEnable(FTM_Type* pFTM, uint8_t u8FaultPin)
 {
     if (pFTM->MODE & FTM_MODE_WPDIS_MASK) /* if not protected */
     {
@@ -1025,7 +1022,7 @@ static inline void FTM_FaultPinFilterEnable(FTM_Type pFTM, uint8_t u8FaultPin)
 * @see FTM_FaultPinFilterDisable.
 *
 *********************************************************************************/
-static inline void FTM_FaultPinFilterDisable(FTM_Type pFTM, uint8_t u8FaultPin)
+static inline void FTM_FaultPinFilterDisable(FTM_Type* pFTM, uint8_t u8FaultPin)
 {
     if (pFTM->MODE & FTM_MODE_WPDIS_MASK) /* if not protected */
     {
@@ -1052,7 +1049,7 @@ static inline void FTM_FaultPinFilterDisable(FTM_Type pFTM, uint8_t u8FaultPin)
 * @see FTM_FaultPinFilterSet.
 *
 *********************************************************************************/
-static inline void FTM_FaultPinFilterCDisableAll(FTM_Type pFTM)
+static inline void FTM_FaultPinFilterCDisableAll(FTM_Type* pFTM)
 {
     pFTM->FLTCTRL &= ~FTM_FLTCTRL_FFVAL_MASK;
 }
@@ -1071,7 +1068,7 @@ static inline void FTM_FaultPinFilterCDisableAll(FTM_Type pFTM)
 * @see FTM_FaultPinFilterCDisableAll.
 *
 *********************************************************************************/
-static inline void FTM_FaultPinFilterSet(FTM_Type pFTM, uint8_t u8FilterValue)
+static inline void FTM_FaultPinFilterSet(FTM_Type* pFTM, uint8_t u8FilterValue)
 {
     if (u8FilterValue)
     {
@@ -1096,7 +1093,7 @@ static inline void FTM_FaultPinFilterSet(FTM_Type pFTM, uint8_t u8FilterValue)
 * @see FTM_GetFaultDetectionFlag.
 *
 *********************************************************************************/
-static inline uint8_t FTM_GetFaultDetectionLogicORFlag(FTM_Type pFTM)
+static inline uint8_t FTM_GetFaultDetectionLogicORFlag(FTM_Type* pFTM)
 {
     return (pFTM->FMS & FTM_FMS_FAULTF_MASK);
 }
@@ -1115,7 +1112,7 @@ static inline uint8_t FTM_GetFaultDetectionLogicORFlag(FTM_Type pFTM)
 * @see FTM_GetFaultDetectionLogicORFlag.
 *
 *********************************************************************************/
-static inline uint8_t FTM_GetFaultDetectionFlag(FTM_Type pFTM, uint8_t u8FaultPin)
+static inline uint8_t FTM_GetFaultDetectionFlag(FTM_Type* pFTM, uint8_t u8FaultPin)
 {
     return (pFTM->FMS & (1 << u8FaultPin));
 }
@@ -1131,9 +1128,26 @@ static inline uint8_t FTM_GetFaultDetectionFlag(FTM_Type pFTM, uint8_t u8FaultPi
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-static inline uint8_t FTM_GetFaultInputsLogicORValue(FTM_Type pFTM)
+static inline uint8_t FTM_GetFaultInputsLogicORValue(FTM_Type* pFTM)
 {
     return (pFTM->FMS & FTM_FMS_FAULTIN_MASK);
+}
+
+
+/*********************************************************************************//*!
+*
+* @brief Get the current count value of the FTM
+*
+* @param[in]    pFTM              pointer to one of three FTM base register address.
+*
+* @return uint16_t.
+*
+* @ Pass/ Fail criteria: none.
+*
+*********************************************************************************/
+
+static inline uint16_t FTM_GetCountValue(FTM_Type* pFTM){
+	return (uint16_t) pFTM->CNT;
 }
 
 /*! @} End of ftm_api_list                                                    */
@@ -1142,64 +1156,65 @@ static inline uint8_t FTM_GetFaultInputsLogicORValue(FTM_Type pFTM)
 * Global functions
 ******************************************************************************/
 
-void FTM_ClockSet(FTM_Type pFTM, uint8_t u8ClockSource, uint8_t u8ClockPrescale);
-void FTM_PWMInit(FTM_Type pFTM, uint8_t u8PWMModeSelect, uint8_t u8PWMEdgeSelect);
-void FTM_InputCaptureInit(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8CaptureMode);
-void FTM_DualEdgeCaptureInit(FTM_Type pFTM, uint8_t u8ChannelPair, uint8_t u8CaptureMode, 
+void FTM_ClockSet(FTM_Type* pFTM, uint8_t u8ClockSource, uint8_t u8ClockPrescale);
+void FTM_PWMInit(FTM_Type* pFTM, uint8_t u8PWMModeSelect, uint8_t u8PWMEdgeSelect);
+void FTM_InputCaptureInit(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint8_t u8CaptureMode);
+void FTM_DualEdgeCaptureInit(FTM_Type* pFTM, uint8_t u8ChannelPair, uint8_t u8CaptureMode, 
                              uint8_t u8Channel_N_Edge, uint8_t u8Channel_Np1_Edge);
-void FTM_OutputCompareInit(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8CompareMode);
-void FTM_SoftwareSync(FTM_Type pFTM);
-void FTM_HardwareSync(FTM_Type pFTM, uint8_t u8TriggerN);
-void FTM_HardwareSyncCombine(FTM_Type pFTM, uint8_t u8TriggerMask);
-void FTM_GenerateTrig2(FTM_Type pFTM);
-void FTM_PWMDeadtimeSet(FTM_Type pFTM, uint8_t u8PrescalerValue, uint8_t u8DeadtimeValue);
-void FTM_OutputMaskSet(FTM_Type pFTM, uint8_t u8FTM_Channel);
-void FTM_SWOutputControlSet(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8ChannelValue);
-void FTM_SetDebugModeBehavior(FTM_Type pFTM, uint8_t u8DebugMode);
-void FTM_SetTOFFrequency(FTM_Type pFTM, uint8_t u8TOFNUM);
-void FTM_PolaritySet(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8ActiveValue);
-void FTM_InvertChannel(FTM_Type pFTM, uint8_t u8ChannelPair);
-void FTM_Init(FTM_Type pFTM, FTM_ConfigType *pConfig);
-void FTM_DeInit(FTM_Type pFTM);
-void FTM_ChannelInit(FTM_Type pFTM, uint8_t u8FTM_Channel, FTM_ChParamsType pFTM_ChParams);
-void FTM_SetCallback(FTM_Type pFTM, FTM_CallbackPtr pfnCallback);
-void  FTM_SyncConfigActivate(FTM_Type pFTM, uint32_t u32ConfigValue);
-void FTM_SyncConfigDeactivate(FTM_Type pFTM, uint32_t u32ConfigValue);
-uint8_t FTM_GetFaultDetectionLogicORFlag(FTM_Type pFTM);
-uint8_t FTM_GetFaultDetectionFlag(FTM_Type pFTM, uint8_t u8FaultPin);
-uint8_t FTM_GetFaultInputsLogicORValue(FTM_Type pFTM);
-void FTM_WriteProtectionEnable(FTM_Type pFTM);
-void FTM_WriteProtectionDisable(FTM_Type pFTM);
-void FTM_FaultPinFilterCDisableAll(FTM_Type pFTM);
-void FTM_FaultPinFilterSet(FTM_Type pFTM, uint8_t u8FilterValue);
-void FTM_FaultPinFilterDisable(FTM_Type pFTM, uint8_t u8FaultPin);
-void FTM_FaultPinFilterEnable(FTM_Type pFTM, uint8_t u8FaultPin);
-void FTM_FaultPinEnable(FTM_Type pFTM, uint8_t u8FaultPin);
-void FTM_FaultPinDisable(FTM_Type pFTM, uint8_t u8FaultPin);
-void FTM_InputCaptureFilterClr(FTM_Type pFTM, uint8_t u8FTM_Channel);
-void FTM_InputCaptureFilterSet(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8FilterValue);
-void FTM_SetLoadMatchChannel(FTM_Type pFTM, uint8_t u8Matchchannel);
-void FTM_SetLoadEnable(FTM_Type pFTM);
-uint8_t FTM_GetExternalTriggerFlag(FTM_Type pFTM);
-void FTM_DisableEnhancedSYNCMode(FTM_Type pFTM);
-void FTM_EnableEnhancedSYNCMode(FTM_Type pFTM);
-uint8_t FTM_GetChannelsPolarity(FTM_Type pFTM);
-void FTM_SetChannelsPolarity(FTM_Type pFTM, uint8_t u8ChsPolValue);
-void FTM_UnMaskChannels(FTM_Type pFTM, uint16_t u16ChMask);
-void FTM_MaskChannels(FTM_Type pFTM, uint16_t u16ChMask);
-void FTM_SetCounterInitValue(FTM_Type pFTM, uint16_t u16CounterValue);
-void FTM_SetChannelValue(FTM_Type pFTM, uint8_t u8FTM_Channel, uint16_t u16ChannelValue);
-void FTM_SetModValue(FTM_Type pFTM, uint16_t u16ModValue);
-void FTM_SetFTMBasic(FTM_Type pFTM);
-void FTM_SetFTMEnhanced(FTM_Type pFTM);
-void FTM_ClrChannelFlag(FTM_Type pFTM, uint8_t u8FTM_Channel);
-uint8_t FTM_GetChannelFlag(FTM_Type pFTM, uint8_t u8FTM_Channel);
-void FTM_ClrOverFlowFlag(FTM_Type pFTM);
-uint8_t FTM_GetOverFlowFlag(FTM_Type pFTM);
-void FTM_DisableChannelInt(FTM_Type pFTM, uint8_t u8FTM_Channel);
-void FTM_EnableChannelInt(FTM_Type pFTM, uint8_t u8FTM_Channel);
-void FTM_DisableOverflowInt(FTM_Type pFTM);
-void FTM_EnableOverflowInt(FTM_Type pFTM);
+void FTM_OutputCompareInit(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint8_t u8CompareMode);
+void FTM_SoftwareSync(FTM_Type* pFTM);
+void FTM_HardwareSync(FTM_Type* pFTM, uint8_t u8TriggerN);
+void FTM_HardwareSyncCombine(FTM_Type* pFTM, uint8_t u8TriggerMask);
+void FTM_GenerateTrig2(FTM_Type* pFTM);
+void FTM_PWMDeadtimeSet(FTM_Type* pFTM, uint8_t u8PrescalerValue, uint8_t u8DeadtimeValue);
+void FTM_OutputMaskSet(FTM_Type* pFTM, uint8_t u8FTM_Channel);
+void FTM_SWOutputControlSet(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint8_t u8ChannelValue);
+void FTM_SetDebugModeBehavior(FTM_Type* pFTM, uint8_t u8DebugMode);
+void FTM_SetTOFFrequency(FTM_Type* pFTM, uint8_t u8TOFNUM);
+void FTM_PolaritySet(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint8_t u8ActiveValue);
+void FTM_InvertChannel(FTM_Type* pFTM, uint8_t u8ChannelPair);
+void FTM_Init(FTM_Type* pFTM, FTM_ConfigType *pConfig);
+void FTM_DeInit(FTM_Type* pFTM);
+void FTM_ChannelInit(FTM_Type* pFTM, uint8_t u8FTM_Channel, FTM_ChParamsType pFTM_ChParams);
+void FTM_SetCallback(FTM_Type* pFTM, FTM_CallbackPtr pfnCallback);
+void  FTM_SyncConfigActivate(FTM_Type* pFTM, uint32_t u32ConfigValue);
+void FTM_SyncConfigDeactivate(FTM_Type* pFTM, uint32_t u32ConfigValue);
+uint8_t FTM_GetFaultDetectionLogicORFlag(FTM_Type* pFTM);
+uint8_t FTM_GetFaultDetectionFlag(FTM_Type* pFTM, uint8_t u8FaultPin);
+uint8_t FTM_GetFaultInputsLogicORValue(FTM_Type* pFTM);
+void FTM_WriteProtectionEnable(FTM_Type* pFTM);
+void FTM_WriteProtectionDisable(FTM_Type* pFTM);
+void FTM_FaultPinFilterCDisableAll(FTM_Type* pFTM);
+void FTM_FaultPinFilterSet(FTM_Type* pFTM, uint8_t u8FilterValue);
+void FTM_FaultPinFilterDisable(FTM_Type* pFTM, uint8_t u8FaultPin);
+void FTM_FaultPinFilterEnable(FTM_Type* pFTM, uint8_t u8FaultPin);
+void FTM_FaultPinEnable(FTM_Type* pFTM, uint8_t u8FaultPin);
+void FTM_FaultPinDisable(FTM_Type* pFTM, uint8_t u8FaultPin);
+void FTM_InputCaptureFilterClr(FTM_Type* pFTM, uint8_t u8FTM_Channel);
+void FTM_InputCaptureFilterSet(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint8_t u8FilterValue);
+void FTM_SetLoadMatchChannel(FTM_Type* pFTM, uint8_t u8Matchchannel);
+void FTM_SetLoadEnable(FTM_Type* pFTM);
+uint8_t FTM_GetExternalTriggerFlag(FTM_Type* pFTM);
+void FTM_DisableEnhancedSYNCMode(FTM_Type* pFTM);
+void FTM_EnableEnhancedSYNCMode(FTM_Type* pFTM);
+uint8_t FTM_GetChannelsPolarity(FTM_Type* pFTM);
+void FTM_SetChannelsPolarity(FTM_Type* pFTM, uint8_t u8ChsPolValue);
+void FTM_UnMaskChannels(FTM_Type* pFTM, uint16_t u16ChMask);
+void FTM_MaskChannels(FTM_Type* pFTM, uint16_t u16ChMask);
+void FTM_SetCounterInitValue(FTM_Type* pFTM, uint16_t u16CounterValue);
+void FTM_SetChannelValue(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint16_t u16ChannelValue);
+void FTM_SetModValue(FTM_Type* pFTM, uint16_t u16ModValue);
+void FTM_SetFTMBasic(FTM_Type* pFTM);
+void FTM_SetFTMEnhanced(FTM_Type* pFTM);
+void FTM_ClrChannelFlag(FTM_Type* pFTM, uint8_t u8FTM_Channel);
+uint8_t FTM_GetChannelFlag(FTM_Type* pFTM, uint8_t u8FTM_Channel);
+void FTM_ClrOverFlowFlag(FTM_Type* pFTM);
+uint8_t FTM_GetOverFlowFlag(FTM_Type* pFTM);
+void FTM_DisableChannelInt(FTM_Type* pFTM, uint8_t u8FTM_Channel);
+void FTM_EnableChannelInt(FTM_Type* pFTM, uint8_t u8FTM_Channel);
+void FTM_DisableOverflowInt(FTM_Type* pFTM);
+void FTM_EnableOverflowInt(FTM_Type* pFTM);
+uint16_t FTM_GetCountValue(FTM_Type* pFTM);
 
 #ifdef __cplusplus
 }

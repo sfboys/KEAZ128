@@ -9,6 +9,6 @@ void HalUartInit(void)
     UART_Config.sctrl2settings.bits.bRe=1;	/* Enable Receiver*/	
     UART_Config.sctrl2settings.bits.bTe=1;	/* Enable Transmitter*/	
     UART_Config.u32SysClkHz = 20000000;   	/* Bus clock in Hz*/	
-    UART_Config.u32Baudrate = 115200;     	/* UART baud rate */	
+    UART_Config.u32Baudrate = 19200;     	/* UART baud rate */	
     UART_Init(UART2,&UART_Config);			/*Initialization of UART utilities*/
 }

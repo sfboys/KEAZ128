@@ -78,10 +78,23 @@ void HalKBIInit(void)
     KBIConfig.sBits.bKbspEn     = 1;/*The latched value in KBxSP register while interrupt flag occur to be read.*/  
     KBIConfig.sBits.bMode       = KBI_MODE_EDGE_ONLY;   
     KBIConfig.sBits.bIntEn      = 1;    /*Falling edge/low level select; KBI0_P24 channel enable(SW2 on FRDM+ board) */ 
-    KBIConfig.sPin[4].bEdge = KBI_FALLING_EDGE_LOW_LEVEL;   
+    KBIConfig.sPin[4].bEdge = KBI_RISING_EDGE_HIGH_LEVEL;   
     KBIConfig.sPin[4].bEn   = 1;    /*Falling edge/low level select; KBI0_P25 channel enable(SW3 on FRDM+ board) */ 
-    KBIConfig.sPin[5].bEdge = KBI_FALLING_EDGE_LOW_LEVEL;   
+    KBIConfig.sPin[5].bEdge = KBI_RISING_EDGE_HIGH_LEVEL;   
     KBIConfig.sPin[5].bEn   = 1;    
     KBI_SetCallback(KBI1, &KBI1_Task);  
     KBI_Init(KBI1, &KBIConfig);
+}
+
+void HalClkInit(void)
+{
+    ICS_ConfigType ICS_set={0};		/* Declaration of ICS_setup structure */
+    ICS_set.u8ClkMode=ICS_CLK_MODE_FEE; /* ICS in FLL engaged internal mode*/
+    ICS_set.bdiv=0;					/* bdiv bit equals 0, prescaler=1*/
+    ICS_set.oscConfig.bEnable=1;	/* Osc enabled*/
+    ICS_set.oscConfig.bRange=1;		/* High frequency range 4-24 MHz*/
+    ICS_set.oscConfig.bIsCryst=1;	/* Oscillator clock source is selected*/
+    ICS_set.oscConfig.u32OscFreq=8000 ; /* 8 MHz crystal, crytal is in KHz*/
+
+    ICS_Init(&ICS_set);            		/*Initialization of core clock at 40MHz, bus clock 20 MHz*/
 }

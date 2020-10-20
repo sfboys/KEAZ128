@@ -111,12 +111,12 @@ extern "C" {
 
 typedef void (*WDOG_CallbackType)(void);
 
-/*! @} End of wdog_callback    
+/*! @} End of wdog_callback */   
 
 /******************************************************************************
 * define watchdog configuration structure
 *
-*//*! @addtogroup wdog_config_type
+*! @addtogroup wdog_config_type
 * @{
 *******************************************************************************/
 

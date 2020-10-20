@@ -721,7 +721,7 @@ void ICS_Init(ICS_ConfigType *pConfig)
   {
 	   ICS_C1 |=ICS_C1_IREFS_MASK;           /* Selection of intern clock to FLL */
 	   ICS_C1|=ICS_C1_IRCLKEN_MASK; 		/* Enable the internal reference clock*/ 
-	   ICS_C1 |=ICS_C1_CLKS(0b00);          /* Clock source select   Output FLL is selected */
+	   ICS_C1 |=ICS_C1_CLKS(0);          /* Clock source select   Output FLL is selected 0b00*/
 	   ICS_SetBusDivider(pConfig->bdiv);	 /* Set core frequency, bus frequency = core freq /2*/
        SIM_CLKDIV|=SIM_CLKDIV_OUTDIV2_MASK;  /*Core frequency divide by 2 for Bus freq*/  
 	   

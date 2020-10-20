@@ -159,11 +159,11 @@ void ACMP_DeInit(ACMP_MemMapPtr pACMPx)
     
     if(ACMP0 == pACMPx)
     {    
-        SIM_->SCGC &= ~SIM_SCGC_ACMP0_MASK;
+        SIM->SCGC &= ~SIM_SCGC_ACMP0_MASK;
     }
     else
     {
-        SIM_->SCGC &= ~SIM_SCGC_ACMP1_MASK;
+        SIM->SCGC &= ~SIM_SCGC_ACMP1_MASK;
     } 
 }
 

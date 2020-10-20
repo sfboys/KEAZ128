@@ -42,6 +42,7 @@ extern "C" {
 /******************************************************************************
 * Global variables
 ******************************************************************************/
+#include "derivative.h"
 
 /******************************************************************************
 * Constants and macros
@@ -64,7 +65,7 @@ extern "C" {
 * @{
 *******************************************************************************/
 #define BAUD_RATE_SJW             	SJW_3TQ	/*!< 1 set Synchronization Jump Width. */
-#define BAUD_RATE_BRP				0		/*!< 1 Baud Rate Prescaler */	
+#define BAUD_RATE_BRP				2		/*!< 1 Baud Rate Prescaler */	
 #define BAUD_RATE_SAMP				0		/*!< 0-One sample per bit, 1-three sample per bit. */	
 #define BAUD_RATE_TSEG1				TSEG_10  /*!< Time Segment 1*/
 #define BAUD_RATE_TSEG2				TSEG_7  /*!< Time Segment 2*/
@@ -279,6 +280,29 @@ extern "C" {
                              This parameter can be CAN_FIFO0 or CAN_FIFO1 */
                        
 }CanRxMsgTypeDef;
+
+typedef struct
+{
+  uint32_t StdId;    /*!< Specifies the standard identifier.
+                          This parameter must be a number between Min_Data = 0 and Max_Data = 0x7FF. */ 
+                        
+  uint32_t ExtId;    /*!< Specifies the extended identifier.
+                          This parameter must be a number between Min_Data = 0 and Max_Data = 0x1FFFFFFF. */ 
+                        
+  uint32_t IDE;      /*!< Specifies the type of identifier for the message that will be transmitted.
+                          This parameter can be a value of @ref CAN_identifier_type */
+
+  uint32_t RTR;      /*!< Specifies the type of frame for the message that will be transmitted.
+                          This parameter can be a value of @ref CAN_remote_transmission_request */
+
+  uint32_t DLC;      /*!< Specifies the length of the frame that will be transmitted.
+                          This parameter must be a number between Min_Data = 0 and Max_Data = 8. */
+
+  uint8_t Data[8];   /*!< Contains the data to be transmitted. 
+                          This parameter must be a number between Min_Data = 0 and Max_Data = 0xFF. */
+   
+}CanTxMsgTypeDef;
+
  
 typedef struct
 {

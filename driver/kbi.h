@@ -43,7 +43,7 @@ extern "C" {
 #include "nvic.h"
 
 #define KBI_MAX_PINS_PER_PORT   32                  /*!< max number of pins */
-#define KBI_Type KBI_MemMapPtr
+//#define KBI_Type KBI_MemMapPtr
 /******************************************************************************
 * Constants
 ******************************************************************************/
@@ -82,11 +82,6 @@ typedef enum
 *******************************************************************************/
 #define KBI_MAX_NO              2                  /*!< max number of modules */
 
-#if defined(CPU_KE02)|| defined(CPU_KE04)
-   #define KBI_MAX_PINS_PER_PORT   8                  /*!< max number of pins */
-#elif defined(CPU_KE06)
-   #define KBI_MAX_PINS_PER_PORT   32                  /*!< max number of pins */
-#endif
 /*! @} End of kbi_macro                                                    */
 
 
@@ -175,7 +170,7 @@ typedef struct
 *****************************************************************************/
 
 
-static inline  void KBI_DetectFallingEdge(KBI_Type pKBI, uint32_t PinMasks)
+static inline  void KBI_DetectFallingEdge(KBI_Type* pKBI, uint32_t PinMasks)
 
 {
     pKBI->SC &= ~KBI_SC_KBMOD_MASK;
@@ -197,7 +192,7 @@ static inline  void KBI_DetectFallingEdge(KBI_Type pKBI, uint32_t PinMasks)
 *
 *****************************************************************************/
 
-static inline  void KBI_DetectRisingEdge(KBI_Type pKBI, uint32_t PinMasks)
+static inline  void KBI_DetectRisingEdge(KBI_Type* pKBI, uint32_t PinMasks)
 
 {
     pKBI->SC &= ~KBI_SC_KBMOD_MASK;
@@ -219,7 +214,7 @@ static inline  void KBI_DetectRisingEdge(KBI_Type pKBI, uint32_t PinMasks)
 *
 *****************************************************************************/
 
-static inline  void KBI_DetectRisingEdgeHighLevel(KBI_Type pKBI, uint32_t PinMasks)
+static inline  void KBI_DetectRisingEdgeHighLevel(KBI_Type* pKBI, uint32_t PinMasks)
 
 {
     pKBI->SC |= KBI_SC_KBMOD_MASK;
@@ -241,7 +236,7 @@ static inline  void KBI_DetectRisingEdgeHighLevel(KBI_Type pKBI, uint32_t PinMas
 *
 *****************************************************************************/
 
-static inline  void KBI_DetectFallingEdgeLowLevel(KBI_Type pKBI, uint32_t PinMasks)
+static inline  void KBI_DetectFallingEdgeLowLevel(KBI_Type* pKBI, uint32_t PinMasks)
 
 {
     pKBI->SC |= KBI_SC_KBMOD_MASK;
@@ -263,7 +258,7 @@ static inline  void KBI_DetectFallingEdgeLowLevel(KBI_Type pKBI, uint32_t PinMas
 *
 *****************************************************************************/
 
-static inline  void KBI_Enable(KBI_Type pKBI, uint32_t PinMasks)
+static inline  void KBI_Enable(KBI_Type* pKBI, uint32_t PinMasks)
 
 {
     pKBI->PE |= (PinMasks);        
@@ -284,7 +279,7 @@ static inline  void KBI_Enable(KBI_Type pKBI, uint32_t PinMasks)
 *
 *****************************************************************************/
 
-static inline  void KBI_Disable(KBI_Type pKBI, uint32_t PinMasks)
+static inline  void KBI_Disable(KBI_Type* pKBI, uint32_t PinMasks)
 
 {
     pKBI->PE &= ~(PinMasks);        
@@ -303,7 +298,7 @@ static inline  void KBI_Disable(KBI_Type pKBI, uint32_t PinMasks)
 * @see KBI_DisableInt.
 *
 *****************************************************************************/
-static inline  void KBI_EnableInt(KBI_Type pKBI)
+static inline  void KBI_EnableInt(KBI_Type* pKBI)
 {
     pKBI->SC |= KBI_SC_KBIE_MASK;        
 }
@@ -322,7 +317,7 @@ static inline  void KBI_EnableInt(KBI_Type pKBI)
 * @see KBI_EnableInt.
 *
 *****************************************************************************/
-static inline  void KBI_DisableInt(KBI_Type pKBI)
+static inline  void KBI_DisableInt(KBI_Type* pKBI)
 {
     pKBI->SC &= ~KBI_SC_KBIE_MASK;        
 }
@@ -341,7 +336,7 @@ static inline  void KBI_DisableInt(KBI_Type pKBI)
 *
 *****************************************************************************/
 
-static inline  uint32_t KBI_GetFlags(KBI_Type pKBI)
+static inline  uint32_t KBI_GetFlags(KBI_Type* pKBI)
 
 {
     return (pKBI->SC & KBI_SC_KBF_MASK);        
@@ -360,11 +355,12 @@ static inline  uint32_t KBI_GetFlags(KBI_Type pKBI)
 * @see KBI_GetFlags.
 *
 *****************************************************************************/
-static inline  void KBI_ClrFlags(KBI_Type pKBI)
+static inline  void KBI_ClrFlags(KBI_Type* pKBI)
 {
     pKBI->SC |= KBI_SC_KBACK_MASK;        
 }
 
+#if defined(MCU_SKEAZ1284)
 /*****************************************************************************//*!
 *
 * @brief Real KBI_SP register enable.
@@ -378,7 +374,7 @@ static inline  void KBI_ClrFlags(KBI_Type pKBI)
 * @see The real time value of Keyboard source pin to be read.
 *
 *****************************************************************************/
-static inline  void KBI_SPEnable(KBI_Type pKBI)
+static inline  void KBI_SPEnable(KBI_Type* pKBI)
 {
     pKBI->SC |= KBI_SC_KBSPEN_MASK;        
 }
@@ -396,7 +392,7 @@ static inline  void KBI_SPEnable(KBI_Type pKBI)
 * @see KBI_GetSP.
 *
 *****************************************************************************/
-static inline  uint32_t KBI_GetSP(KBI_Type pKBI)
+static inline  uint32_t KBI_GetSP(KBI_Type* pKBI)
 {
     return (pKBI->SP & KBI_SP_SP_MASK);        
 }
@@ -414,10 +410,15 @@ static inline  uint32_t KBI_GetSP(KBI_Type pKBI)
 * @see KBI_RstSP.
 *
 *****************************************************************************/
-static inline  void KBI_RstSP(KBI_Type pKBI)
+static inline  void KBI_RstSP(KBI_Type *pKBI)
 {
     pKBI->SC |= KBI_SC_RSTKBSP_MASK;        
 }
+#elif (MCU_SKEAZN642)
+ /* KEAZN64 family does not have KBI_SC_RSTKBSP, KBI_SC_KBSPEN, or KBI_SP. */
+#else
+ /* If your device has more KBI register implementations add them here. */
+#endif
 
 
 /*! @} End of kbi_api_list                                                  */
@@ -426,8 +427,9 @@ static inline  void KBI_RstSP(KBI_Type pKBI)
 * Global functions
 ******************************************************************************/
 
-void KBI_Init(KBI_Type pKBI, KBI_ConfigType *pConfig);
-void KBI_SetCallback(KBI_Type pKBI, KBI_CallbackType pfnCallback);
+void KBI_Init(KBI_Type* pKBI, KBI_ConfigType *pConfig);
+void KBI_SetCallback(KBI_Type* pKBI, KBI_CallbackType pfnCallback);
+void KBI_DeInit(KBI_Type* pKBI);
 
 
 #endif 

@@ -54,6 +54,9 @@
 /******************************************************************************
 * Local variables
 ******************************************************************************/
+static FTM_Type* pFTM0 = (FTM_Type*)FTM0;
+static FTM_Type* pFTM1 = (FTM_Type*)FTM1;
+static FTM_Type* pFTM2 = (FTM_Type*)FTM2;
 
 /******************************************************************************
 * Local functions
@@ -84,7 +87,7 @@ FTM_CallbackPtr FTM_Callback[3] = {(FTM_CallbackPtr)(0)};
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_ClockSet(FTM_Type pFTM, uint8_t u8ClockSource, uint8_t u8ClockPrescale)
+void FTM_ClockSet(FTM_Type* pFTM, uint8_t u8ClockSource, uint8_t u8ClockPrescale)
 {
     uint8_t   u8Temp;
     u8Temp  = (pFTM->SC & 0xE0);
@@ -105,17 +108,17 @@ void FTM_ClockSet(FTM_Type pFTM, uint8_t u8ClockSource, uint8_t u8ClockPrescale)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_PWMInit(FTM_Type pFTM, uint8_t u8PWMModeSelect, uint8_t u8PWMEdgeSelect)
+void FTM_PWMInit(FTM_Type* pFTM, uint8_t u8PWMModeSelect, uint8_t u8PWMEdgeSelect)
 {
     uint8_t   channels, i;
     
     /* open the clock gate */
-	if (FTM0 == pFTM)
+	if (pFTM0 == pFTM)
     {
         channels = 2;
         SIM->SCGC |= SIM_SCGC_FTM0_MASK;
     }
-    else if(FTM1 == pFTM)
+    else if(pFTM1 == pFTM)
     {
         channels = 2;
     }        
@@ -175,16 +178,16 @@ void FTM_PWMInit(FTM_Type pFTM, uint8_t u8PWMModeSelect, uint8_t u8PWMEdgeSelect
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_InputCaptureInit(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8CaptureMode)
+void FTM_InputCaptureInit(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint8_t u8CaptureMode)
 { 
 
     /* open the clock gate */
-	if ((FTM0 == pFTM) && (u8FTM_Channel < 2))
+	if ((pFTM0 == pFTM) && (u8FTM_Channel < 2))
     {
         SIM->SCGC |= SIM_SCGC_FTM0_MASK;
         Enable_Interrupt(FTM0_IRQn);
     }
-    else if((FTM1 == pFTM)  && (u8FTM_Channel < 2))
+    else if((pFTM1 == pFTM)  && (u8FTM_Channel < 2))
     {
         SIM->SCGC |= SIM_SCGC_FTM1_MASK;
         Enable_Interrupt(FTM1_IRQn);
@@ -228,7 +231,7 @@ void FTM_InputCaptureInit(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8Captur
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_DualEdgeCaptureInit(FTM_Type pFTM, uint8_t u8ChannelPair, uint8_t u8CaptureMode, 
+void FTM_DualEdgeCaptureInit(FTM_Type* pFTM, uint8_t u8ChannelPair, uint8_t u8CaptureMode, 
                                  uint8_t u8Channel_N_Edge, uint8_t u8Channel_Np1_Edge)
 { 
     
@@ -277,15 +280,15 @@ void FTM_DualEdgeCaptureInit(FTM_Type pFTM, uint8_t u8ChannelPair, uint8_t u8Cap
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_OutputCompareInit(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8CompareMode)
+void FTM_OutputCompareInit(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint8_t u8CompareMode)
 {
    
     /* open the clock gate */
-	if(FTM0 == pFTM)
+	if(pFTM0 == pFTM)
     {
         SIM->SCGC |= SIM_SCGC_FTM0_MASK;
     }
-    else if(FTM1 == pFTM)
+    else if(pFTM1 == pFTM)
     {
         SIM->SCGC |= SIM_SCGC_FTM1_MASK;
     }        
@@ -311,7 +314,7 @@ void FTM_OutputCompareInit(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8Compa
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_SoftwareSync(FTM_Type pFTM)
+void FTM_SoftwareSync(FTM_Type* pFTM)
 {
   
 
@@ -331,7 +334,7 @@ void FTM_SoftwareSync(FTM_Type pFTM)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_HardwareSync(FTM_Type pFTM, uint8_t u8TriggerN)
+void FTM_HardwareSync(FTM_Type* pFTM, uint8_t u8TriggerN)
 {
     
     pFTM->SYNCONF   |= FTM_SYNCONF_SYNCMODE_MASK;   /* recommend enhanced sync mode */
@@ -364,7 +367,7 @@ void FTM_HardwareSync(FTM_Type pFTM, uint8_t u8TriggerN)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_HardwareSyncCombine(FTM_Type pFTM, uint8_t u8TriggerMask)
+void FTM_HardwareSyncCombine(FTM_Type* pFTM, uint8_t u8TriggerMask)
 {
     pFTM->SYNCONF   |= FTM_SYNCONF_SYNCMODE_MASK;   /* recommend enhanced sync mode */
     pFTM->SYNC      &= 0x8F;
@@ -382,13 +385,16 @@ void FTM_HardwareSyncCombine(FTM_Type pFTM, uint8_t u8TriggerMask)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_GenerateTrig2(FTM_Type pFTM)
+void FTM_GenerateTrig2(FTM_Type* pFTM)
 {
    
     if(pFTM->SYNC & FTM_SYNC_TRIG2_MASK)
     {
-
-        SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;
+					#ifndef MCU_SKEAZN642
+					SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;  
+					#else					
+					SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;         /* hardware sync */ 
+					#endif
 
     }
 }
@@ -407,7 +413,7 @@ void FTM_GenerateTrig2(FTM_Type pFTM)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_PWMDeadtimeSet(FTM_Type pFTM, uint8_t u8PrescalerValue, uint8_t u8DeadtimeValue)
+void FTM_PWMDeadtimeSet(FTM_Type* pFTM, uint8_t u8PrescalerValue, uint8_t u8DeadtimeValue)
 {
     
     pFTM->COMBINE |= 0x101010;              /* enable dead time insertion */
@@ -438,7 +444,7 @@ void FTM_PWMDeadtimeSet(FTM_Type pFTM, uint8_t u8PrescalerValue, uint8_t u8Deadt
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_OutputMaskSet(FTM_Type pFTM, uint8_t u8FTM_Channel)
+void FTM_OutputMaskSet(FTM_Type* pFTM, uint8_t u8FTM_Channel)
 {
    
 
@@ -454,8 +460,11 @@ void FTM_OutputMaskSet(FTM_Type pFTM, uint8_t u8FTM_Channel)
         else if(pFTM->SYNCONF & FTM_SYNCONF_HWOM_MASK)  /* if hardware sync is needed*/
         {
             pFTM->SYNC |= FTM_SYNC_TRIG2_MASK;
-            SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;         /* hardware sync */ 
-
+					#ifndef MCU_SKEAZN642
+					SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;  
+					#else					
+					SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;         /* hardware sync */ 
+					#endif
         }
         else
         {
@@ -479,7 +488,7 @@ void FTM_OutputMaskSet(FTM_Type pFTM, uint8_t u8FTM_Channel)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_SWOutputControlSet(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8ChannelValue)
+void FTM_SWOutputControlSet(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint8_t u8ChannelValue)
 {
     
     if(FTM_SWOCTRL_HIGH == u8ChannelValue)
@@ -501,7 +510,11 @@ void FTM_SWOutputControlSet(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8Chan
         else if(pFTM->SYNCONF & FTM_SYNCONF_HWSOC_MASK)     /* if hardware sync is needed*/
         {
             pFTM->SYNC |= FTM_SYNC_TRIG2_MASK;
-            SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;             /* hardware sync */ 
+          #ifndef MCU_SKEAZN642
+					SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;  
+					#else					
+					SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;         /* hardware sync */ 
+					#endif
 
         }
     }
@@ -523,7 +536,7 @@ void FTM_SWOutputControlSet(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8Chan
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_PolaritySet(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8ActiveValue)
+void FTM_PolaritySet(FTM_Type* pFTM, uint8_t u8FTM_Channel, uint8_t u8ActiveValue)
 {
     
     if(FTM_POLARITY_HIGHACTIVE == u8ActiveValue)
@@ -548,7 +561,7 @@ void FTM_PolaritySet(FTM_Type pFTM, uint8_t u8FTM_Channel, uint8_t u8ActiveValue
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_SetDebugModeBehavior(FTM_Type pFTM, uint8_t u8DebugMode)
+void FTM_SetDebugModeBehavior(FTM_Type* pFTM, uint8_t u8DebugMode)
 {
     pFTM->CONF &= ~FTM_CONF_BDMMODE_MASK;
     pFTM->CONF |= FTM_CONF_BDMMODE(u8DebugMode);
@@ -566,7 +579,7 @@ void FTM_SetDebugModeBehavior(FTM_Type pFTM, uint8_t u8DebugMode)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_SetTOFFrequency(FTM_Type pFTM, uint8_t u8TOFNUM)
+void FTM_SetTOFFrequency(FTM_Type* pFTM, uint8_t u8TOFNUM)
 {
     pFTM->CONF &= ~FTM_CONF_NUMTOF_MASK;
     pFTM->CONF |= FTM_CONF_NUMTOF(u8TOFNUM);
@@ -584,7 +597,7 @@ void FTM_SetTOFFrequency(FTM_Type pFTM, uint8_t u8TOFNUM)
 * @ Pass/ Fail criteria: none.
 *
 *********************************************************************************/
-void FTM_InvertChannel(FTM_Type pFTM, uint8_t u8ChannelPair)
+void FTM_InvertChannel(FTM_Type* pFTM, uint8_t u8ChannelPair)
 {
 
     pFTM->INVCTRL |= 1<<u8ChannelPair;
@@ -599,8 +612,11 @@ void FTM_InvertChannel(FTM_Type pFTM, uint8_t u8ChannelPair)
         {
             pFTM->SYNC |= FTM_SYNC_TRIG2_MASK;
 
-
-            SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;             /* hardware sync */ 
+					#ifndef MCU_SKEAZN642
+					SIM->SOPT0  |= SIM_SOPT0_FTMSYNC_MASK;  
+					#else					
+					SIM->SOPT  |= SIM_SOPT_FTMSYNC_MASK;         /* hardware sync */ 
+					#endif
 
         }
     }
@@ -622,14 +638,14 @@ void FTM_InvertChannel(FTM_Type pFTM, uint8_t u8ChannelPair)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void FTM_Init(FTM_Type pFTM, FTM_ConfigType *pConfig)
+void FTM_Init(FTM_Type* pFTM, FTM_ConfigType *pConfig)
 {
-    if(FTM0 == pFTM)
+    if(pFTM0 == pFTM)
     {
         SIM->SCGC |= SIM_SCGC_FTM0_MASK;
     }
 
-    else if(FTM1 == pFTM)
+    else if(pFTM1 == pFTM)
     {
         SIM->SCGC |= SIM_SCGC_FTM1_MASK;
     }
@@ -641,7 +657,7 @@ void FTM_Init(FTM_Type pFTM, FTM_ConfigType *pConfig)
     /* disable counter */
     pFTM->SC = 0; 
     
-    if(FTM2 == pFTM)
+    if(pFTM2 == pFTM)
     {
      		pFTM->MODE |= pConfig->mode;
 			pFTM->COMBINE   = pConfig->combine;      
@@ -669,12 +685,12 @@ void FTM_Init(FTM_Type pFTM, FTM_ConfigType *pConfig)
     pFTM->SC |= pConfig->clk_source<<3|pConfig->prescaler<<0|pConfig->cpwms<<5|pConfig->toie<<6;
     if( pConfig->toie)
     {
-    	if(FTM0 == pFTM)
+    	if(pFTM0 == pFTM)
 		{
 			Enable_Interrupt(FTM0_IRQn);
 
 		}
-		else if(FTM1 == pFTM)
+		else if(pFTM1 == pFTM)
 		{
 			Enable_Interrupt(FTM1_IRQn);
 
@@ -699,12 +715,12 @@ void FTM_Init(FTM_Type pFTM, FTM_ConfigType *pConfig)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void FTM_DeInit(FTM_Type pFTM)
+void FTM_DeInit(FTM_Type* pFTM)
 {
     pFTM->SC = 0;       
 	pFTM->MOD = 0;
 	pFTM->CNT = 0;
-    if(FTM2 == pFTM) 
+    if(pFTM2 == pFTM) 
     {
           pFTM->MODE = 0x4; 
           pFTM->COMBINE = 0;      
@@ -725,19 +741,17 @@ void FTM_DeInit(FTM_Type pFTM)
           pFTM->PWMLOAD = 0;      
     }
     /* close the clock gate */
-	if (FTM0 == pFTM)
+	if (pFTM0 == pFTM)
     {
         SIM->SCGC &= ~SIM_SCGC_FTM0_MASK;
         Disable_Interrupt(FTM0_IRQn);
     }
-#if !defined(CPU_KE04)    
-    else if(FTM1 == pFTM)
+    else if(pFTM1 == pFTM)
     {
         SIM->SCGC &= ~SIM_SCGC_FTM1_MASK;
         Disable_Interrupt(FTM1_IRQn);
     } 
-#endif
-    else if (FTM2 == pFTM)
+    else if (pFTM2 == pFTM)
     {
         SIM->SCGC &= ~SIM_SCGC_FTM2_MASK;
         Disable_Interrupt(FTM2_IRQn);
@@ -757,15 +771,15 @@ void FTM_DeInit(FTM_Type pFTM)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void FTM_ChannelInit(FTM_Type pFTM, uint8_t u8FTM_Channel, FTM_ChParamsType pTFTMCH_Params)
+void FTM_ChannelInit(FTM_Type* pFTM, uint8_t u8FTM_Channel, FTM_ChParamsType pTFTMCH_Params)
 { 
     
-	if (FTM0 == pFTM)
+	if (pFTM0 == pFTM)
     {
         SIM->SCGC |= SIM_SCGC_FTM0_MASK;
     }
 
-    else if(FTM1 == pFTM)
+    else if(pFTM1 == pFTM)
     {
         SIM->SCGC |= SIM_SCGC_FTM1_MASK;
     }        
@@ -779,7 +793,7 @@ void FTM_ChannelInit(FTM_Type pFTM, uint8_t u8FTM_Channel, FTM_ChParamsType pTFT
     
     if( pTFTMCH_Params.ctrl.bits.bMode==FTM_INPUT_CAPTURE)
     {
-        pFTM->CONTROLS[u8FTM_Channel].CnSC |= 0b00<<4;
+        pFTM->CONTROLS[u8FTM_Channel].CnSC |= 0<<4;//0b00
     	 pFTM->CONTROLS[u8FTM_Channel].CnSC |= pTFTMCH_Params.ctrl.bits.bEdge<<2;
     }
     else if( pTFTMCH_Params.ctrl.bits.bMode==FTM_OUTPUT_COMPARE)
@@ -825,12 +839,12 @@ void FTM_ChannelInit(FTM_Type pFTM, uint8_t u8FTM_Channel, FTM_ChParamsType pTFT
     if(1==pTFTMCH_Params.ctrl.bits.bCHIE)
     {
     	pFTM->CONTROLS[u8FTM_Channel].CnSC |=FTM_CnSC_CHIE_MASK;
-    	if(FTM0 == pFTM)
+    	if(pFTM0 == pFTM)
     	{
         	Enable_Interrupt(FTM0_IRQn);
 
     	}
-    	else if(FTM1 == pFTM)
+    	else if(pFTM1 == pFTM)
     	{
         	Enable_Interrupt(FTM1_IRQn);
 
@@ -861,7 +875,7 @@ void FTM_ChannelInit(FTM_Type pFTM, uint8_t u8FTM_Channel, FTM_ChParamsType pTFT
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void  FTM_SyncConfigActivate(FTM_Type pFTM, uint32_t u32ConfigValue)
+void  FTM_SyncConfigActivate(FTM_Type* pFTM, uint32_t u32ConfigValue)
 {
     pFTM->SYNCONF |= u32ConfigValue;   
 }
@@ -878,7 +892,7 @@ void  FTM_SyncConfigActivate(FTM_Type pFTM, uint32_t u32ConfigValue)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-void  FTM_SyncConfigDeactivate(FTM_Type pFTM, uint32_t u32ConfigValue)
+void  FTM_SyncConfigDeactivate(FTM_Type* pFTM, uint32_t u32ConfigValue)
 {
     pFTM->SYNCONF &= ~u32ConfigValue;   
 }
@@ -895,7 +909,7 @@ void  FTM_SyncConfigDeactivate(FTM_Type pFTM, uint32_t u32ConfigValue)
 * @ Pass/ Fail criteria: none
 *
 *****************************************************************************/
-void  FTM_SetCallback(FTM_Type pFTM, FTM_CallbackPtr pfnCallback)
+void  FTM_SetCallback(FTM_Type* pFTM, FTM_CallbackPtr pfnCallback)
 {
    FTM_Callback[((uint32_t)pFTM - (uint32_t)FTM0_BASE)>>12] = pfnCallback;
 }
@@ -952,12 +966,12 @@ void FTM1_IRQHandler(void)
 * @ Pass/ Fail criteria: none.
 *
 *****************************************************************************/
-
+#if 0
 void FTM2_IRQHandler(void)
 {
-    if(FTM_Callback[2])
+	if(FTM_Callback[2])
     {
         FTM_Callback[2]();
     }
 }
-
+#endif

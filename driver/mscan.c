@@ -34,9 +34,11 @@
 *
 * provide APIs for configuring MSCAN module (MSCAN).
 ******************************************************************************/
-#include <string.h>
-#include "common.h"
-#include "mscan.h"
+ #include<string.h>
+ //#include "arm_cm0.h"
+ #include "mscan.h"
+
+
 
 /******************************************************************************
 * Global variables
@@ -45,6 +47,10 @@
 /******************************************************************************
 * Constants and macros
 ******************************************************************************/
+#define DisableInterrupts __asm(" CPSID i");
+#define EnableInterrupts __asm(" CPSIE i");
+#define FALSE 0
+#define TRUE 1
 
 /******************************************************************************
 * Local types

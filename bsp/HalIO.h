@@ -4,6 +4,7 @@
 #include "common.h"
 #include "gpio.h"
 #include "kbi.h"
+#include "ics.h"
 
 typedef enum
 {
@@ -17,5 +18,6 @@ typedef enum
 void SetLedDisplay(LED_ENUM status);
 void HalKBIInit(void);
 void HalGpioInit(void);
+void HalClkInit(void);
 #endif
 

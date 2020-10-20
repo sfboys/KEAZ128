@@ -74,7 +74,7 @@ extern "C" {
 *******************************************************************************/
 
 #define     SPI_ERR_SUCCESS            0                                /*!< success */
-#define     SPI_ERR_CODE_BASE         ((uint32)SPI0 - 0x40000000L)      /*!< error code base for SPI */
+#define     SPI_ERR_CODE_BASE         ((uint32_t)SPI0 - 0x40000000L)      /*!< error code base for SPI */
 #define     SPI_ERR_TXBUF_NOT_EMPTY   (SPI_ERR_CODE_BASE+1)             /*!< failure due to SPTEF (empty) not set */
 #define     SPI_ERR_RXBUF_NOT_FULL    (SPI_ERR_CODE_BASE+2)             /*!< failure due to SPRF (full) not set */
 /*! @} End of spi_error_list                                            */

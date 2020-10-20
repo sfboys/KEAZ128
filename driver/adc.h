@@ -50,8 +50,6 @@ extern "C" {
 
 #define ADC_VREF_VREFH                 0x00			/*!< ADC reference voltage is VREFH*/
 #define ADC_VREF_VDDA                  0x01			/*!< ADC reference voltage is VDDA*/
-//#define ADC ADC_BASE_PTR
-//#define SIM SIM_BASE_PTR
 
 /*! @} End of adc_ref_list                                                    						*/
 
@@ -129,7 +127,7 @@ extern "C" {
 /******************************************************************************
 * define ADC FIFO_LEVEL
 *
-*//*! @addtogroup adc_fifo_level_list
+*//*! @addtogroup ADC_FIFO_DISABLEadc_fifo_level_list
 * @{
 *******************************************************************************/
 #define ADC_FIFO_DISABLE                                0 /*!< FIFO Level 0 */
@@ -216,7 +214,7 @@ typedef struct
     uint16_t u16PinControl;                 /*!< pin control */
     uint8_t u8ClockSource;                  /*!< clock source selection */
     uint8_t u8ClockDiv;                     /*!< set clock divider */
-    uint8_t u8Mode;                         /*!< set clcok mode(8/10/12 bit mode) */
+    uint8_t u8Mode;                         /*!< set ADC mode(8/10/12 bit mode) */
     uint8_t u8FiFoLevel;                    /*!< set FIFO level */
 }ADC_ConfigType,*ADC_ConfigTypePtr;
 /*! @} End of adc_config_type                                               */
@@ -635,7 +633,7 @@ static inline void ADC_HardwareTriggerSingle( ADC_MemMapPtr pADC )
    *****************************************************************************/
 static inline void ADC_HardwareTriggerMaskEnable( ADC_MemMapPtr pADC )
 {
-    pADC->SC5 |= ADC_SC5_HTRGMASKE_MASK;
+//    pADC->SC5 |= ADC_SC5_HTRGMASKE_MASK;
 }
 /*****************************************************************************//*!
    *
@@ -647,9 +645,10 @@ static inline void ADC_HardwareTriggerMaskEnable( ADC_MemMapPtr pADC )
    *
    * @ Pass/ Fail criteria: none
    *****************************************************************************/
+
 static inline void ADC_HardwareTriggerMaskDisable( ADC_MemMapPtr pADC )
 {
-    pADC->SC5 &= ~ADC_SC5_HTRGMASKE_MASK;
+//    pADC->SC5 &= ~ADC_SC5_HTRGMASKE_MASK;
 }
 /*****************************************************************************//*!
    *
@@ -663,7 +662,7 @@ static inline void ADC_HardwareTriggerMaskDisable( ADC_MemMapPtr pADC )
    *****************************************************************************/
 static inline void ADC_HardwareTriggerMaskAuto( ADC_MemMapPtr pADC )
 {
-    pADC->SC5 |= ADC_SC5_HTRGMASKSEL_MASK;
+//    pADC->SC5 |= ADC_SC5_HTRGMASKSEL_MASK;
 }
 /*****************************************************************************//*!
    *
@@ -677,7 +676,7 @@ static inline void ADC_HardwareTriggerMaskAuto( ADC_MemMapPtr pADC )
    *****************************************************************************/
 static inline void ADC_HardwareTriggerMaskNonAuto( ADC_MemMapPtr pADC )
 {
-    pADC->SC5 &= ~ADC_SC5_HTRGMASKSEL_MASK;
+//    pADC->SC5 &= ~ADC_SC5_HTRGMASKSEL_MASK;
 }
 #endif
 

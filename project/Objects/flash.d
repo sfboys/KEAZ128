@@ -1,9 +1,0 @@
-.\objects\flash.o: ..\driver\flash.c
-.\objects\flash.o: ..\driver\flash.h
-.\objects\flash.o: ..\mcu\inc\derivative.h
-.\objects\flash.o: ..\mcu\inc\SKEAZ1284.h
-.\objects\flash.o: D:\Programfile\KEIL\ARM\ARMCC\Bin\..\include\stdint.h
-.\objects\flash.o: ..\mcu\inc\core_cm0plus.h
-.\objects\flash.o: ..\mcu\inc\core_cmInstr.h
-.\objects\flash.o: ..\mcu\inc\core_cmFunc.h
-.\objects\flash.o: ..\mcu\inc\system_SKEAZ1284.h

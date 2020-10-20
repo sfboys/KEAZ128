@@ -24,6 +24,10 @@
 *
 * @author Freescale
 *
+* @version 0.0.1
+*
+* @date Jun. 25, 2013
+*
 * @brief header file for FLASH module utilities (FLASH). 
 *
 *******************************************************************************
@@ -40,7 +44,9 @@ extern "C" {
 /******************************************************************************
 * Includes
 ******************************************************************************/
-#include "derivative.h"
+#include "SKEAZ1284.h"
+#include "typedef.h"
+
 /******************************************************************************
 * Constants
 ******************************************************************************/
@@ -55,8 +61,8 @@ extern "C" {
 *//*! @addtogroup flash_stalling_control_enable
 * @{
 *******************************************************************************/
-#define TRUE	1
-#define FLASH_ENABLE_STALLING_FLASH_CONTROLLER	/* enable flash stalling control */
+
+#define FLASH_ENABLE_STALLING_FLASH_CONTROLLER	/*!< enable flash stalling control */
 
 /*! @} End of flash_stalling_control_enable                                  */
 
@@ -67,13 +73,13 @@ extern "C" {
 * @{
 *******************************************************************************/
 
-#define FTMRE_FSTAT_MGSTAT0_MASK  (1)						/* FTMRE FSTAT MGSTAT0 MASK */
-#define FTMRE_FSTAT_MGSTAT1_MASK  (1<<1)					/* FTMRE FSTAT MGSTAT1 MASK */
+//#define FTMRH_FSTAT_MGSTAT0_MASK  (1)						/*!< FTMRH FSTAT MGSTAT0 MASK */
+//#define FTMRH_FSTAT_MGSTAT1_MASK  (1<<1)				/*!< FTMRH FSTAT MGSTAT1 MASK */
 /*! @} End of flash_MGSTAT_list                                                */
 
-#define FLASH_SECTOR_SIZE			512						/* FTMRE sector size*/
-#define FLASH_START_ADDRESS			0						/* FTMRE start address */
-#define EEPROM_START_ADDRESS		0x10000000				/* EEPRON start address*/
+#define FLASH_SECTOR_SIZE			512							  /*!< FTMRH sector size*/
+#define FLASH_START_ADDRESS			0								/*!< FTMRH start address */
+#define EEPROM_START_ADDRESS		0x10000000			/*!< EEPRON start address*/
 
 /******************************************************************************
 * flash and eeprom driver error status
@@ -81,17 +87,17 @@ extern "C" {
 *//*! @addtogroup flash_error_list
 * @{
 *******************************************************************************/
-#define FLASH_ERR_BASE				0x3000										/* FTMRE error base */
-#define FLASH_ERR_SUCCESS			0											/* FTMRE sucess */
-#define FLASH_ERR_INVALID_PARAM		(FLASH_ERR_BASE+1)							/* Invalid parameter error code */
-#define EEPROM_ERR_SINGLE_BIT_FAULT	(FLASH_ERR_BASE+2)							/* EEPROM single bit fault error code */
-#define EEPROM_ERR_DOUBLE_BIT_FAULT	(FLASH_ERR_BASE+4)							/* EEPROM double bits fault error code */
-#define FLASH_ERR_ACCESS			(FLASH_ERR_BASE+8)							/* Flash access error code */
-#define FLASH_ERR_PROTECTION		(FLASH_ERR_BASE+0x10)						/* Flash protection error code */
-#define FLASH_ERR_MGSTAT0			(FLASH_ERR_BASE+0x11)						/* Flash verification error code */
-#define FLASH_ERR_MGSTAT1			(FLASH_ERR_BASE+0x12)						/* Flash non-correctable error code */
-#define FLASH_ERR_INIT_CCIF			(FLASH_ERR_BASE+0x14)						/* Flash driver init error with CCIF = 1 */
-#define FLASH_ERR_INIT_FDIV			(FLASH_ERR_BASE+0x18)						/* Flash driver init error with wrong FDIV */
+#define FLASH_ERR_BASE				0x3000										/*!< FTMRH error base */
+#define FLASH_ERR_SUCCESS			0													/*!< FTMRH sucess */
+#define FLASH_ERR_INVALID_PARAM		(FLASH_ERR_BASE+1)		/*!<  invalid parameter error code*/
+#define EEPROM_ERR_SINGLE_BIT_FAULT	(FLASH_ERR_BASE+2)	/*!<  EEPROM single bit fault error code*/
+#define EEPROM_ERR_DOUBLE_BIT_FAULT	(FLASH_ERR_BASE+4)	/*!<  EEPROM double bits fault error code*/
+#define FLASH_ERR_ACCESS			(FLASH_ERR_BASE+8)				/*!< flash access error code*/
+#define FLASH_ERR_PROTECTION		(FLASH_ERR_BASE+0x10)		/*!<  flash protection error code*/
+#define FLASH_ERR_MGSTAT0			(FLASH_ERR_BASE+0x11)			/*!<  flash verification error code*/
+#define FLASH_ERR_MGSTAT1			(FLASH_ERR_BASE+0x12)			/*!<  flash non-correctable error code*/
+#define FLASH_ERR_INIT_CCIF			(FLASH_ERR_BASE+0x14)		/*!<  flash driver init error with CCIF = 1*/
+#define FLASH_ERR_INIT_FDIV			(FLASH_ERR_BASE+0x18)		/*!<  flash driver init error with wrong FDIV*/ 
 /*! @} End of flash_error_list                                                */
 
 /******************************************************************************
@@ -100,24 +106,24 @@ extern "C" {
 *//*! @addtogroup flash_command_list
 * @{
 *******************************************************************************/
-#define FTMRE_CMD_ERASE_VERIFY_ALL						0x01					/* FTMRE erase verify all command */
-#define FTMRE_CMD_ERASE_VERIFY_BLOCK					0x02					/* FTMRE erase verify block command */
-#define FTMRE_CMD_ERASE_ALL								0x08					/* FTMRE erase all command */
-#define FTMRE_CMD_ERASE_BLOCK							0x09					/* FTMRE erase blockcommand */
-#define FTMRE_CMD_UNSECURE								0x0B					/* FTMRE unsecure command */
-#define FTMRE_CMD_SET_USER_MARGIN						0x0D					/* FTMRE set usermargin command */
+#define FTMRH_CMD_ERASE_VERIFY_ALL				0x01			/*!< FTMRH erase verify all command */
+#define FTMRH_CMD_ERASE_VERIFY_BLOCK			0x02			/*!< FTMRH erase verify block command */
+#define FTMRH_CMD_ERASE_ALL								0x08			/*!< FTMRH erase all command */
+#define FTMRH_CMD_ERASE_BLOCK							0x09			/*!< FTMRH erase blockcommand */
+#define FTMRH_CMD_UNSECURE								0x0B			/*!< FTMRH unsecure command */
+#define FTMRH_CMD_SET_USER_MARGIN					0x0D			/*!< FTMRH set usermargin command */
 
-#define FLASH_CMD_ERASE_VERIFY_SECTION					0x03					/* FTMRE erase verify section command */
-#define FLASH_CMD_READONCE								0x04					/* FTMRE read once command */
-#define FLASH_CMD_PROGRAM								0x06					/* FTMRE program command */
-#define FLASH_CMD_PROGRAMONCE							0x07					/* FTMRE program once command */
-#define FLASH_CMD_ERASE_SECTOR							0x0A					/* FTMRE erase sector command */
-#define FLASH_CMD_BACKDOOR_ACCESS						0x0C					/* FTMRE backdoor key access command */
-#define FLASH_CMD_SET_USER_MARGIN_LEVEL					0x0D					/* FTMRE set user margin level command */
+#define FLASH_CMD_ERASE_VERIFY_SECTION		0x03			/*!< FTMRH erase verify section command */
+#define FLASH_CMD_READONCE								0x04			/*!< FTMRH read once command */
+#define FLASH_CMD_PROGRAM									0x06			/*!< FTMRH program command */
+#define FLASH_CMD_PROGRAMONCE							0x07			/*!< FTMRH program once command */
+#define FLASH_CMD_ERASE_SECTOR						0x0A			/*!< FTMRH erase sector command */
+#define FLASH_CMD_BACKDOOR_ACCESS					0x0C			/*!< FTMRH backdoor key access command */
+#define FLASH_CMD_SET_USER_MARGIN_LEVEL		0x0D			/*!< FTMRH set user margin level command */
 
-#define EEPROM_CMD_ERASE_VERIFY_SECTION					0x10					/* EEPROM erase berify section command */
-#define EEPROM_CMD_PROGRAM								0x11					/* EEPROM program command */
-#define EEPROM_CMD_ERASE_SECTOR 						0x12					/* EEPROM erase sector command */
+#define EEPROM_CMD_ERASE_VERIFY_SECTION		0x10			/*!< EEPROM erase berify section command */
+#define EEPROM_CMD_PROGRAM								0x11			/*!< EEPROM program command */
+#define EEPROM_CMD_ERASE_SECTOR 					0x12			/*!< EEPROM erase sector command */
 /*! @} End of flash_command_list                                              */
 
 
@@ -142,7 +148,7 @@ extern "C" {
 *****************************************************************************/
 __STATIC_INLINE void FLASH_IntEnable( void )
 {
-	FTMRE_FCNFG |= FTMRE_FCNFG_CCIE_MASK;
+	FTMRH->FCNFG |= FTMRH_FCNFG_CCIE_MASK;	
 }
 /*****************************************************************************//*!
   *
@@ -156,8 +162,143 @@ __STATIC_INLINE void FLASH_IntEnable( void )
 *****************************************************************************/
 __STATIC_INLINE void FLASH_IntDisable( void )
 {
-	FTMRE_FCNFG &= ~FTMRE_FCNFG_CCIE_MASK;
+	FTMRH->FCNFG &= ~FTMRH_FCNFG_CCIE_MASK;	
 }
+
+#if defined(CPU_KEA8) 
+/*****************************************************************************//*!
+  *
+  * @brief Double Bit Fault Detect Interrupt Enable.
+  *        
+  * @param none.
+  *
+  * @return none.
+  *
+  * @ Pass/ Fail criteria: none.
+*****************************************************************************/
+__STATIC_INLINE void FLASH_DoubleBitFaultEnable( void )
+{
+	FTMRH->FERCNFG |= FTMRH_FERCNFG_DFDIE_MASK;	
+}
+/*****************************************************************************//*!
+  *
+  * @brief Double Bit Fault Detect Interrupt Disable.
+  *        
+  * @param none.
+  *
+  * @return none.
+  *
+  * @ Pass/ Fail criteria: none.
+*****************************************************************************/
+__STATIC_INLINE void FLASH_DoubleBitFaultDisable( void )
+{
+	FTMRH->FERCNFG &= ~FTMRH_FERCNFG_DFDIE_MASK;	
+}
+/*****************************************************************************//*!
+  *
+  * @brief Single Bit Fault Detect Interrupt Enable.
+  *        
+  * @param none.
+  *
+  * @return none.
+  *
+  * @ Pass/ Fail criteria: none.
+*****************************************************************************/
+__STATIC_INLINE void FLASH_SingleBitFaultEnable( void )
+{
+	FTMRH->FERCNFG |= FTMRH_FERCNFG_SFDIE_MASK;	
+}
+/*****************************************************************************//*!
+  *
+  * @brief Single Bit Fault Detect Interrupt Disable.
+  *        
+  * @param none.
+  *
+  * @return none.
+  *
+  * @ Pass/ Fail criteria: none.
+*****************************************************************************/
+__STATIC_INLINE void FLASH_SingleBitFaultDisable( void )
+{
+	FTMRH->FERCNFG &= ~FTMRH_FERCNFG_SFDIE_MASK;	
+}
+/*****************************************************************************//*!
+  *
+  * @brief Clear Double Bit Fault Detect Interrupt Flag.
+  *        
+  * @param none.
+  *
+  * @return none.
+  *
+  * @ Pass/ Fail criteria: none.
+*****************************************************************************/
+__STATIC_INLINE void FLASH_ClearDoubleBitFaultFlag( void )
+{
+	FTMRH->FERSTAT |= FTMRH_FERSTAT_DFDIF_MASK;	
+}
+/*****************************************************************************//*!
+  *
+  * @brief Clear Single Bit Fault Detect Interrupt Flag.
+  *        
+  * @param none.
+  *
+  * @return none.
+  *
+  * @ Pass/ Fail criteria: none.
+*****************************************************************************/
+__STATIC_INLINE void FLASH_ClearSingleBitFaultFlag( void )
+{
+	FTMRH->FERSTAT |= FTMRH_FERSTAT_SFDIF_MASK;	
+}
+/*****************************************************************************//*!
+  *
+  * @brief Force Double Bit Fault Detect,The FDFD bit allows the user to simulate a double bit 
+  *             fault during flash array read operations and check the associated interrupt routine.
+  *        
+  * @param u8EnableStatus  Force double bit fault detect or not.
+  *
+  * @return none.
+  *
+  * @ Pass/ Fail criteria: none.
+*****************************************************************************/
+__STATIC_INLINE void FLASH_ForceDoubleBitFault( uint8_t u8EnableStatus )
+{
+	if( u8EnableStatus )
+	{
+		FTMRH->FCNFG |= FTMRH_FCNFG_FDFD_MASK;	
+	}
+	else
+	{
+		FTMRH->FCNFG &= ~FTMRH_FCNFG_FDFD_MASK;
+	}
+}
+/*****************************************************************************//*!
+  *
+  * @brief Force Single Bit Fault Detect,The FDFD bit allows the user to simulate a single bit 
+  *             fault during flash array read operations and check the associated interrupt routine.
+  *        
+  * @param u8EnableStatus  Force single bit fault detect or not.
+  *
+  * @return none.
+  *
+  * @ Pass/ Fail criteria: none.
+*****************************************************************************/
+__STATIC_INLINE void FLASH_ForceSingleBitFault( uint8_t u8EnableStatus )
+{
+	if( u8EnableStatus )
+	{
+		FTMRH->FCNFG |= FTMRH_FCNFG_FSFD_MASK;	
+	}
+	else
+	{
+		FTMRH->FCNFG &= ~FTMRH_FCNFG_FSFD_MASK;
+	}
+}
+#else
+
+
+
+#endif
 
 /******************************************************************************
 * Types
@@ -189,7 +330,11 @@ uint16_t FLASH_Unsecure(void);
 uint16_t FLASH_EraseBlock_NoWait(uint32_t wNVMTargetAddress, uint8_t bIsEEPROM);
 uint16_t FLASH_CheckErrStatus(void);
 
+#if (defined(IAR))
+__ramfunc void FLASH_LaunchCMD(uint8_t bWaitComplete);
+#else
 void FLASH_LaunchCMD(uint8_t bWaitComplete);
+#endif
 
 uint16_t EEPROM_Program1Byte(uint32_t wNVMTargetAddress, uint8_t bData);
 uint16_t EEPROM_ProgramUpto4Bytes(uint32_t wNVMTargetAddress, uint8_t *pbData, uint8_t bByteCount);

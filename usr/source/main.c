@@ -22,10 +22,13 @@ void appUartTask(void *pdata);
 
 int main(void)
 {
+    HalClkInit();
     HalUartInit();
+    HalADCInit();
     HalKBIInit();
     HalGpioInit();
 	OSInit ();
+    kbiMsgQueue = OSQCreate(&queueMsgBuffer[0], 5);
 	OSTaskCreate(appUartTask,(void *)0,&taskUartstk[LED_STK_SIZE-1],TASK_UART_PRIO);
     OSTaskCreate(appLedTask,(void *)0,&taskLedstk[LED_STK_SIZE-1],TASK_LED_PRIO);
     OS_CPU_SysTickInit(400000);
@@ -62,8 +65,7 @@ void appLedTask(void *pdata)
         OSTimeDly (10); //10ms 一个tick ，当前延时100ms
     }
 }
-//const char *stringA = " SW2 PRESSED" ;
-//const char *stringB = " SW2 PRESSED" ;    
+
 void appUartTask(void *pdata)
 {
     void *queueMsgPend =NULL ;

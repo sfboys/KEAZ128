@@ -450,7 +450,7 @@ static __inline void OSC_InactiveInStop(void)
 *****************************************************************************/
 static __inline void Stop(void)
 {
-    asm("WFI");    
+    __asm__("WFI");    
 }
 
 

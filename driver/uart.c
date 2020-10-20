@@ -30,6 +30,7 @@
 #include "uart.h"
 #include "ics.h"
 #include "derivative.h"
+#include <stdio.h>
 
 
 uint16_t global_pass_count = 0;
@@ -38,17 +39,17 @@ UART_TxDoneCallbackType UART_TxDoneCallback[MAX_UART_NO] = {(0)};
 UART_RxDoneCallbackType UART_RxDoneCallback[MAX_UART_NO] = {(0)};
 
 
-static uint8_t *pUART_TxBuff[MAX_UART_NO] = {(0)};           /* pointer to RxBuf */
-static uint8_t *pUART_RxBuff[MAX_UART_NO] = {(0)};           /* pointer to TxBuf */
-static uint16_t gu16UART_TxBuffPos[MAX_UART_NO] = {0};        /* write position to RxBuf */
-static uint16_t gu16UART_RxBuffPos[MAX_UART_NO] = {0};        /* read position to TxBuf */
-static uint32_t gu32UART_BuffSize[MAX_UART_NO] = {0};         /* buffer size*/
+//static uint8_t *pUART_TxBuff[MAX_UART_NO] = {(0)};           /* pointer to RxBuf */
+//static uint8_t *pUART_RxBuff[MAX_UART_NO] = {(0)};           /* pointer to TxBuf */
+//static uint16_t gu16UART_TxBuffPos[MAX_UART_NO] = {0};        /* write position to RxBuf */
+//static uint16_t gu16UART_RxBuffPos[MAX_UART_NO] = {0};        /* read position to TxBuf */
+//static uint32_t gu32UART_BuffSize[MAX_UART_NO] = {0};         /* buffer size*/
 
-#define NULL	(0)
+//#define NULL	(0)
 /******************************************************************************
 * Local variables
 ******************************************************************************/
-UART_CallbackType UART_Callback = NULL;
+UART_CallbackType UART_Callback[3] = {(UART_CallbackType)(0)};
 /******************************************************************************
 * Local function prototypes
 ******************************************************************************/
@@ -56,7 +57,7 @@ UART_CallbackType UART_Callback = NULL;
 /******************************************************************************
 * Local functions
 *****************************************************************************/
-void UART_InitPrint(void);
+//void UART_InitPrint(void);
 /******************************************************************************
 * Global functions
 ******************************************************************************/
@@ -311,7 +312,7 @@ uint8_t UART_CheckFlag(UART_MemMapPtr *pUART, UART_FlagType FlagType)
 {
     uint16_t u16StatusFlags = 0;
 
-    u16StatusFlags = UART_GetFlags(pUART);
+    u16StatusFlags = UART_GetFlags((UART_MemMapPtr)pUART);
 
     return (u16StatusFlags & (1<<FlagType));
 }
@@ -395,10 +396,16 @@ void UART_WaitTxComplete(UART_MemMapPtr pUART)
 *
 * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void UART_SetCallback(UART_CallbackType pfnCallback)
+void UART_SetCallback(UART_MemMapPtr pUART, UART_CallbackType pfnCallback)
 {
-   
-    UART_Callback = pfnCallback;
+
+    if(pUART==UART0){
+    	UART_Callback[0]=pfnCallback;
+    }else if(pUART==UART1){
+    	UART_Callback[1]=pfnCallback;
+    }else{
+    	UART_Callback[2]=pfnCallback;
+    }
 }
 
 
@@ -415,9 +422,10 @@ void UART_SetCallback(UART_CallbackType pfnCallback)
 *
 * @ Pass/ Fail criteria:
 *****************************************************************************/
+
 void UART0_IRQHandler(void)
 {
-    UART_Callback(UART0_BASE_PTR);
+	UART_Callback[0]();
 }
 
 
@@ -433,8 +441,7 @@ void UART0_IRQHandler(void)
 *****************************************************************************/
 void UART1_IRQHandler(void)
 {
-    UART_Callback(UART1_BASE_PTR);
-    
+    UART_Callback[1]();
 }
 
 
@@ -450,8 +457,27 @@ void UART1_IRQHandler(void)
 *****************************************************************************/
 void UART2_IRQHandler(void)
 {
-    UART_Callback(UART2_BASE_PTR);
+    UART_Callback[2]();
 }
 
+// 重定向c库函数printf到UART2
+int fputc(int ch, FILE *f)
+{
+    /* 发送一个字节数据到USART3 */
+    //USART_SendData(UART1, (uint8_t) ch);
+    UART_PutChar(UART2, (uint8_t)ch);
+    /* 等待发送完毕 */
+    //while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);		
+    while (!UART_IsTxBuffEmpty(UART2));
+    return (ch);
+}
 
+/// 重定向c库函数scanf到UART2
+int fgetc(FILE *f)
+{
+    /* 等待串口1输入数据 */
+    //while (USART_GetFlagStatus(USART3, USART_FLAG_RXNE) == RESET);
+    while (!UART_IsRxBuffFull(UART2));
+    return (int)UART_ReadDataReg(UART2);
+}
 

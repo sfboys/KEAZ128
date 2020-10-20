@@ -1576,6 +1576,9 @@ typedef struct {
 #define FTMRE_FSTAT_MGSTAT_MASK                  0x3u
 #define FTMRE_FSTAT_MGSTAT_SHIFT                 0
 #define FTMRE_FSTAT_MGSTAT(x)                    (((uint8_t)(((uint8_t)(x))<<FTMRE_FSTAT_MGSTAT_SHIFT))&FTMRE_FSTAT_MGSTAT_MASK)
+#define FTMRH_FSTAT_MGSTAT0_MASK  				 (0x1u)						/*!< FTMRH FSTAT MGSTAT0 MASK */
+#define FTMRH_FSTAT_MGSTAT1_MASK  				 (0x2u)				/*!< FTMRH FSTAT MGSTAT1 MASK */
+
 #define FTMRE_FSTAT_MGBUSY_MASK                  0x8u
 #define FTMRE_FSTAT_MGBUSY_SHIFT                 3
 #define FTMRE_FSTAT_FPVIOL_MASK                  0x10u

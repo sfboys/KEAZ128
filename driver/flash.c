@@ -24,6 +24,10 @@
 *
 * @author Freescale
 *
+* @version 0.0.1
+*
+* @date Jun. 25, 2013
+*
 * @brief providing APIs for configuring FLASH module (FLASH). 
 *
 *******************************************************************************
@@ -42,7 +46,8 @@
 /******************************************************************************
 * Local types
 ******************************************************************************/
-
+#define False 0
+#define True  1
 /******************************************************************************
 * Local function prototypes
 ******************************************************************************/
@@ -66,6 +71,9 @@
 * @{
 *******************************************************************************/
 
+#define DisableALLInterrupts __asm(" CPSID i");//其他C文件中,所以需要定义个不同的名字
+#define EnableALLInterrupts __asm(" CPSIE i");
+
 /*****************************************************************************//*!
   *
   * @brief initialize flash driver.
@@ -82,7 +90,7 @@ uint16_t FLASH_Init(uint32_t u32BusClock)
 	uint16_t u16Err = FLASH_ERR_SUCCESS;
 	uint8_t clkDIV = u32BusClock/1000000L - 1;
 	
-	if(!(FTMRE_FSTAT & FTMRE_FSTAT_CCIF_MASK))
+	if(!(FTMRH->FSTAT & FTMRH_FSTAT_CCIF_MASK))
 	{
 		u16Err |= FLASH_ERR_INIT_CCIF;
 		return u16Err;
@@ -90,26 +98,26 @@ uint16_t FLASH_Init(uint32_t u32BusClock)
 	/* initialize the flash clock to be within spec 1MHz 
 	 * 
 	 */
-	if(!(FTMRE_FCLKDIV & FTMRE_FCLKDIV_FDIVLCK_MASK))
+	if(!(FTMRH->FCLKDIV & FTMRH_FCLKDIV_FDIVLCK_MASK))
 	{
 		/* FCLKDIV register is not locked */
-		if((FTMRE_FCLKDIV & FTMRE_FCLKDIV_FDIVLD_MASK) &&
-                  ((FTMRE_FCLKDIV & FTMRE_FCLKDIV_FDIV_MASK) != FTMRE_FCLKDIV_FDIV(clkDIV)))
+		if((FTMRH->FCLKDIV & FTMRH_FCLKDIV_FDIVLD_MASK) && 
+                  ((FTMRH->FCLKDIV & FTMRH_FCLKDIV_FDIV_MASK) != FTMRH_FCLKDIV_FDIV(clkDIV)))
 		{
 			/* flash clock prescaler is loaded but with wrong value */
 			u16Err |= FLASH_ERR_INIT_FDIV;
 			return (u16Err);
 		}
-		FTMRE_FCLKDIV = (FTMRE_FCLKDIV & ~(FTMRE_FCLKDIV_FDIV_MASK)) | FTMRE_FCLKDIV_FDIV(clkDIV);
+		FTMRH->FCLKDIV = (FTMRH->FCLKDIV & ~(FTMRH_FCLKDIV_FDIV_MASK)) | FTMRH_FCLKDIV_FDIV(clkDIV);
                 
 #if 0
-		FTMRE_FCLKDIV  |= FTMRE_FCLKDIV_FDIVLCK_MASK; /* lock the prescaler */
+		FTMRH->FCLKDIV  |= FTMRH_FCLKDIV_FDIVLCK_MASK; /* lock the prescaler */
 #endif
 	}
 	else
 	{
 		/* FCLKDIV register is locked */
-		if((FTMRE_FCLKDIV & FTMRE_FCLKDIV_FDIV_MASK) != FTMRE_FCLKDIV_FDIV(clkDIV))
+		if((FTMRH->FCLKDIV & FTMRH_FCLKDIV_FDIV_MASK) != FTMRH_FCLKDIV_FDIV(clkDIV))
 		{
 			/* flash clock prescaler is wrong */
 			u16Err |= FLASH_ERR_INIT_FDIV;
@@ -234,55 +242,55 @@ uint16_t FLASH_Program1LongWord(uint32_t u32NVMTargetAddress, uint32_t u32DwData
 		return (u16Err);
 	}
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FLASH_CMD_PROGRAM;// program FLASH command
-	FTMRE_FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
+	FTMRH->FCCOBHI = FLASH_CMD_PROGRAM;// program FLASH command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
 	// Write index to specify the lower byte memory address bits[15:0] to be loaded
-	FTMRE_FCCOBIX = 0x1;
+	FTMRH->FCCOBIX = 0x1;
 	// Write the lower byte memory address bits[15:0]
-	FTMRE_FCCOBLO = u32NVMTargetAddress;
-	FTMRE_FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
 	// Write index to specify the word0 (MSB word) to be programmed
-	FTMRE_FCCOBIX = 0x2;
+	FTMRH->FCCOBIX = 0x2;
 #if     defined(BIG_ENDIAN)        
 	// Write the word  0
-	FTMRE_FCCOBHI = (u32DwData>>16)>>8;
-	FTMRE_FCCOBLO = (u32DwData>>16);
+	FTMRH->FCCOBHI = (u32DwData>>16)>>8;
+	FTMRH->FCCOBLO = (u32DwData>>16);
 #else        
-	FTMRE_FCCOBHI = (u32DwData) >>8;
-	FTMRE_FCCOBLO = (u32DwData);
+	FTMRH->FCCOBHI = (u32DwData) >>8;	
+	FTMRH->FCCOBLO = (u32DwData);	
 #endif        
 	// Write index to specify the word1 (LSB word) to be programmed
-	FTMRE_FCCOBIX = 0x3;
+	FTMRH->FCCOBIX = 0x3;
 	// Write the word1 
 #if     defined(BIG_ENDIAN)        
-	FTMRE_FCCOBHI = (u32DwData) >>8;
-	FTMRE_FCCOBLO = (u32DwData);
+	FTMRH->FCCOBHI = (u32DwData) >>8;	
+	FTMRH->FCCOBLO = (u32DwData);	
 #else
-	FTMRE_FCCOBHI = (u32DwData>>16)>>8;
-	FTMRE_FCCOBLO = (u32DwData>>16);
+	FTMRH->FCCOBHI = (u32DwData>>16)>>8;
+	FTMRH->FCCOBLO = (u32DwData>>16);
 #endif        
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 	
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_FPVIOL_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
 	{
 		u16Err |= FLASH_ERR_PROTECTION;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}	
@@ -314,94 +322,96 @@ uint16_t FLASH_Program2LongWords(uint32_t u32NVMTargetAddress, uint32_t u32DwDat
 		u16Err = FLASH_ERR_INVALID_PARAM;
 		return (u16Err);
 	}
+     DisableALLInterrupts ;
+ 
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FLASH_CMD_PROGRAM;// program FLASH command
-	FTMRE_FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
+	FTMRH->FCCOBHI = FLASH_CMD_PROGRAM;// program FLASH command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
 	// Write index to specify the lower byte memory address bits[15:0] to be loaded
-	FTMRE_FCCOBIX = 0x1;
+	FTMRH->FCCOBIX = 0x1;
 	// Write the lower byte memory address bits[15:0]
-	FTMRE_FCCOBLO = u32NVMTargetAddress;
-	FTMRE_FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
         
 	// Write index to specify the word0 (MSB word) to be programmed
-	FTMRE_FCCOBIX = 0x2;
+	FTMRH->FCCOBIX = 0x2;
 	// Write the word 0
 #if     defined(BIG_ENDIAN)                
-	//FTMRE_FCCOB = (u32DwData0>>16) & 0xFFFF;
-	FTMRE_FCCOBHI = (u32DwData0>>16)>>8;
-	FTMRE_FCCOBLO = (u32DwData0>>16);
+	//FTMRH_FCCOB = (u32DwData0>>16) & 0xFFFF;
+	FTMRH->FCCOBHI = (u32DwData0>>16)>>8;
+	FTMRH->FCCOBLO = (u32DwData0>>16);
         
 	// Write index to specify the word1 (LSB word) to be programmed
-	FTMRE_FCCOBIX = 0x3;
+	FTMRH->FCCOBIX = 0x3;
 	// Write word 1
-	//FTMRE_FCCOB = (u32DwData0) & 0xFFFF;
-	FTMRE_FCCOBHI = (u32DwData0) >>8;
-	FTMRE_FCCOBLO = (u32DwData0);
+	//FTMRH_FCCOB = (u32DwData0) & 0xFFFF;
+	FTMRH->FCCOBHI = (u32DwData0) >>8;
+	FTMRH->FCCOBLO = (u32DwData0);
 	
 	// Write index to specify the word0 (MSB word) to be programmed
-	FTMRE_FCCOBIX = 0x4;
+	FTMRH->FCCOBIX = 0x4;
 	// Write the word2
-	//FTMRE_FCCOB = (u32DwData1>>16) & 0xFFFF;
-	FTMRE_FCCOBHI = (u32DwData1>>16)>>8;
-	FTMRE_FCCOBLO = (u32DwData1>>16);
+	//FTMRH_FCCOB = (u32DwData1>>16) & 0xFFFF;
+	FTMRH->FCCOBHI = (u32DwData1>>16)>>8;
+	FTMRH->FCCOBLO = (u32DwData1>>16);
         
 	// Write index to specify the word1 (LSB word) to be programmed
-	FTMRE_FCCOBIX = 0x5;
+	FTMRH->FCCOBIX = 0x5;
 	// Write word 3
-	//FTMRE_FCCOB = (u32DwData1) & 0xFFFF;
-	FTMRE_FCCOBHI = (u32DwData1) >>8;
-	FTMRE_FCCOBLO = (u32DwData1);
+	//FTMRH_FCCOB = (u32DwData1) & 0xFFFF;
+	FTMRH->FCCOBHI = (u32DwData1) >>8;
+	FTMRH->FCCOBLO = (u32DwData1);
 #else
-	//FTMRE_FCCOB = (u32DwData0) & 0xFFFF;
-	FTMRE_FCCOBHI = (u32DwData0) >>8;
-	FTMRE_FCCOBLO = (u32DwData0);
+	//FTMRH_FCCOB = (u32DwData0) & 0xFFFF;
+	FTMRH->FCCOBHI = (u32DwData0) >>8;
+	FTMRH->FCCOBLO = (u32DwData0);
         
 	// Write index to specify the word1 (LSB word) to be programmed
-	FTMRE_FCCOBIX = 0x3;
+	FTMRH->FCCOBIX = 0x3;
 	// Write word 1
-	FTMRE_FCCOBHI = (u32DwData0>>16)>>8;
-	FTMRE_FCCOBLO = (u32DwData0>>16);
+	FTMRH->FCCOBHI = (u32DwData0>>16)>>8;
+	FTMRH->FCCOBLO = (u32DwData0>>16);
 	
 	// Write index to specify the word0 (MSB word) to be programmed
-	FTMRE_FCCOBIX = 0x4;
+	FTMRH->FCCOBIX = 0x4;
 	// Write the word2
-	//FTMRE_FCCOB = (u32DwData1) & 0xFFFF;
-	FTMRE_FCCOBHI = (u32DwData1) >>8;
-	FTMRE_FCCOBLO = (u32DwData1);
+	//FTMRH_FCCOB = (u32DwData1) & 0xFFFF;
+	FTMRH->FCCOBHI = (u32DwData1) >>8;
+	FTMRH->FCCOBLO = (u32DwData1);        
         
 	// Write index to specify the word1 (LSB word) to be programmed
-	FTMRE_FCCOBIX = 0x5;
+	FTMRH->FCCOBIX = 0x5;
 	// Write word 3
-	//FTMRE_FCCOB = (u32DwData1>>16) & 0xFFFF;
-	FTMRE_FCCOBHI = (u32DwData1>>16)>>8;
-	FTMRE_FCCOBLO = (u32DwData1>>16);
+	//FTMRH_FCCOB = (u32DwData1>>16) & 0xFFFF;
+	FTMRH->FCCOBHI = (u32DwData1>>16)>>8;
+	FTMRH->FCCOBLO = (u32DwData1>>16);
 #endif
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 	
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_FPVIOL_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
 	{
 		u16Err |= FLASH_ERR_PROTECTION;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}	
-	
+	EnableALLInterrupts;
 	return (u16Err);
 }
 
@@ -430,42 +440,102 @@ uint16_t FLASH_EraseSector(uint32_t u32NVMTargetAddress)
 		return (u16Err);
 	}
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FLASH_CMD_ERASE_SECTOR;// EEPROM FLASH command
-	FTMRE_FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
+	FTMRH->FCCOBHI = FLASH_CMD_ERASE_SECTOR;// EEPROM FLASH command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
 	// Write index to specify the lower byte memory address bits[15:0] to be loaded
-	FTMRE_FCCOBIX = 0x1;
+	FTMRH->FCCOBIX = 0x1;
 	// Write the lower byte memory address bits[15:0]
-	FTMRE_FCCOBLO = u32NVMTargetAddress;
-	FTMRE_FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
 	
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 	
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_FPVIOL_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
 	{
 		u16Err |= FLASH_ERR_PROTECTION;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}	
-
+#if defined(CPU_KEA8) 
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
+	}
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
+	}
+#endif	
 	return (u16Err);
 }
+
+#if defined(CPU_KEA8) 
+/*****************************************************************************//*!
+  *
+  * @brief program EEPROM routine, each program operation supports up to 4 bytes
+  * 		 programming.
+  *        
+  * @param[in]   u32NVMTargetAddress programed EEPROM address.
+  * @param[in]   pData programming data pointer.
+  * @param[in]   u16SizeBytes programming data length.
+  *
+  * @return error status.
+  *
+  * @ Pass/ Fail criteria: none
+*****************************************************************************/
+
+uint16_t EEPROM_Program(uint32_t u32NVMTargetAddress, uint8_t *pData, uint16_t u16SizeBytes)
+{
+	uint16_t u16Err = FLASH_ERR_SUCCESS;
+	uint8_t  u8WrLeftBytes = (u16SizeBytes & 0x3);
+	uint16_t u16WrLeftLongWords = u16SizeBytes>>2;
+	uint32_t u32WrTargetAddress = u32NVMTargetAddress;
+	int  i;
+	
+
+	// Loop for 4 bytes programming
+	for(i = 0; i < u16WrLeftLongWords; i++)
+	{
+		u16Err = EEPROM_ProgramUpto4Bytes(u32WrTargetAddress, pData, 4);
+		if(u16Err)
+		{
+			goto EndP;
+			//break;
+		}
+		u32WrTargetAddress += 4;
+		pData += 4;
+	}
+	if(u8WrLeftBytes>0)
+	{
+		u16Err = EEPROM_ProgramUpto4Bytes(u32WrTargetAddress, pData, u8WrLeftBytes);	
+	}
+EndP:	
+	return (u16Err);
+}
+
+#endif
+
+
+
+
+
 
 /*****************************************************************************//*!
   *
@@ -484,35 +554,44 @@ uint16_t FLASH_Unsecure(void)
 	uint16_t u16Err = FLASH_ERR_SUCCESS;
 	
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FTMRE_CMD_UNSECURE;// EEPROM FLASH command
-	FTMRE_FCCOBLO = 0;// memory address bits[23:16]
+	FTMRH->FCCOBHI = FTMRH_CMD_UNSECURE;// EEPROM FLASH command
+	FTMRH->FCCOBLO = 0;// memory address bits[23:16]
 	
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 	
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_FPVIOL_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
 	{
 		u16Err |= FLASH_ERR_PROTECTION;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}	
-
+#if defined(CPU_KEA8) 	
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
+	}
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
+	}
+#endif	
 	return (u16Err);
 }
 
@@ -528,49 +607,62 @@ uint16_t FLASH_Unsecure(void)
   *
   * @ Pass/ Fail criteria: none.
 *****************************************************************************/
+#if (defined(IAR))
+__ramfunc uint16_t FLASH_EraseBlock(uint32_t u32NVMTargetAddress, uint8_t bIsEEPROM)
+#else
 uint16_t FLASH_EraseBlock(uint32_t u32NVMTargetAddress, uint8_t bIsEEPROM)
+#endif
 {
 	uint16_t u16Err = FLASH_ERR_SUCCESS;
 	
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FTMRE_CMD_ERASE_BLOCK;// erase FLASH block command
-	FTMRE_FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block
+	FTMRH->FCCOBHI = FTMRH_CMD_ERASE_BLOCK;// erase FLASH block command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block
 	if(bIsEEPROM)
 	{
-		FTMRE_FCCOBLO |= 0x80;	// bit 23 = 1 for EEPROM block
+		FTMRH->FCCOBLO |= 0x80;	// bit 23 = 1 for EEPROM block
 	}
 	// Write index to specify the lower byte memory address bits[15:0] to be loaded
-	FTMRE_FCCOBIX = 0x1;
+	FTMRH->FCCOBIX = 0x1;
 	// Write the lower byte memory address bits[15:0]
-	FTMRE_FCCOBLO = u32NVMTargetAddress;
-	FTMRE_FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
 	
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 	
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_FPVIOL_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
 	{
 		u16Err |= FLASH_ERR_PROTECTION;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}	
-
+#if defined(CPU_KEA8) 	
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
+	}
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
+	}
+#endif	
 	return (u16Err);
 }
 
@@ -591,40 +683,49 @@ uint16_t FLASH_EraseVerifyBlock(uint32_t u32NVMTargetAddress, uint8_t bIsEEPROM)
 	uint16_t u16Err = FLASH_ERR_SUCCESS;
 	
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FTMRE_CMD_ERASE_VERIFY_BLOCK;// erase FLASH block command
-	FTMRE_FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block
+	FTMRH->FCCOBHI = FTMRH_CMD_ERASE_VERIFY_BLOCK;// erase FLASH block command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block
 	if(bIsEEPROM)
 	{
-		FTMRE_FCCOBLO |= 0x80;	// bit 23 = 1 for EEPROM block
+		FTMRH->FCCOBLO |= 0x80;	// bit 23 = 1 for EEPROM block
 	}
 	// Write index to specify the lower byte memory address bits[15:0] to be loaded
-	FTMRE_FCCOBIX = 0x1;
+	FTMRH->FCCOBIX = 0x1;
 	// Write the lower byte memory address bits[15:0]
-	FTMRE_FCCOBLO = u32NVMTargetAddress;
-	FTMRE_FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
 	
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 	
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}	
-
+#if defined(CPU_KEA8) 	
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
+	}
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
+	}
+#endif	
 	return (u16Err);
 }
 
@@ -650,42 +751,57 @@ uint16_t FLASH_EraseVerifySection(uint32_t u32NVMTargetAddress, uint16_t u16Long
 		return (u16Err);
 	}	
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FLASH_CMD_ERASE_VERIFY_SECTION;// erase verify FLASH section command
-	FTMRE_FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block
+	FTMRH->FCCOBHI = FLASH_CMD_ERASE_VERIFY_SECTION;// erase verify FLASH section command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block
 	// Write index to specify the lower byte memory address bits[15:0] to be loaded
-	FTMRE_FCCOBIX = 0x1;
+	FTMRH->FCCOBIX = 0x1;
 	// Write the lower byte memory address bits[15:0]
-	FTMRE_FCCOBLO = u32NVMTargetAddress;
-	FTMRE_FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
 
 	// Write index to specify the # of longwords to be verified
-	FTMRE_FCCOBIX = 0x2;
+	FTMRH->FCCOBIX = 0x2;
 	// Write the # of longwords 
-	FTMRE_FCCOBLO = u16LongWordCount;
-	FTMRE_FCCOBHI = u16LongWordCount>>8;
+	FTMRH->FCCOBLO = u16LongWordCount;
+	FTMRH->FCCOBHI = u16LongWordCount>>8;
 	
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 	
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}	
-
+#if defined(CPU_KEA8) 
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
+	}
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
+	}
+#endif
+#if 0	
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
+	{
+		u16Err |= FLASH_ERR_PROTECTION;		
+	}
+#endif	
 	return (u16Err);
 }
 
@@ -704,41 +820,41 @@ uint16_t FLASH_EraseVerifyAll(void)
 	uint16_t u16Err = FLASH_ERR_SUCCESS;
 	
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FTMRE_CMD_ERASE_VERIFY_ALL;// erase verify all flash & EEPROM blocks
+	FTMRH->FCCOBHI = FTMRH_CMD_ERASE_VERIFY_ALL;// erase verify all flash & EEPROM blocks
 	
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 	
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
 	
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}	
 #if 0	
-	if(FTMRE_FERSTAT & (FTMRE_FERSTAT_SFDIF_MASK))
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
 	{
 		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
 	}
-	if(FTMRE_FERSTAT & (FTMRE_FERSTAT_DFDIF_MASK))
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
 	{
 		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
 	}
 
-	if(FTMRE_FSTAT & FTMRE_FSTAT_FPVIOL_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
 	{
 		u16Err |= FLASH_ERR_PROTECTION;		
 	}
@@ -760,41 +876,41 @@ uint16_t FLASH_EraseAll(void)
 {
 	uint16_t u16Err = FLASH_ERR_SUCCESS;
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FTMRE_CMD_ERASE_ALL;// erase  all flash & EEPROM blocks
+	FTMRH->FCCOBHI = FTMRH_CMD_ERASE_ALL;// erase  all flash & EEPROM blocks
 	
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 	
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}	
 #if 0	
-	if(FTMRE_FERSTAT & (FTMRE_FERSTAT_SFDIF_MASK))
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
 	{
 		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
 	}
-	if(FTMRE_FERSTAT & (FTMRE_FERSTAT_DFDIF_MASK))
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
 	{
 		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
 	}
 #endif	
 
-	if(FTMRE_FSTAT & FTMRE_FSTAT_FPVIOL_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
 	{
 		u16Err |= FLASH_ERR_PROTECTION;		
 	}
@@ -826,45 +942,45 @@ uint16_t FLASH_ProgramOnce(uint8_t u8PhraseIndex, uint8_t *pData8Bytes)
 		return (u16Err);
 	}
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[17:16]	
-	FTMRE_FCCOBHI = FLASH_CMD_PROGRAMONCE;// command
-	FTMRE_FCCOBLO = 0;// memory address bits[17:16]
+	FTMRH->FCCOBHI = FLASH_CMD_PROGRAMONCE;// command
+	FTMRH->FCCOBLO = 0;// memory address bits[17:16]
 	// Write index to specify the lower byte memory address bits[15:0] to be loaded
-	FTMRE_FCCOBIX = 0x1;
+	FTMRH->FCCOBIX = 0x1;
 	// Write the phrase index
-	FTMRE_FCCOBLO = u8PhraseIndex;
-	FTMRE_FCCOBHI = u8PhraseIndex>>8;
+	FTMRH->FCCOBLO = u8PhraseIndex;
+	FTMRH->FCCOBHI = u8PhraseIndex>>8;
 	
 	// Write 4 words
 	for(i = 0; i < 4; i++)
 	{
 		// Write index to specify the word (MSB word) to be programmed
-		FTMRE_FCCOBIX = 0x2+i;
+		FTMRH->FCCOBIX = 0x2+i;
 		// Write the word 0
-		FTMRE_FCCOBHI = ((uint16_t)pData8Bytes[(i<<1)+1]);
-                FTMRE_FCCOBLO = pData8Bytes[(i<<1)];
+		FTMRH->FCCOBHI = ((uint16_t)pData8Bytes[(i<<1)+1]);
+                FTMRH->FCCOBLO = pData8Bytes[(i<<1)];
 	}
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 	
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_FPVIOL_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
 	{
 		u16Err |= FLASH_ERR_PROTECTION;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}	
@@ -895,42 +1011,42 @@ uint16_t FLASH_ReadOnce(uint8_t u8PhraseIndex, uint8_t *pData8Bytes)
 		return (u16Err);
 	}
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[17:16]	
-	FTMRE_FCCOBHI = FLASH_CMD_READONCE;// command
-	FTMRE_FCCOBLO = 0;// memory address bits[17:16]
+	FTMRH->FCCOBHI = FLASH_CMD_READONCE;// command
+	FTMRH->FCCOBLO = 0;// memory address bits[17:16]
 	// Write index to specify the lower byte memory address bits[15:0] to be loaded
-	FTMRE_FCCOBIX = 0x1;
+	FTMRH->FCCOBIX = 0x1;
 	// Write the phrase index
-	FTMRE_FCCOBLO = u8PhraseIndex;
-	FTMRE_FCCOBHI = u8PhraseIndex >>8;
+	FTMRH->FCCOBLO = u8PhraseIndex;	
+	FTMRH->FCCOBHI = u8PhraseIndex >>8;	
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 	// Read 4 words
 	for(i = 0; i < 4; i++)
 	{
 		// Read the word (MSB word) indexed by FCCOBIX 
-		FTMRE_FCCOBIX = 0x2+i;
-		pData8Bytes[i<<1] = FTMRE_FCCOBLO;
-		pData8Bytes[(i<<1)+1] = FTMRE_FCCOBHI;
+		FTMRH->FCCOBIX = 0x2+i;
+		pData8Bytes[i<<1] = FTMRH->FCCOBLO; 
+		pData8Bytes[(i<<1)+1] = FTMRH->FCCOBHI; 
 	}	
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_FPVIOL_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
 	{
 		u16Err |= FLASH_ERR_PROTECTION;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}
@@ -939,6 +1055,404 @@ uint16_t FLASH_ReadOnce(uint8_t u8PhraseIndex, uint8_t *pData8Bytes)
 }
 
 
+#if defined(CPU_KEA8) 
+/*****************************************************************************//*!
+  *
+  * @brief erase verify flash section.
+  *        
+  * @param[in] u32NVMTargetAddress: target address in NVM, must be longword aligned.  
+  * @param[in] u16LongWordCount:   number of bytes to be verified.
+  *	
+  * @return none
+  *
+  * @ Pass/ Fail criteria: none
+*****************************************************************************/
+uint16_t EEPROM_EraseVerifySection(uint32_t u32NVMTargetAddress, uint16_t u16ByteCount)
+{
+	uint16_t u16Err = FLASH_ERR_SUCCESS;
+	// Check address to see if it is aligned to 4 bytes
+	// Global address [1:0] must be 00.
+	if(u32NVMTargetAddress & 0x03)
+	{
+		u16Err = FLASH_ERR_INVALID_PARAM;
+		return (u16Err);
+	}
+	// Clear error flags
+	FTMRH->FSTAT = 0x30;
+	
+	// Write index to specify the command code to be loaded
+	FTMRH->FCCOBIX = 0x0;
+	// Write command code and memory address bits[23:16]	
+	FTMRH->FCCOBHI = EEPROM_CMD_ERASE_VERIFY_SECTION;// erase verify FLASH section command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block
+	// Write index to specify the lower byte memory address bits[15:0] to be loaded
+	FTMRH->FCCOBIX = 0x1;
+	// Write the lower byte memory address bits[15:0]
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	// Write index to specify the # of longwords to be verified
+	FTMRH->FCCOBIX = 0x2;
+	// Write the # of longwords 
+	FTMRH->FCCOBLO = u16ByteCount;
+	FTMRH->FCCOBHI = u16ByteCount>>8;
+	
+	// Launch the command
+	FLASH_LaunchCMD(True);
+	
+	// Check error status
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
+	{
+		u16Err |= FLASH_ERR_ACCESS;
+	}
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
+	{
+		u16Err |= FLASH_ERR_MGSTAT0;		
+	}
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
+	{
+		u16Err |= FLASH_ERR_MGSTAT1;		
+	}
+#if 0	
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
+	}
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
+	}	
+	
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
+	{
+		u16Err |= FLASH_ERR_PROTECTION;		
+	}
+#endif	
+	return (u16Err);
+}
+/*****************************************************************************//*!
+  *
+  * @brief program one byte to EEPROM.
+  *        
+  * @param[in] u32NVMTargetAddress: target address in EEPROM.  
+  * @param[in] u8Data:   programming data.
+  *	
+  * @return error status.
+  *
+  * @ Pass/ Fail criteria: none
+*****************************************************************************/
+uint16_t EEPROM_Program1Byte(uint32_t u32NVMTargetAddress, uint8_t u8Data)
+{
+	uint16_t u16Err = FLASH_ERR_SUCCESS;
+	
+	// Clear error flags
+	FTMRH->FSTAT = 0x30;
+	
+	// Write index to specify the command code to be loaded
+	FTMRH->FCCOBIX = 0x0;
+	// Write command code and memory address bits[23:16]	
+	FTMRH->FCCOBHI = EEPROM_CMD_PROGRAM;// EEPROM FLASH command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
+	// Write index to specify the lower byte memory address bits[15:0] to be loaded
+	FTMRH->FCCOBIX = 0x1;
+	// Write the lower byte memory address bits[15:0]
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	// Write index to specify the byte0 (MSB word) to be programmed
+	FTMRH->FCCOBIX = 0x2;
+	// Write the byte 0
+	FTMRH->FCCOBLO = u8Data;
+	// Launch the command
+	FLASH_LaunchCMD(True);
+
+	
+	// Check error status
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
+	{
+		u16Err |= FLASH_ERR_ACCESS;
+	}
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
+	{
+		u16Err |= FLASH_ERR_PROTECTION;		
+	}
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
+	{
+		u16Err |= FLASH_ERR_MGSTAT0;		
+	}
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
+	{
+		u16Err |= FLASH_ERR_MGSTAT1;		
+	}	
+#if 0	
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
+	}
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
+	}
+#endif	
+	
+	return (u16Err);
+}
+
+/*****************************************************************************//*!
+  *
+  * @brief program up to 4 bytes to EEPROM.
+  *        
+  * @param[in] u32NVMTargetAddress: target address in EEPROM.  
+  * @param[in] pData:   programming data pointer.
+  * @param[in] u8ByteCount number of programming data.
+  *	
+  * @return error status.
+  *
+  * @ Pass/ Fail criteria: none
+*****************************************************************************/
+uint16_t EEPROM_ProgramUpto4Bytes(uint32_t u32NVMTargetAddress, uint8_t *pData, uint8_t u8ByteCount)
+{
+	int i;
+	uint16_t u16Err = FLASH_ERR_SUCCESS;
+	if(u8ByteCount >4 || u8ByteCount == 0)
+	{
+		u16Err = FLASH_ERR_INVALID_PARAM;
+		return (u16Err);		
+	}
+	// Clear error flags
+	FTMRH->FSTAT = 0x30;
+	
+	// Write index to specify the command code to be loaded
+	FTMRH->FCCOBIX = 0x0;
+	// Write command code and memory address bits[23:16]	
+	FTMRH->FCCOBHI = EEPROM_CMD_PROGRAM;// EEPROM FLASH command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
+	// Write index to specify the lower byte memory address bits[15:0] to be loaded
+	FTMRH->FCCOBIX = 0x1;
+	// Write the lower byte memory address bits[15:0]
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	
+	for (i = 0; i < u8ByteCount; i++)
+	{
+		// Write index to specify the byte0 (MSB word) to be programmed
+		FTMRH->FCCOBIX = 0x2+i;
+		// Write the byte 0
+		FTMRH->FCCOBLO = *pData++;
+	}
+	// Launch the command
+	FLASH_LaunchCMD(True);
+	
+	// Check error status
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
+	{
+		u16Err |= FLASH_ERR_ACCESS;
+	}
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
+	{
+		u16Err |= FLASH_ERR_PROTECTION;		
+	}
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
+	{
+		u16Err |= FLASH_ERR_MGSTAT0;		
+	}
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
+	{
+		u16Err |= FLASH_ERR_MGSTAT1;		
+	}	
+#if 0	
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
+	}
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
+	}
+#endif	
+	return (u16Err);
+}
+
+
+/*****************************************************************************//*!
+  *
+  * @brief erase EEPROM sector, each EEPROM sector is of 2 bytes long.
+  * 		 
+  * @param[in]  u32NVMTargetAddress target EEPROM address. 
+  *
+  * @return error status.
+  *
+  * @ Pass/ Fail criteria: none.
+*****************************************************************************/
+uint16_t EEPROM_EraseSector(uint32_t u32NVMTargetAddress)
+{
+	uint16_t u16Err = FLASH_ERR_SUCCESS;
+
+	// Clear error flags
+	FTMRH->FSTAT = 0x30;
+	
+	// Write index to specify the command code to be loaded
+	FTMRH->FCCOBIX = 0x0;
+	// Write command code and memory address bits[23:16]	
+	FTMRH->FCCOBHI = EEPROM_CMD_ERASE_SECTOR;// EEPROM FLASH command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
+	// Write index to specify the lower byte memory address bits[15:0] to be loaded
+	FTMRH->FCCOBIX = 0x1;
+	// Write the lower byte memory address bits[15:0]
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;        
+	
+	// Launch the command
+        FLASH_LaunchCMD(True);
+	
+	// Check error status
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
+	{
+		u16Err |= FLASH_ERR_ACCESS;
+	}
+	if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
+	{
+		u16Err |= FLASH_ERR_PROTECTION;		
+	}
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
+	{
+		u16Err |= FLASH_ERR_MGSTAT0;		
+	}
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
+	{
+		u16Err |= FLASH_ERR_MGSTAT1;		
+	}	
+#if 0	
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
+	}
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
+	}
+#endif	
+	return (u16Err);
+}
+
+/*****************************************************************************//*!
+  *
+  * @brief program one byte to EEPROM, don't wait complete flag.
+  *        
+  * @param[in] u32NVMTargetAddress: target address in EEPROM.  
+  * @param[in] u8Data:   programming data.
+  *	
+  * @return error status.
+  *
+  * @ Pass/ Fail criteria: none
+*****************************************************************************/
+uint16_t EEPROM_Program1Byte_NoWait(uint32_t u32NVMTargetAddress, uint8_t u8Data)
+{
+	uint16_t u16Err = FLASH_ERR_SUCCESS;
+	
+	// Clear error flags
+	FTMRH->FSTAT = 0x30;
+	
+	// Write index to specify the command code to be loaded
+	FTMRH->FCCOBIX = 0x0;
+	// Write command code and memory address bits[23:16]	
+	FTMRH->FCCOBHI = EEPROM_CMD_PROGRAM;// EEPROM FLASH command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
+	// Write index to specify the lower byte memory address bits[15:0] to be loaded
+	FTMRH->FCCOBIX = 0x1;
+	// Write the lower byte memory address bits[15:0]
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	// Write index to specify the byte0 (MSB word) to be programmed
+	FTMRH->FCCOBIX = 0x2;
+	// Write the byte 0
+	FTMRH->FCCOBLO = u8Data;
+	// Launch the command
+	FTMRH->FSTAT = 0x80;
+
+	return (u16Err);
+}
+
+/*****************************************************************************//*!
+  *
+  * @brief program up to 4 bytes to EEPROM, don't wait complete flag.
+  *        
+  * @param[in] u32NVMTargetAddress: target address in EEPROM.  
+  * @param[in] pData:   programming data pointer.
+  * @param[in] u8ByteCount number of programming data.
+  *	
+  * @return error status.
+  *
+  * @ Pass/ Fail criteria: none
+*****************************************************************************/
+uint16_t EEPROM_ProgramUpto4Bytes_NoWait(uint32_t u32NVMTargetAddress, uint8_t *pData, uint8_t u8ByteCount)
+{
+	int i;
+	uint16_t u16Err = FLASH_ERR_SUCCESS;
+	if(u8ByteCount >4 || u8ByteCount == 0)
+	{
+		u16Err = FLASH_ERR_INVALID_PARAM;
+		return (u16Err);		
+	}
+	// Clear error flags
+	FTMRH->FSTAT = 0x30;
+	
+	// Write index to specify the command code to be loaded
+	FTMRH->FCCOBIX = 0x0;
+	// Write command code and memory address bits[23:16]	
+	FTMRH->FCCOBHI = EEPROM_CMD_PROGRAM;// EEPROM FLASH command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
+	// Write index to specify the lower byte memory address bits[15:0] to be loaded
+	FTMRH->FCCOBIX = 0x1;
+	// Write the lower byte memory address bits[15:0]
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	
+	for (i = 0; i < u8ByteCount; i++)
+	{
+		// Write index to specify the byte0 (MSB word) to be programmed
+		FTMRH->FCCOBIX = 0x2+i;
+		// Write the byte 0
+		FTMRH->FCCOBLO = *pData++;
+	}
+	// Launch the command
+	FTMRH->FSTAT = 0x80;
+      
+	return (u16Err);
+}
+/*****************************************************************************//*!
+  *
+  * @brief erase EEPROM sector, each EEPROM sector is of 2 bytes long, don't wait complete flag.
+  * 		 
+  * @param[in]  u32NVMTargetAddress target EEPROM address. 
+  *
+  * @return error status.
+  *
+  * @ Pass/ Fail criteria: none.
+*****************************************************************************/
+uint16_t EEPROM_EraseSector_NoWait(uint32_t u32NVMTargetAddress)
+{
+	uint16_t u16Err = FLASH_ERR_SUCCESS;
+
+	// Clear error flags
+	FTMRH->FSTAT = 0x30;
+	
+	// Write index to specify the command code to be loaded
+	FTMRH->FCCOBIX = 0x0;
+	// Write command code and memory address bits[23:16]	
+	FTMRH->FCCOBHI = EEPROM_CMD_ERASE_SECTOR;// EEPROM FLASH command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16]
+	// Write index to specify the lower byte memory address bits[15:0] to be loaded
+	FTMRH->FCCOBIX = 0x1;
+	// Write the lower byte memory address bits[15:0]
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;        
+	
+	// Launch the command
+	FTMRH->FSTAT = 0x80;
+	
+	return (u16Err);
+}
+
+#endif
 /*****************************************************************************//*!
   *
   * @brief erase flash/Flash block without wait.
@@ -956,25 +1470,25 @@ uint16_t FLASH_EraseBlock_NoWait(uint32_t u32NVMTargetAddress, uint8_t bIsEEPROM
 	uint16_t u16Err = FLASH_ERR_SUCCESS;
 	
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FTMRE_CMD_ERASE_BLOCK;// erase FLASH block command
-	FTMRE_FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block
+	FTMRH->FCCOBHI = FTMRH_CMD_ERASE_BLOCK;// erase FLASH block command
+	FTMRH->FCCOBLO = u32NVMTargetAddress>>16;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block
 	if(bIsEEPROM)
 	{
-		FTMRE_FCCOBLO |= 0x80;	// bit 23 = 1 for EEPROM block
+		FTMRH->FCCOBLO |= 0x80;	// bit 23 = 1 for EEPROM block
 	}
 	// Write index to specify the lower byte memory address bits[15:0] to be loaded
-	FTMRE_FCCOBIX = 0x1;
+	FTMRH->FCCOBIX = 0x1;
 	// Write the lower byte memory address bits[15:0]
-	FTMRE_FCCOBLO = u32NVMTargetAddress;
-	FTMRE_FCCOBHI = u32NVMTargetAddress>>8;
+	FTMRH->FCCOBLO = u32NVMTargetAddress;
+	FTMRH->FCCOBHI = u32NVMTargetAddress>>8;
 	
 	// Launch the command
-	FTMRE_FSTAT = 0x80;
+	FTMRH->FSTAT = 0x80;
 
 	return (u16Err);
 }
@@ -998,39 +1512,48 @@ uint16_t FLASH_VerifyBackdoorKey(uint8_t *pKey)
     uint16_t i;
         
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FLASH_CMD_BACKDOOR_ACCESS;// erase verify FLASH section command
-	FTMRE_FCCOBLO = 0;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block
+	FTMRH->FCCOBHI = FLASH_CMD_BACKDOOR_ACCESS;// erase verify FLASH section command
+	FTMRH->FCCOBLO = 0;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block	
         // Write index to specify the lower byte memory address bits[15:0] to be loaded
  
         for(i = 0; i < 4; i++)
         {
-            FTMRE_FCCOBIX = 0x1+i;
-            FTMRE_FCCOBLO = *pKey++;
-            FTMRE_FCCOBHI = *pKey++;
+            FTMRH->FCCOBIX = 0x1+i;
+            FTMRH->FCCOBLO = *pKey++;
+            FTMRH->FCCOBHI = *pKey++;      
         }
 	
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}	
-
+#if defined(CPU_KEA8) 
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
+	}
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
+	}
+#endif
 	return (u16Err);
 }
 
@@ -1058,41 +1581,51 @@ uint16_t FLASH_SetUserMarginLevel(uint32_t u32NVMTargetAddress, uint16_t u16Marg
 	}
        
 	// Clear error flags
-	FTMRE_FSTAT = 0x30;
+	FTMRH->FSTAT = 0x30;
 	
 	// Write index to specify the command code to be loaded
-	FTMRE_FCCOBIX = 0x0;
+	FTMRH->FCCOBIX = 0x0;
 	// Write command code and memory address bits[23:16]	
-	FTMRE_FCCOBHI = FLASH_CMD_SET_USER_MARGIN_LEVEL;// erase verify FLASH section command
-	FTMRE_FCCOBLO = u32NVMTargetAddress >> 16;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block
+	FTMRH->FCCOBHI = FLASH_CMD_SET_USER_MARGIN_LEVEL;// erase verify FLASH section command
+	FTMRH->FCCOBLO = u32NVMTargetAddress >> 16;// memory address bits[23:16] with bit23 = 0 for Flash block, 1 for EEPROM block	
 	if(bIsEEPROM)
 	{
-		FTMRE_FCCOBLO |= 0x80;	// bit 23 = 1 for EEPROM block
+		FTMRH->FCCOBLO |= 0x80;	// bit 23 = 1 for EEPROM block
 	}
-	FTMRE_FCCOBIX = 0x1;
-	FTMRE_FCCOBHI = u32NVMTargetAddress >> 8;//
-	FTMRE_FCCOBLO = u32NVMTargetAddress;
+	FTMRH->FCCOBIX = 0x1;
+	FTMRH->FCCOBHI = u32NVMTargetAddress >> 8;// 
+	FTMRH->FCCOBLO = u32NVMTargetAddress;	
 
-        FTMRE_FCCOBIX = 0x2;
-	FTMRE_FCCOBHI = u16MarginLevel >> 8;//
-	FTMRE_FCCOBLO = u16MarginLevel;
+        FTMRH->FCCOBIX = 0x2;
+	FTMRH->FCCOBHI = u16MarginLevel >> 8;// 
+	FTMRH->FCCOBLO = u16MarginLevel;	
 
 	// Launch the command
-	FLASH_LaunchCMD(TRUE);
+	FLASH_LaunchCMD(True);
 
 	// Check error status
-	if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
 	{
 		u16Err |= FLASH_ERR_ACCESS;
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT0;		
 	}
-	if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+	if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
 	{
 		u16Err |= FLASH_ERR_MGSTAT1;		
 	}
+#if defined(CPU_KEA8) 
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_SFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_SINGLE_BIT_FAULT;
+	}
+	if(FTMRH->FERSTAT & (FTMRH_FERSTAT_DFDIF_MASK))
+	{
+		u16Err |= EEPROM_ERR_DOUBLE_BIT_FAULT;
+	}
+#endif
 
 	return (u16Err);
 }
@@ -1110,19 +1643,19 @@ uint16_t FLASH_SetUserMarginLevel(uint32_t u32NVMTargetAddress, uint16_t u16Marg
 uint16_t FLASH_CheckErrStatus(void)
 {
     uint16_t u16Err = FLASH_ERR_SUCCESS;  
-    if(FTMRE_FSTAT & FTMRE_FSTAT_ACCERR_MASK)
+    if(FTMRH->FSTAT & FTMRH_FSTAT_ACCERR_MASK)
     {
             u16Err |= FLASH_ERR_ACCESS;
     }
-    if(FTMRE_FSTAT & FTMRE_FSTAT_FPVIOL_MASK)
+    if(FTMRH->FSTAT & FTMRH_FSTAT_FPVIOL_MASK)
     {
             u16Err |= FLASH_ERR_PROTECTION;		
     }
-    if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+    if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT0_MASK)
     {
             u16Err |= FLASH_ERR_MGSTAT0;		
     }
-    if(FTMRE_FSTAT & FTMRE_FSTAT_MGSTAT_MASK)
+    if(FTMRH->FSTAT & FTMRH_FSTAT_MGSTAT1_MASK)
     {
             u16Err |= FLASH_ERR_MGSTAT1;		
     }
@@ -1150,13 +1683,13 @@ void FLASH_LaunchCMD(uint8_t bWaitComplete)
 #endif
 {
 #if     defined(FLASH_ENABLE_STALLING_FLASH_CONTROLLER)
-     MCM_PLACR |= MCM_PLACR_ESFC_MASK;          /* enable stalling flash controller when flash is busy */
+     MCM->PLACR |= MCM_PLACR_ESFC_MASK;          /* enable stalling flash controller when flash is busy */
 #endif
-    FTMRE_FSTAT = 0x80;
+    FTMRH->FSTAT = 0x80;    
     if(bWaitComplete)
     {
       // Wait till command is completed
-      while (!(FTMRE_FSTAT & FTMRE_FSTAT_CCIF_MASK));
+      while (!(FTMRH->FSTAT & FTMRH_FSTAT_CCIF_MASK));
     }
 }
 /*! @} End of nvm_api_list                                               						*/

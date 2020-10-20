@@ -41,6 +41,7 @@ extern "C" {
 ******************************************************************************/
 #include "derivative.h"
 #include "nvic.h"
+#include "assert.h"
 /******************************************************************************
 * Constants
 ******************************************************************************/
@@ -572,7 +573,7 @@ static inline void ACMP_InputPinEnable(ACMP_MemMapPtr pACMPx, uint8_t u8InputPin
 *****************************************************************************/
 static inline void ACMP_InputPinDisable(ACMP_MemMapPtr pACMPx, uint8_t u8InputPin)
 {
-    ASSERT(!(u8InputPin & (~ACMP_C2_ACIPE_MASK)));
+    assert(!(u8InputPin & (~ACMP_C2_ACIPE_MASK)));
     pACMPx->C2 &= ~ACMP_C2_ACIPE(u8InputPin);
 }
 

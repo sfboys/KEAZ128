@@ -402,11 +402,6 @@
               <FileType>1</FileType>
               <FilePath>..\usr\source\main.c</FilePath>
             </File>
-            <File>
-              <FileName>led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\usr\source\led.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -513,16 +508,6 @@
               <FilePath>..\driver\adc.c</FilePath>
             </File>
             <File>
-              <FileName>crc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\driver\crc.c</FilePath>
-            </File>
-            <File>
-              <FileName>flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\driver\flash.c</FilePath>
-            </File>
-            <File>
               <FileName>ftm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\driver\ftm.c</FilePath>
@@ -548,16 +533,6 @@
               <FilePath>..\driver\pit.c</FilePath>
             </File>
             <File>
-              <FileName>pmc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\driver\pmc.c</FilePath>
-            </File>
-            <File>
-              <FileName>pwt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\driver\pwt.c</FilePath>
-            </File>
-            <File>
               <FileName>rtc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\driver\rtc.c</FilePath>
@@ -577,6 +552,11 @@
               <FileType>1</FileType>
               <FilePath>..\driver\wdog.c</FilePath>
             </File>
+            <File>
+              <FileName>nvic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driver\nvic.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -586,11 +566,6 @@
               <FileName>arm_cm0.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\arm_cm0.c</FilePath>
-            </File>
-            <File>
-              <FileName>assert.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\common\assert.c</FilePath>
             </File>
           </Files>
         </Group>

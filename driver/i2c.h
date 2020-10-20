@@ -46,7 +46,7 @@ extern "C" {
 /******************************************************************************
 * Constants and macros
 ******************************************************************************/
-#define I2C_Type I2C_MemMapPtr
+//#define I2C_Type I2C_MemMapPtr
 //#define SIM SIM_BASE_PTR
 //#define I2C0 I2C0_BASE_PTR
 //#define I2C1 I2C1_BASE_PTR
@@ -185,7 +185,7 @@ typedef void (*I2C_CallbackType)(void);		/*!< I2C call back function */
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline void I2C_TxEnable(I2C_Type pI2Cx)
+static inline void I2C_TxEnable(I2C_Type* pI2Cx)
 {
     pI2Cx->C1 |= I2C_C1_TX_MASK;
 }
@@ -199,7 +199,7 @@ static inline void I2C_TxEnable(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-static inline void I2C_RxEnable(I2C_Type pI2Cx)
+static inline void I2C_RxEnable(I2C_Type* pI2Cx)
 {
     pI2Cx->C1 &= ~I2C_C1_TX_MASK;
 }
@@ -214,7 +214,7 @@ static inline void I2C_RxEnable(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline void I2C_SetBaudRate(I2C_Type pI2Cx,uint32_t u32Bps)
+static inline void I2C_SetBaudRate(I2C_Type* pI2Cx,uint32_t u32Bps)
 {
     pI2Cx->F = (uint8_t)u32Bps;
 }
@@ -228,7 +228,7 @@ static inline void I2C_SetBaudRate(I2C_Type pI2Cx,uint32_t u32Bps)
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-static inline void I2C_GeneralCallEnable(I2C_Type pI2Cx)
+static inline void I2C_GeneralCallEnable(I2C_Type* pI2Cx)
 {
      pI2Cx->C2 |= I2C_C2_GCAEN_MASK;
 }
@@ -242,7 +242,7 @@ static inline void I2C_GeneralCallEnable(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline void I2C_SMBusAlertEnable(I2C_Type pI2Cx)
+static inline void I2C_SMBusAlertEnable(I2C_Type* pI2Cx)
 {
      pI2Cx->SMB|= I2C_SMB_ALERTEN_MASK;
 }
@@ -256,7 +256,7 @@ static inline void I2C_SMBusAlertEnable(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline void I2C_RangeAddressEnable(I2C_Type pI2Cx)
+static inline void I2C_RangeAddressEnable(I2C_Type* pI2Cx)
 {
      pI2Cx->C2 |= I2C_C2_RMEN_MASK;
 }
@@ -270,7 +270,7 @@ static inline void I2C_RangeAddressEnable(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline void I2C_SHTF2IntEnable(I2C_Type pI2Cx)
+static inline void I2C_SHTF2IntEnable(I2C_Type* pI2Cx)
 {
      pI2Cx->SMB |= I2C_SMB_SHTF2IE_MASK;
 }
@@ -284,7 +284,7 @@ static inline void I2C_SHTF2IntEnable(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline void I2C_TimeoutCounterClockSelect(I2C_Type pI2Cx, uint8_t u8Clock)
+static inline void I2C_TimeoutCounterClockSelect(I2C_Type* pI2Cx, uint8_t u8Clock)
 {
     if( u8Clock )
     {
@@ -305,9 +305,9 @@ static inline void I2C_TimeoutCounterClockSelect(I2C_Type pI2Cx, uint8_t u8Clock
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline uint8_t I2C_GetStatus(I2C_Type pI2Cx)
+static inline uint8_t I2C_GetStatus(I2C_Type* pI2Cx)
 {
-    return pI2Cx->S1;
+    return pI2Cx->S;
 }
 /*****************************************************************************//*!
    *
@@ -319,9 +319,9 @@ static inline uint8_t I2C_GetStatus(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline void I2C_ClearStatus(I2C_Type pI2Cx, uint8_t u8ClearFlag)
+static inline void I2C_ClearStatus(I2C_Type* pI2Cx, uint8_t u8ClearFlag)
 {
-    pI2Cx->S1 |= u8ClearFlag;
+    pI2Cx->S |= u8ClearFlag;
 }
 /*****************************************************************************//*!
    *
@@ -333,7 +333,7 @@ static inline void I2C_ClearStatus(I2C_Type pI2Cx, uint8_t u8ClearFlag)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline void I2C_WriteDataReg(I2C_Type pI2Cx, uint8_t u8DataBuff)
+static inline void I2C_WriteDataReg(I2C_Type* pI2Cx, uint8_t u8DataBuff)
 {
     pI2Cx->D = u8DataBuff;
 }
@@ -347,7 +347,7 @@ static inline void I2C_WriteDataReg(I2C_Type pI2Cx, uint8_t u8DataBuff)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline uint8_t I2C_ReadDataReg(I2C_Type pI2Cx )
+static inline uint8_t I2C_ReadDataReg(I2C_Type* pI2Cx )
 {
     return pI2Cx->D;
 }
@@ -361,7 +361,7 @@ static inline uint8_t I2C_ReadDataReg(I2C_Type pI2Cx )
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline uint8_t I2C_IsTxMode(I2C_Type pI2Cx )
+static inline uint8_t I2C_IsTxMode(I2C_Type* pI2Cx )
 {
     return(pI2Cx->C1 & I2C_C1_TX_MASK);
 }
@@ -375,9 +375,9 @@ static inline uint8_t I2C_IsTxMode(I2C_Type pI2Cx )
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline uint8_t I2C_IsBusy(I2C_Type pI2Cx )
+static inline uint8_t I2C_IsBusy(I2C_Type* pI2Cx )
 {
-    return (pI2Cx->S1 & I2C_S_BUSY_MASK);
+    return (pI2Cx->S & I2C_S_BUSY_MASK);
 }
 /*****************************************************************************//*!
    *
@@ -389,9 +389,9 @@ static inline uint8_t I2C_IsBusy(I2C_Type pI2Cx )
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-static inline uint8_t I2C_IsReceivedAck(I2C_Type pI2Cx )
+static inline uint8_t I2C_IsReceivedAck(I2C_Type* pI2Cx )
 {
-    return (pI2Cx->S1 & I2C_S_RXAK_MASK);
+    return (pI2Cx->S & I2C_S_RXAK_MASK);
 }
 /*****************************************************************************//*!
    *
@@ -403,7 +403,7 @@ static inline uint8_t I2C_IsReceivedAck(I2C_Type pI2Cx )
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-static inline uint8_t I2C_IsMasterMode(I2C_Type pI2Cx )
+static inline uint8_t I2C_IsMasterMode(I2C_Type* pI2Cx )
 {
     return(pI2Cx->C1 & I2C_C1_MST_MASK);
 }
@@ -417,7 +417,7 @@ static inline uint8_t I2C_IsMasterMode(I2C_Type pI2Cx )
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline uint8_t I2C_IsSMB_SLTF(I2C_Type pI2Cx )
+static inline uint8_t I2C_IsSMB_SLTF(I2C_Type* pI2Cx )
 {
     return (pI2Cx->SMB & I2C_SMB_SLTF_MASK);
 }
@@ -431,7 +431,7 @@ static inline uint8_t I2C_IsSMB_SLTF(I2C_Type pI2Cx )
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline uint8_t I2C_IsSMB_SHTF2(I2C_Type pI2Cx )
+static inline uint8_t I2C_IsSMB_SHTF2(I2C_Type* pI2Cx )
 {
     return(pI2Cx->SMB & I2C_SMB_SHTF2_MASK);
 }
@@ -445,7 +445,7 @@ static inline uint8_t I2C_IsSMB_SHTF2(I2C_Type pI2Cx )
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-static inline void I2C_ClearSLTF(I2C_Type pI2Cx )
+static inline void I2C_ClearSLTF(I2C_Type* pI2Cx )
 {
     pI2Cx->SMB |= I2C_SMB_SLTF_MASK;
 }
@@ -459,7 +459,7 @@ static inline void I2C_ClearSLTF(I2C_Type pI2Cx )
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-static inline void I2C_ClearSHTF2(I2C_Type pI2Cx )
+static inline void I2C_ClearSHTF2(I2C_Type* pI2Cx )
 {
     pI2Cx->SMB |= I2C_SMB_SHTF2_MASK;
 }
@@ -473,7 +473,7 @@ static inline void I2C_ClearSHTF2(I2C_Type pI2Cx )
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-static inline void I2C_SendAck(I2C_Type pI2Cx )
+static inline void I2C_SendAck(I2C_Type* pI2Cx )
 {
     pI2Cx->C1 &= ~I2C_C1_TXAK_MASK;
 }
@@ -487,7 +487,7 @@ static inline void I2C_SendAck(I2C_Type pI2Cx )
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-static inline void I2C_SendNack(I2C_Type pI2Cx )
+static inline void I2C_SendNack(I2C_Type* pI2Cx )
 {
     pI2Cx->C1 |= I2C_C1_TXAK_MASK;
 }
@@ -501,51 +501,51 @@ static inline void I2C_SendNack(I2C_Type pI2Cx )
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-static inline void I2C_SecondAddressEnable(I2C_Type pI2Cx)
+static inline void I2C_SecondAddressEnable(I2C_Type* pI2Cx)
 {
      pI2Cx->SMB |= I2C_SMB_SIICAEN_MASK;
 }
 /******************************************************************************
 * Global functions
 ******************************************************************************/
-void I2C_Init(I2C_Type pI2Cx,I2C_ConfigPtr pI2CConfig);
-uint8_t I2C_Start(I2C_Type pI2Cx);
-uint8_t I2C_Stop(I2C_Type pI2Cx);
-uint8_t I2C_RepeatStart(I2C_Type pI2Cx);
-uint8_t I2C_IsTxMode(I2C_Type pI2Cx );
-uint8_t I2C_IsBusy(I2C_Type pI2Cx );
-uint8_t I2C_IsReceivedAck(I2C_Type pI2Cx );
-uint8_t I2C_IsMasterMode(I2C_Type pI2Cx );
-void I2C_ClearSHTF2(I2C_Type pI2Cx );
-void I2C_ClearSLTF(I2C_Type pI2Cx );
-uint8_t I2C_IsSMB_SHTF2(I2C_Type pI2Cx );
-uint8_t I2C_IsSMB_SLTF(I2C_Type pI2Cx );
-void I2C_TxEnable(I2C_Type pI2Cx);
-void I2C_RxEnable(I2C_Type pI2Cx);
-void I2C_IntEnable(I2C_Type pI2Cx);
-void I2C_IntDisable(I2C_Type pI2Cx);
-void I2C_SetBaudRate(I2C_Type pI2Cx,uint32_t u32Bps);
-void I2C_SetSlaveAddress(I2C_Type pI2Cx,uint16_t u16SlaveAddress);
-void I2C_GeneralCallEnable(I2C_Type pI2Cx);
-void I2C_SMBusAlertEnable(I2C_Type pI2Cx);
-void I2C_RangeAddressEnable(I2C_Type pI2Cx);
-void I2C_SHTF2IntEnable(I2C_Type pI2Cx);
-void I2C_TimeoutCounterClockSelect(I2C_Type pI2Cx, uint8_t u8Clock);
-void I2C_SetSCLLowTimeout(I2C_Type pI2Cx, uint16_t u16Timeout);
-uint8_t I2C_GetStatus(I2C_Type pI2Cx);
-void I2C_ClearStatus(I2C_Type pI2Cx, uint8_t u8ClearFlag);
-void I2C_SendAck(I2C_Type pI2Cx );
-void I2C_SendNack(I2C_Type pI2Cx );
-void I2C_SecondAddressEnable(I2C_Type pI2Cx);
-void I2C_ClearStatus(I2C_Type pI2Cx, uint8_t u8ClearFlag);
-void I2C_WriteDataReg(I2C_Type pI2Cx, uint8_t u8DataBuff);
-uint8_t I2C_ReadDataReg(I2C_Type pI2Cx );
-void I2C_Deinit(I2C_Type pI2Cx);
-uint8_t I2C_WriteOneByte(I2C_Type pI2Cx, uint8_t u8WrBuff);
-uint8_t I2C_ReadOneByte(I2C_Type pI2Cx, uint8_t *pRdBuff, uint8_t u8Ack);
-uint8_t I2C_MasterSend(I2C_Type pI2Cx, uint16_t Address );
-uint8_t I2C_MasterSendWait(I2C_Type pI2Cx,uint16_t u16SlaveAddress,uint8_t *pWrBuff,uint32_t u32Length);
-uint8_t I2C_MasterRead(I2C_Type pI2Cx, uint16_t u16Address);
+void I2C_Init(I2C_Type* pI2Cx,I2C_ConfigPtr pI2CConfig);
+uint8_t I2C_Start(I2C_Type* pI2Cx);
+uint8_t I2C_Stop(I2C_Type* pI2Cx);
+uint8_t I2C_RepeatStart(I2C_Type* pI2Cx);
+uint8_t I2C_IsTxMode(I2C_Type* pI2Cx );
+uint8_t I2C_IsBusy(I2C_Type* pI2Cx );
+uint8_t I2C_IsReceivedAck(I2C_Type* pI2Cx );
+uint8_t I2C_IsMasterMode(I2C_Type* pI2Cx );
+void I2C_ClearSHTF2(I2C_Type* pI2Cx );
+void I2C_ClearSLTF(I2C_Type* pI2Cx );
+uint8_t I2C_IsSMB_SHTF2(I2C_Type* pI2Cx );
+uint8_t I2C_IsSMB_SLTF(I2C_Type* pI2Cx );
+void I2C_TxEnable(I2C_Type* pI2Cx);
+void I2C_RxEnable(I2C_Type* pI2Cx);
+void I2C_IntEnable(I2C_Type* pI2Cx);
+void I2C_IntDisable(I2C_Type* pI2Cx);
+void I2C_SetBaudRate(I2C_Type* pI2Cx,uint32_t u32Bps);
+void I2C_SetSlaveAddress(I2C_Type* pI2Cx,uint16_t u16SlaveAddress);
+void I2C_GeneralCallEnable(I2C_Type* pI2Cx);
+void I2C_SMBusAlertEnable(I2C_Type* pI2Cx);
+void I2C_RangeAddressEnable(I2C_Type* pI2Cx);
+void I2C_SHTF2IntEnable(I2C_Type* pI2Cx);
+void I2C_TimeoutCounterClockSelect(I2C_Type* pI2Cx, uint8_t u8Clock);
+void I2C_SetSCLLowTimeout(I2C_Type* pI2Cx, uint16_t u16Timeout);
+uint8_t I2C_GetStatus(I2C_Type* pI2Cx);
+void I2C_ClearStatus(I2C_Type* pI2Cx, uint8_t u8ClearFlag);
+void I2C_SendAck(I2C_Type* pI2Cx );
+void I2C_SendNack(I2C_Type* pI2Cx );
+void I2C_SecondAddressEnable(I2C_Type* pI2Cx);
+void I2C_ClearStatus(I2C_Type* pI2Cx, uint8_t u8ClearFlag);
+void I2C_WriteDataReg(I2C_Type* pI2Cx, uint8_t u8DataBuff);
+uint8_t I2C_ReadDataReg(I2C_Type* pI2Cx );
+void I2C_Deinit(I2C_Type* pI2Cx);
+uint8_t I2C_WriteOneByte(I2C_Type* pI2Cx, uint8_t u8WrBuff);
+uint8_t I2C_ReadOneByte(I2C_Type* pI2Cx, uint8_t *pRdBuff, uint8_t u8Ack);
+uint8_t I2C_MasterSend(I2C_Type* pI2Cx, uint16_t Address );
+uint8_t I2C_MasterSendWait(I2C_Type* pI2Cx,uint16_t u16SlaveAddress,uint8_t *pWrBuff,uint32_t u32Length);
+uint8_t I2C_MasterRead(I2C_Type* pI2Cx, uint16_t u16Address);
 uint8_t I2C_MasterReadWait(I2C_Type *pI2Cx,uint16_t u16SlaveAddress,uint8_t *pRdBuff,uint32_t u32Length);
 void I2C0_SetCallBack( I2C_CallbackType pCallBack );
 void I2C1_SetCallBack( I2C_CallbackType pCallBack );

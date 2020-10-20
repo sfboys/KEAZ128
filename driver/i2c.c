@@ -54,6 +54,8 @@
 * Local variables
 ******************************************************************************/
 static I2C_CallbackType I2C_Callback[2] = {(I2C_CallbackType)(0)};
+static I2C_Type* pI2C0 = (I2C_Type*)I2C0;
+static I2C_Type* pI2C1 = (I2C_Type*)I2C1;
 /******************************************************************************
 * Local functions
 ******************************************************************************/
@@ -81,13 +83,13 @@ static I2C_CallbackType I2C_Callback[2] = {(I2C_CallbackType)(0)};
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
 
-void I2C_Init(I2C_Type pI2Cx,I2C_ConfigPtr pI2CConfig)
+void I2C_Init(I2C_Type* pI2Cx,I2C_ConfigPtr pI2CConfig)
 {
     uint8_t u8Temp;
 
 
     
-    if(pI2Cx == I2C0)
+    if(pI2Cx == pI2C0)
     {
         SIM->SCGC |= SIM_SCGC_I2C0_MASK;
     }
@@ -144,12 +146,12 @@ void I2C_Init(I2C_Type pI2Cx,I2C_ConfigPtr pI2CConfig)
     if( pI2CConfig->sSetting.bIntEn )
     {
         u8Temp |= I2C_C1_IICIE_MASK;
-        if(pI2Cx == I2C0)
+        if(pI2Cx == pI2C0)
         {
             Enable_Interrupt(I2C0_IRQn);
         }
     
-        else if(pI2Cx == I2C1)
+        else if(pI2Cx == pI2C1)
         {
         
             Enable_Interrupt(I2C1_IRQn);
@@ -190,7 +192,7 @@ void I2C_Init(I2C_Type pI2Cx,I2C_ConfigPtr pI2CConfig)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-uint8_t I2C_Start(I2C_Type pI2Cx)
+uint8_t I2C_Start(I2C_Type* pI2Cx)
 {
     uint32_t u32Timeout;
     uint8_t u8ErrorStatus;
@@ -224,7 +226,7 @@ uint8_t I2C_Start(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-uint8_t I2C_Stop(I2C_Type pI2Cx)
+uint8_t I2C_Stop(I2C_Type* pI2Cx)
 {
     uint32_t u32Timeout;
     uint8_t u8ErrorStatus;
@@ -258,7 +260,7 @@ uint8_t I2C_Stop(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-uint8_t I2C_RepeatStart(I2C_Type pI2Cx)
+uint8_t I2C_RepeatStart(I2C_Type* pI2Cx)
 {
     uint32_t u32Timeout;
     uint8_t u8ErrorStatus;
@@ -268,7 +270,7 @@ uint8_t I2C_RepeatStart(I2C_Type pI2Cx)
     
     pI2Cx->C1 |= I2C_C1_RSTA_MASK;
 
-    while( (!I2C_IsBusy(I2C0) ) && ( u32Timeout < I2C_WAIT_STATUS_TIMEOUT))
+    while( (!I2C_IsBusy(pI2Cx) ) && ( u32Timeout < I2C_WAIT_STATUS_TIMEOUT))
      {
         u32Timeout ++;
      }
@@ -291,7 +293,7 @@ uint8_t I2C_RepeatStart(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void I2C_SetSlaveAddress(I2C_Type pI2Cx,uint16_t u16SlaveAddress)
+void I2C_SetSlaveAddress(I2C_Type* pI2Cx,uint16_t u16SlaveAddress)
 {
     /* write low 8bit address */
     pI2Cx->A1 = (uint8_t)u16SlaveAddress;
@@ -311,14 +313,14 @@ void I2C_SetSlaveAddress(I2C_Type pI2Cx,uint16_t u16SlaveAddress)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void I2C_IntDisable(I2C_Type pI2Cx)
+void I2C_IntDisable(I2C_Type* pI2Cx)
 {
     pI2Cx->C1 &= ~I2C_C1_IICIE_MASK;
-    if(pI2Cx == I2C0)
+    if(pI2Cx == pI2C0)
     {
         Disable_Interrupt(I2C0_IRQn);
     }
-    else if(pI2Cx == I2C1)
+    else if(pI2Cx == pI2C1)
     {
         Disable_Interrupt(I2C1_IRQn);
     }
@@ -334,15 +336,15 @@ void I2C_IntDisable(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-void I2C_IntEnable(I2C_Type pI2Cx)
+void I2C_IntEnable(I2C_Type* pI2Cx)
 {
     pI2Cx->C1 |= I2C_C1_IICIE_MASK;
-    if(pI2Cx == I2C0)
+    if(pI2Cx == pI2C0)
     {
         Enable_Interrupt(I2C0_IRQn);
     }
    
-    else if(pI2Cx == I2C1)
+    else if(pI2Cx == pI2C1)
     {
         Enable_Interrupt(I2C1_IRQn);
     }
@@ -360,7 +362,7 @@ void I2C_IntEnable(I2C_Type pI2Cx)
    *
    * @ Pass/ Fail criteria: none.
 *****************************************************************************/
-void I2C_SetSCLLowTimeout(I2C_Type pI2Cx, uint16_t u16Timeout)
+void I2C_SetSCLLowTimeout(I2C_Type* pI2Cx, uint16_t u16Timeout)
 {
     pI2Cx->SLTL = (uint8_t)u16Timeout;
     pI2Cx->SLTH = (uint8_t)(u16Timeout>>8);
@@ -375,10 +377,10 @@ void I2C_SetSCLLowTimeout(I2C_Type pI2Cx, uint16_t u16Timeout)
    *
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
-void I2C_Deinit(I2C_Type pI2Cx)
+void I2C_Deinit(I2C_Type* pI2Cx)
 {
      pI2Cx->C1 &= ~I2C_C1_IICEN_MASK;
-    if(pI2Cx == I2C0)
+    if(pI2Cx == pI2C0)
     {
         SIM->SCGC &= ~SIM_SCGC_I2C0_MASK;
     }
@@ -401,7 +403,7 @@ void I2C_Deinit(I2C_Type pI2Cx)
    * @ Pass/ Fail criteria: none
 *****************************************************************************/
 
-uint8_t I2C_WriteOneByte(I2C_Type pI2Cx, uint8_t u8WrBuff)
+uint8_t I2C_WriteOneByte(I2C_Type* pI2Cx, uint8_t u8WrBuff)
 {
     uint32_t u32Timeout;
     uint8_t u8ErrorStatus;
@@ -455,7 +457,7 @@ uint8_t I2C_WriteOneByte(I2C_Type pI2Cx, uint8_t u8WrBuff)
    * @ Pass/ Fail criteria:  none
 *****************************************************************************/
 
-uint8_t I2C_ReadOneByte(I2C_Type pI2Cx, uint8_t *pRdBuff, uint8_t u8Ack)
+uint8_t I2C_ReadOneByte(I2C_Type* pI2Cx, uint8_t *pRdBuff, uint8_t u8Ack)
 {
     uint32_t u32Timeout;
     uint8_t u8ErrorStatus;
@@ -517,21 +519,21 @@ uint8_t I2C_ReadOneByte(I2C_Type pI2Cx, uint8_t *pRdBuff, uint8_t u8Ack)
    *
    * @ Pass/ Fail criteria:  read data
 *****************************************************************************/
-uint8_t I2C_MasterSend(I2C_Type pI2Cx, uint16_t Address )
+uint8_t I2C_MasterSend(I2C_Type* pI2Cx, uint16_t Address )
 {
 	 uint8_t u8Status;
 
-	    if( I2C_IsBusy(I2C0) )
+	    if( I2C_IsBusy(pI2Cx) )
 	    {
 	        return I2C_ERROR_BUS_BUSY;
 	    }
 
 	    /* send out start on bus */
-	    u8Status = I2C_Start(I2C0);
-	    I2C_TxEnable(I2C0);
+	    u8Status = I2C_Start(pI2Cx);
+	    I2C_TxEnable(pI2Cx);
 	    if( u8Status == I2C_ERROR_NULL )
 	    {
-	        u8Status = I2C_WriteOneByte(I2C0,Address|I2C_WRITE);
+	        u8Status = I2C_WriteOneByte(pI2Cx,Address|I2C_WRITE);
 	
 	    }
 	    return u8Status;
@@ -553,7 +555,7 @@ uint8_t I2C_MasterSend(I2C_Type pI2Cx, uint16_t Address )
    * @ Pass/ Fail criteria:  none
 *****************************************************************************/
 
-uint8_t I2C_MasterSendWait(I2C_Type pI2Cx,uint16_t u16SlaveAddress,uint8_t *pWrBuff,uint32_t u32Length)
+uint8_t I2C_MasterSendWait(I2C_Type* pI2Cx,uint16_t u16SlaveAddress,uint8_t *pWrBuff,uint32_t u32Length)
 {
 	 uint32_t i;
 	 uint8_t u8ErrorStatus;
@@ -600,30 +602,30 @@ uint8_t I2C_MasterSendWait(I2C_Type pI2Cx,uint16_t u16SlaveAddress,uint8_t *pWrB
    *
    * @ Pass/ Fail criteria:  none.
 *****************************************************************************/
-uint8_t I2C_MasterRead(I2C_Type pI2Cx, uint16_t u16Address)
+uint8_t I2C_MasterRead(I2C_Type* pI2Cx, uint16_t u16Address)
 {
     
     uint8_t u8Status;
     
-  I2C_IntDisable(I2C0);
+  I2C_IntDisable(pI2Cx);
    
    /* send out start on bus */
-   u8Status = I2C_Start(I2C0);
+   u8Status = I2C_Start(pI2Cx);
 
    if( u8Status == I2C_ERROR_NULL )
    {
-       u8Status = I2C_WriteOneByte(I2C0,u16Address|I2C_READ);
+       u8Status = I2C_WriteOneByte(pI2Cx,u16Address|I2C_READ);
        if( u8Status == I2C_ERROR_NULL )
        {
            
             /* change to Rx mode */
-            I2C_SendAck(I2C0);
-            I2C_RxEnable(I2C0);
-            I2C_ReadDataReg(I2C0);
+            I2C_SendAck(pI2Cx);
+            I2C_RxEnable(pI2Cx);
+            I2C_ReadDataReg(pI2Cx);
        }
    }
 
-  I2C_IntEnable(I2C0);
+  I2C_IntEnable(pI2Cx);
    
    return u8Status;
 

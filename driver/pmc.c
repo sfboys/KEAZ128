@@ -120,7 +120,8 @@ void PMC_SetMode(PMC_Type *pPMC,uint8_t u8PmcMode)
         	 */
         	SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
             /* Not using KEIL's uVision, so use the standard assembly command */
-        	asm("WFI");
+        	//asm("WFI");
+				  __asm("WFI");
             break;
         case PmcModeStop4:
             /* enable LVD in stop mode */
@@ -128,7 +129,8 @@ void PMC_SetMode(PMC_Type *pPMC,uint8_t u8PmcMode)
         	/* Set the SLEEPDEEP bit to enable deep sleep mode (STOP) */
         	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
         	/* Not using KEIL's uVision, so use the standard assembly command */
-        	asm("WFI");
+        	//asm("WFI");
+				  __asm("WFI");				
         	break;
         case PmcModeStop3: 
             /* disable LVD in stop mode */
@@ -136,7 +138,8 @@ void PMC_SetMode(PMC_Type *pPMC,uint8_t u8PmcMode)
         	/* Set the SLEEPDEEP bit to enable deep sleep mode (STOP) */
         	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
         	/* Not using KEIL's uVision, so use the standard assembly command */
-        	asm("WFI");
+        	//asm("WFI");
+				  __asm("WFI");		
         	break;
         default: 
             break;

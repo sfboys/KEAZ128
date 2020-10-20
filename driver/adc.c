@@ -32,6 +32,7 @@
 * provide APIs for configuring ADC module (ADC)
 ******************************************************************************/
 #include "adc.h"
+#include "nvic.h"
 /******************************************************************************
 * Local function
 ******************************************************************************/
@@ -335,7 +336,7 @@ void ADC_SetFifoLevel( ADC_MemMapPtr pADC, uint8_t u8FifoLevel )
    *
    * @ Pass/ Fail criteria: none.
    *****************************************************************************/
-void ADC_IRQHandler(void)
+void ADC0_IRQHandler(void)
 {
     if( ADC_Callback[0] )
     {

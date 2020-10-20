@@ -1,332 +1,0 @@
-Dependencies for Project 'keaz128keilproject', Target 'Target 1': (DO NOT MODIFY !)
-F (..\mcu\startup\startup_SKEAZ1284.s)(0x55B043E8)(--cpu Cortex-M0+ -g --apcs=interwork --pd "__MICROLIB SETA 1"-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include--pd "__UVISION_VERSION SETA 526" --pd "SKEAZ128xxx4 SETA 1"--list .\listings\startup_skeaz1284.lst --xref -o .\objects\startup_skeaz1284.o --depend .\objects\startup_skeaz1284.d)
-F (..\mcu\startup\system_SKEAZ1284.c)(0x55B043E8)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\system_skeaz1284.o --omf_browse .\objects\system_skeaz1284.crf --depend .\objects\system_skeaz1284.d)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-F (..\usr\source\main.c)(0x5F6A12AE)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
-I (..\bsp\HalADC.h)(0x5F6A06B9)
-I (..\common\common.h)(0x5F6A12AE)
-I (..\common\arm_cm0.h)(0x5E5C6C91)
-I (..\common\kea128_config.h)(0x5E5C6C91)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdlib.h)(0x599EDB3C)
-I (..\common\assert.h)(0x5E5C6C91)
-I (..\driver\adc.h)(0x55AE036E)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\bsp\HalIO.h)(0x5F6A12AE)
-I (..\driver\gpio.h)(0x55AF373C)
-I (..\driver\kbi.h)(0x55B0449A)
-I (..\driver\nvic.h)(0x55B04CD4)
-I (..\bsp\HalUart.h)(0x5F68C14F)
-I (..\driver\uart.h)(0x55B0512A)
-I (..\uCOS-II\Source\includes.h)(0x5B6AA1D4)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdarg.h)(0x599EDB3A)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdio.h)(0x599EDB3C)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\math.h)(0x599EDB3E)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\usr\source\led.c)(0x5B65A2F0)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\led.o --omf_browse .\objects\led.crf --depend .\objects\led.d)
-I (..\usr\inc\led.h)(0x5B6590AC)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-F (..\bsp\HalADC.c)(0x5F6A06AD)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\haladc.o --omf_browse .\objects\haladc.crf --depend .\objects\haladc.d)
-I (..\bsp\HalADC.h)(0x5F6A06B9)
-I (..\common\common.h)(0x5F6A12AE)
-I (..\common\arm_cm0.h)(0x5E5C6C91)
-I (..\common\kea128_config.h)(0x5E5C6C91)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdlib.h)(0x599EDB3C)
-I (..\common\assert.h)(0x5E5C6C91)
-I (..\driver\adc.h)(0x55AE036E)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-F (..\bsp\HalIO.c)(0x5F6A0F40)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\halio.o --omf_browse .\objects\halio.crf --depend .\objects\halio.d)
-I (..\uCOS-II\Source\includes.h)(0x5B6AA1D4)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdarg.h)(0x599EDB3A)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdio.h)(0x599EDB3C)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdlib.h)(0x599EDB3C)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\math.h)(0x599EDB3E)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-I (..\bsp\HalIO.h)(0x5F6A12AE)
-I (..\common\common.h)(0x5F6A12AE)
-I (..\common\arm_cm0.h)(0x5E5C6C91)
-I (..\common\kea128_config.h)(0x5E5C6C91)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (..\common\assert.h)(0x5E5C6C91)
-I (..\driver\gpio.h)(0x55AF373C)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\driver\kbi.h)(0x55B0449A)
-I (..\driver\nvic.h)(0x55B04CD4)
-F (..\bsp\HalUart.c)(0x5F68C133)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\haluart.o --omf_browse .\objects\haluart.crf --depend .\objects\haluart.d)
-I (..\bsp\HalUart.h)(0x5F68C14F)
-I (..\common\common.h)(0x5F6A12AE)
-I (..\common\arm_cm0.h)(0x5E5C6C91)
-I (..\common\kea128_config.h)(0x5E5C6C91)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdlib.h)(0x599EDB3C)
-I (..\common\assert.h)(0x5E5C6C91)
-I (..\driver\uart.h)(0x55B0512A)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\driver\nvic.h)(0x55B04CD4)
-F (..\uCOS-II\Ports\os_cpu_c.c)(0x5090D9F6)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_cpu_c.o --omf_browse .\objects\os_cpu_c.crf --depend .\objects\os_cpu_c.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\uCOS-II\Ports\os_dbg.c)(0x5B6A9406)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_dbg.o --omf_browse .\objects\os_dbg.crf --depend .\objects\os_dbg.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\uCOS-II\Ports\os_cpu_a.asm)(0x5B6AA466)(--cpu Cortex-M0+ -g --apcs=interwork --pd "__MICROLIB SETA 1"-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include--pd "__UVISION_VERSION SETA 526" --pd "SKEAZ128xxx4 SETA 1"--list .\listings\os_cpu_a.lst --xref -o .\objects\os_cpu_a.o --depend .\objects\os_cpu_a.d)
-F (..\uCOS-II\Source\os_core.c)(0x5091C978)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_core.o --omf_browse .\objects\os_core.crf --depend .\objects\os_core.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\uCOS-II\Source\os_flag.c)(0x5091C96A)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_flag.o --omf_browse .\objects\os_flag.crf --depend .\objects\os_flag.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\uCOS-II\Source\os_mbox.c)(0x5091C978)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_mbox.o --omf_browse .\objects\os_mbox.crf --depend .\objects\os_mbox.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\uCOS-II\Source\os_mem.c)(0x5091C978)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_mem.o --omf_browse .\objects\os_mem.crf --depend .\objects\os_mem.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\uCOS-II\Source\os_mutex.c)(0x5091C978)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_mutex.o --omf_browse .\objects\os_mutex.crf --depend .\objects\os_mutex.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\uCOS-II\Source\os_q.c)(0x5091C978)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_q.o --omf_browse .\objects\os_q.crf --depend .\objects\os_q.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\uCOS-II\Source\os_sem.c)(0x5091C978)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_sem.o --omf_browse .\objects\os_sem.crf --depend .\objects\os_sem.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\uCOS-II\Source\os_task.c)(0x5091C978)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_task.o --omf_browse .\objects\os_task.crf --depend .\objects\os_task.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\uCOS-II\Source\os_time.c)(0x5091C978)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_time.o --omf_browse .\objects\os_time.crf --depend .\objects\os_time.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\uCOS-II\Source\os_tmr.c)(0x5091C978)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\os_tmr.o --omf_browse .\objects\os_tmr.crf --depend .\objects\os_tmr.d)
-I (..\uCOS-II\Source\ucos_ii.h)(0x5B6AA1D3)
-I (..\uCOS-II\Source\os_cfg.h)(0x5F6A124E)
-I (..\uCOS-II\Ports\os_cpu.h)(0x5090AF78)
-F (..\driver\acmp.c)(0x55ADFF44)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\acmp.o --omf_browse .\objects\acmp.crf --depend .\objects\acmp.d)
-I (..\driver\acmp.h)(0x55ADFF88)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (..\driver\nvic.h)(0x55B04CD4)
-F (..\driver\adc.c)(0x55AE02EA)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\adc.o --omf_browse .\objects\adc.crf --depend .\objects\adc.d)
-I (..\driver\adc.h)(0x55AE036E)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-F (..\driver\crc.c)(0x55D59C78)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\crc.o --omf_browse .\objects\crc.crf --depend .\objects\crc.d)
-I (..\driver\crc.h)(0x55D59CCA)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-F (..\driver\flash.c)(0x55D58380)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\flash.o --omf_browse .\objects\flash.crf --depend .\objects\flash.d)
-I (..\driver\flash.h)(0x55D582EC)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-F (..\driver\ftm.c)(0x55AF234E)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\ftm.o --omf_browse .\objects\ftm.crf --depend .\objects\ftm.d)
-I (..\driver\ftm.h)(0x55AF2378)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (..\driver\nvic.h)(0x55B04CD4)
-F (..\driver\i2c.c)(0x55AF5FB0)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\i2c.o --omf_browse .\objects\i2c.crf --depend .\objects\i2c.d)
-I (..\driver\i2c.h)(0x55AF5FCC)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (..\driver\nvic.h)(0x55B04CD4)
-F (..\driver\ics.c)(0x55B03D7A)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\ics.o --omf_browse .\objects\ics.crf --depend .\objects\ics.d)
-I (..\driver\ics.h)(0x55B03D94)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-F (..\driver\kbi.c)(0x55B04402)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\kbi.o --omf_browse .\objects\kbi.crf --depend .\objects\kbi.d)
-I (..\driver\kbi.h)(0x55B0449A)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (..\driver\nvic.h)(0x55B04CD4)
-F (..\driver\mscan.c)(0x5F6729C5)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\mscan.o --omf_browse .\objects\mscan.crf --depend .\objects\mscan.d)
-I (..\common\common.h)(0x5F6A12AE)
-I (..\common\arm_cm0.h)(0x5E5C6C91)
-I (..\common\kea128_config.h)(0x5E5C6C91)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdlib.h)(0x599EDB3C)
-I (..\common\assert.h)(0x5E5C6C91)
-I (..\driver\mscan.h)(0x5E5C6C90)
-F (..\driver\pit.c)(0x55B045A8)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\pit.o --omf_browse .\objects\pit.crf --depend .\objects\pit.d)
-I (..\driver\pit.h)(0x55B045B4)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (..\driver\nvic.h)(0x55B04CD4)
-F (..\driver\pmc.c)(0x55D57AAC)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\pmc.o --omf_browse .\objects\pmc.crf --depend .\objects\pmc.d)
-I (..\driver\pmc.h)(0x55D5A05E)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-F (..\driver\pwt.c)(0x55B047F2)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\pwt.o --omf_browse .\objects\pwt.crf --depend .\objects\pwt.d)
-I (..\driver\pwt.h)(0x55B0487A)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (..\driver\nvic.h)(0x55B04CD4)
-F (..\driver\rtc.c)(0x55B0499E)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\rtc.o --omf_browse .\objects\rtc.crf --depend .\objects\rtc.d)
-I (..\driver\rtc.h)(0x55B049AE)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (..\driver\nvic.h)(0x55B04CD4)
-F (..\driver\spi.c)(0x55B04CBC)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\spi.o --omf_browse .\objects\spi.crf --depend .\objects\spi.d)
-I (..\driver\spi.h)(0x55B04CD4)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (..\driver\nvic.h)(0x55B04CD4)
-F (..\driver\uart.c)(0x55B05120)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\uart.o --omf_browse .\objects\uart.crf --depend .\objects\uart.d)
-I (..\driver\uart.h)(0x55B0512A)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (..\driver\nvic.h)(0x55B04CD4)
-I (..\driver\ics.h)(0x55B03D94)
-F (..\driver\wdog.c)(0x55B05680)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\wdog.o --omf_browse .\objects\wdog.crf --depend .\objects\wdog.d)
-I (..\driver\wdog.h)(0x55B056FA)
-I (..\mcu\inc\derivative.h)(0x55B043E8)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-F (..\common\arm_cm0.c)(0x5F672758)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\arm_cm0.o --omf_browse .\objects\arm_cm0.crf --depend .\objects\arm_cm0.d)
-I (..\common\common.h)(0x5F6A12AE)
-I (..\common\arm_cm0.h)(0x5E5C6C91)
-I (..\common\kea128_config.h)(0x5E5C6C91)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdlib.h)(0x599EDB3C)
-I (..\common\assert.h)(0x5E5C6C91)
-F (..\common\assert.c)(0x5F6A12E5)(--c99 --gnu -c --cpu Cortex-M0+ -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ..\mcu\inc -I ..\usr\inc -I ..\uCOS-II\Ports -I ..\uCOS-II\Source -I ..\bsp -I ..\common -I ..\driver-I.\RTE\_Target_1-ID:\Programfile\KEIL\ARM\PACK\Keil\Kinetis_KEAxx_DFP\1.3.0\Device\Include-ID:\Programfile\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="526" -DSKEAZ128xxx4 -DTRK_KEA128 -DCPU_KEA128 -DKEIL -DDEBUG_PRINT-o .\objects\assert.o --omf_browse .\objects\assert.crf --depend .\objects\assert.d)
-I (..\common\common.h)(0x5F6A12AE)
-I (..\common\arm_cm0.h)(0x5E5C6C91)
-I (..\common\kea128_config.h)(0x5E5C6C91)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdint.h)(0x599EDB3E)
-I (..\mcu\inc\SKEAZ1284.h)(0x55B043E8)
-I (..\mcu\inc\core_cm0plus.h)(0x55B043E8)
-I (..\mcu\inc\core_cmInstr.h)(0x55B043E8)
-I (..\mcu\inc\core_cmFunc.h)(0x55B043E8)
-I (..\mcu\inc\system_SKEAZ1284.h)(0x5F68BEE3)
-I (D:\Programfile\KEIL\ARM\ARMCC\include\stdlib.h)(0x599EDB3C)
-I (..\common\assert.h)(0x5E5C6C91)
